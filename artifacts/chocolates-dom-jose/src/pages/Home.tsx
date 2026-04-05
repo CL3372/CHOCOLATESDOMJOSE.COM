@@ -1,3 +1,5 @@
+import logoSrc from "@assets/0C72531B-1759-4199-886F-93339619B831_1775420886008.JPG";
+
 const products = [
   {
     name: "Trufas Artesanais",
@@ -46,13 +48,15 @@ export default function Home() {
 
           <div className="mx-auto max-w-4xl text-center">
 
-            {/* Logo placement box */}
-            <div className="mb-10 rounded-[2rem] border border-white/10 bg-white/5 px-8 py-12 shadow-2xl backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.5em] text-white/60">Logo placement</p>
-              <div className="mt-6 flex justify-center">
-                <div className="flex h-[120px] w-[240px] items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                  <span className="font-serif text-3xl tracking-[0.3em] text-yellow-300/80">CDJ</span>
-                </div>
+            {/* Logo */}
+            <div className="mb-10 flex justify-center">
+              <div className="rounded-2xl bg-white px-10 py-8 shadow-2xl">
+                <img
+                  src={logoSrc}
+                  alt="Dom José Logo"
+                  className="max-h-[180px] w-auto object-contain"
+                  data-testid="img-logo"
+                />
               </div>
             </div>
 
