@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Chocolates Dom José"
+version = "1.0.0"
+id = "artifacts/chocolates-dom-jose"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25100
+
+[services.development]
+run = "pnpm --filter @workspace/chocolates-dom-jose run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/chocolates-dom-jose", "run", "build" ]
+publicDir = "artifacts/chocolates-dom-jose/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25100"
+BASE_PATH = "/"
