@@ -9,6 +9,9 @@ import peraImg4 from "@assets/B1B5018B-896A-4DE6-B3D8-83192AD6FA8D_1775497812771
 import laranjaImg from "@assets/C5049C7D-4C50-4DC6-9FF1-35C328026F8A_1_105_c_1775497857994.jpeg";
 import choc77Img from "@assets/C8C3450E-D74C-4028-8A60-556EA3DA337B_1_105_c_1775497898196.jpeg";
 import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1775497921548.jpeg";
+import piriImg1 from "@assets/1A7B88D2-D1EA-4199-A7D2-B37DEF6AB8B2_1_105_c_1775498174881.jpeg";
+import piriImg2 from "@assets/470F55A1-A0DE-438A-8CE6-9420CC02210B_1_105_c_1775498178960.jpeg";
+import piriImg3 from "@assets/5D196451-7C91-40D5-A833-00FFBF39133A_1_105_c_1775498185074.jpeg";
 
 type Lang = "PT" | "EN" | "DE" | "NL";
 
@@ -248,7 +251,7 @@ const products = [
       DE: "Die Schärfe des Königs — ein Produkt mit starker Persönlichkeit und erstklassiger Präsentation.",
       NL: "De pittigheid van de koning — een product met een sterke persoonlijkheid en premium presentatie.",
     },
-    images: ["https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80"],
+    images: [piriImg1, piriImg2, piriImg3],
   },
 ];
 
