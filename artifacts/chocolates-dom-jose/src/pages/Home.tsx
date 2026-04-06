@@ -13,6 +13,10 @@ import piriImg1 from "@assets/1A7B88D2-D1EA-4199-A7D2-B37DEF6AB8B2_1_105_c_17754
 import piriImg2 from "@assets/470F55A1-A0DE-438A-8CE6-9420CC02210B_1_105_c_1775498178960.jpeg";
 import piriImg3 from "@assets/5D196451-7C91-40D5-A833-00FFBF39133A_1_105_c_1775498185074.jpeg";
 import piriImg4 from "@assets/piri_extra.jpg";
+import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775498751104.jpeg";
+import cabazImg2 from "@assets/6B7C46BB-4F99-4C06-B042-49477038A177_1_105_c_1775498765125.jpeg";
+import cabazImg3 from "@assets/2F27B28B-3481-45FF-9C0A-4F9CA152FA00_1_105_c_1775498790966.jpeg";
+import cabazImg4 from "@assets/B32139AA-0033-43EA-9DD9-C46E629306AC_1_105_c_1775498796966.jpeg";
 
 type Lang = "PT" | "EN" | "DE" | "NL";
 
@@ -262,8 +266,7 @@ const products = [
       DE: "Exklusive Zusammenstellungen unserer handwerklichen Produkte — ideal für Geschenke, Firmen und besondere Anlässe.",
       NL: "Exclusieve samenstellingen met onze ambachtelijke producten — ideaal voor cadeaus, bedrijven en bijzondere gelegenheden.",
     },
-    images: ["https://images.unsplash.com/photo-1607344645866-009c320b63e0?auto=format&fit=crop&w=900&q=80"],
-    placeholder: true,
+    images: [cabazImg1, cabazImg2, cabazImg3, cabazImg4],
   },
 ];
 
