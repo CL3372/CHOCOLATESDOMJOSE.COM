@@ -1,5 +1,5 @@
 import { useState } from "react";
-import logoSrc from "@assets/0C72531B-1759-4199-886F-93339619B831_1775420886008.JPG";
+import logoSrc from "@assets/logo_bw.png";
 
 type Lang = "PT" | "EN" | "DE" | "NL";
 
@@ -259,14 +259,13 @@ export default function Home() {
 
             {/* Logo */}
             <div className="mb-10 flex justify-center">
-              <div className="rounded-2xl bg-white px-10 py-8 shadow-2xl">
-                <img
-                  src={logoSrc}
-                  alt="Dom José Logo"
-                  className="max-h-[180px] w-auto object-contain"
-                  data-testid="img-logo"
-                />
-              </div>
+              <img
+                src={logoSrc}
+                alt="Dom José Logo"
+                className="max-h-[200px] w-auto object-contain"
+                style={{ filter: "invert(1)" }}
+                data-testid="img-logo"
+              />
             </div>
 
             <p className="mb-4 inline-block rounded-full border border-white/20 bg-white/5 px-4 py-1 text-sm uppercase tracking-[0.2em] text-white">
