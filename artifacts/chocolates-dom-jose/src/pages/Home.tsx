@@ -387,7 +387,8 @@ export default function Home() {
                 {t.btnTalk}
               </a>
               <a
-                href="#"
+                href="/catalogo-dom-jose.pdf"
+                download="Catalogo-Dom-Jose.pdf"
                 data-testid="btn-descarregar-catalogo"
                 className="rounded-2xl border border-white/20 px-6 py-3 font-medium text-white transition hover:bg-white/10"
               >
