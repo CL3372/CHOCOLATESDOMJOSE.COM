@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import { useCart, type Lang } from "@/context/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import logoSrc from "@assets/logo_bw.png";
@@ -294,6 +294,46 @@ const products = [
   },
 ];
 
+function FadeIn({ children, className = "", delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function PaymentBadges() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2">
+      {[
+        { label: "Visa", cls: "border-blue-400/20 bg-blue-400/5 text-blue-200/80" },
+        { label: "Mastercard", cls: "border-orange-400/20 bg-orange-400/5 text-orange-200/80" },
+        { label: "MB WAY", cls: "border-red-400/20 bg-red-400/5 text-red-300/80" },
+        { label: "PayPal", cls: "border-blue-500/20 bg-blue-500/5 text-blue-300/80" },
+        { label: "Revolut Pay", cls: "border-violet-400/20 bg-violet-400/5 text-violet-300/80" },
+      ].map(({ label, cls }) => (
+        <span key={label} className={`rounded-full border px-3 py-1 text-xs font-medium ${cls}`}>{label}</span>
+      ))}
+    </div>
+  );
+}
+
 function ProductCard({ product, lang, addToCartLabel, priceFromLabel }: {
   product: typeof products[number];
   lang: Lang;
@@ -319,12 +359,12 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel }: {
     : `€${(product.price / 100).toFixed(2)}`;
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-xl">
+    <div className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-xl transition-shadow duration-300 hover:shadow-yellow-900/20 hover:shadow-2xl">
       <div className="relative h-72 w-full flex-shrink-0 overflow-hidden">
         <img
           src={imgs[imgIdx]}
           alt={product.name[lang]}
-          className="h-full w-full object-cover transition-opacity duration-300"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {hasMultiple && (
           <>
@@ -375,13 +415,35 @@ export default function Home() {
   const t = translations[lang];
   const { openCart, count } = useCart();
 
+  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const orderStatus = params.get("order");
+  const [banner, setBanner] = useState<"success" | "cancelled" | null>(
+    orderStatus === "success" ? "success" : orderStatus === "cancelled" ? "cancelled" : null
+  );
+
   return (
     <div className="min-h-screen bg-[#0f0a07] text-white">
       <CartDrawer lang={lang} />
 
+      {/* Order status banner */}
+      {banner === "success" && (
+        <div className="animate-fade-in-down fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-4 bg-green-800/95 px-6 py-3 text-sm text-white shadow-lg backdrop-blur">
+          <p className="font-medium">✓ {lang === "PT" ? "Pagamento confirmado! Obrigado pela sua compra." : lang === "DE" ? "Zahlung bestätigt! Danke für Ihren Kauf." : lang === "NL" ? "Betaling bevestigd! Bedankt voor uw aankoop." : "Payment confirmed! Thank you for your order."}</p>
+          <button onClick={() => setBanner(null)} className="text-white/70 hover:text-white transition">✕</button>
+        </div>
+      )}
+      {banner === "cancelled" && (
+        <div className="animate-fade-in-down fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-4 bg-yellow-800/95 px-6 py-3 text-sm text-white shadow-lg backdrop-blur">
+          <p>{lang === "PT" ? "Pagamento cancelado. O seu carrinho foi mantido." : lang === "DE" ? "Zahlung abgebrochen. Ihr Warenkorb wurde gespeichert." : lang === "NL" ? "Betaling geannuleerd. Uw winkelwagen is bewaard." : "Payment cancelled. Your cart has been kept."}</p>
+          <button onClick={() => setBanner(null)} className="text-white/70 hover:text-white transition">✕</button>
+        </div>
+      )}
+
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/10 bg-black">
         <div className="absolute inset-0 bg-gradient-to-b from-[#111111] via-black to-[#111111]" />
+        {/* Warm amber glow */}
+        <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse 70% 50% at 50% 30%, rgba(180,100,20,0.18) 0%, transparent 70%)" }} />
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
 
           {/* Language switcher + cart */}
@@ -481,22 +543,26 @@ export default function Home() {
 
       {/* Products */}
       <section id="produtos" className="mx-auto max-w-7xl px-6 py-20 lg:px-10">
-        <div className="mb-12 max-w-2xl">
-          <p className="text-sm uppercase tracking-[0.25em] text-yellow-300">{t.productsLabel}</p>
-          <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">{t.productsHeading}</h2>
-          <p className="mt-4 text-white/70">{t.productsDesc}</p>
-        </div>
+        <FadeIn>
+          <div className="mb-12 max-w-2xl">
+            <p className="text-sm uppercase tracking-[0.25em] text-yellow-300">{t.productsLabel}</p>
+            <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">{t.productsHeading}</h2>
+            <p className="mt-4 text-white/70">{t.productsDesc}</p>
+          </div>
+        </FadeIn>
 
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {products.map((product, idx) => (
-            <div key={idx} data-testid={`card-product-${idx}`} className="h-full">
-              <ProductCard
-                product={product}
-                lang={lang}
-                addToCartLabel={t.addToCart}
-                priceFromLabel={t.priceFrom}
-              />
-            </div>
+            <FadeIn key={idx} delay={idx * 80}>
+              <div data-testid={`card-product-${idx}`} className="h-full">
+                <ProductCard
+                  product={product}
+                  lang={lang}
+                  addToCartLabel={t.addToCart}
+                  priceFromLabel={t.priceFrom}
+                />
+              </div>
+            </FadeIn>
           ))}
         </div>
       </section>
@@ -504,22 +570,26 @@ export default function Home() {
       {/* Brand story + Ideal para */}
       <section className="bg-[#17110d]">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-20 lg:grid-cols-2 lg:px-10">
-          <div>
-            <p className="text-sm uppercase tracking-[0.25em] text-yellow-300">{t.historyLabel}</p>
-            <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">{t.historyHeading}</h2>
-            <p className="mt-5 text-white/75">{t.historyP1}</p>
-            <p className="mt-4 text-white/75">{t.historyP2}</p>
-          </div>
-          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-xl">
-            <h3 className="text-2xl font-semibold">{t.idealTitle}</h3>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {t.idealItems.map((item) => (
-                <div key={item} className="rounded-2xl border border-white/10 bg-black/20 p-4 text-white/80">
-                  {item}
-                </div>
-              ))}
+          <FadeIn>
+            <div>
+              <p className="text-sm uppercase tracking-[0.25em] text-yellow-300">{t.historyLabel}</p>
+              <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">{t.historyHeading}</h2>
+              <p className="mt-5 text-white/75">{t.historyP1}</p>
+              <p className="mt-4 text-white/75">{t.historyP2}</p>
             </div>
-          </div>
+          </FadeIn>
+          <FadeIn delay={150}>
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-xl">
+              <h3 className="text-2xl font-semibold">{t.idealTitle}</h3>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {t.idealItems.map((item) => (
+                  <div key={item} className="rounded-2xl border border-white/10 bg-black/20 p-4 text-white/80">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
@@ -633,7 +703,10 @@ export default function Home() {
         />
       </div>
 
-      <footer className="border-t border-white/10 py-6 text-center text-sm text-white/40">
+      <footer className="border-t border-white/10 py-8 text-center text-sm text-white/40">
+        <div className="mb-5">
+          <PaymentBadges />
+        </div>
         <div className="mb-3 flex items-center justify-center gap-5">
           <a
             href="https://www.chocolatesdomjose.com"
@@ -668,6 +741,22 @@ export default function Home() {
         </div>
         <p>&copy; {new Date().getFullYear()} Chocolates Dom José. {t.footer}</p>
       </footer>
+
+      {/* Sticky floating cart button */}
+      <button
+        onClick={openCart}
+        aria-label="Open cart"
+        className={`fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-yellow-400 text-black shadow-2xl transition-all duration-300 hover:bg-yellow-300 hover:scale-110 active:scale-95 ${count > 0 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+        </svg>
+        {count > 0 && (
+          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black text-[10px] font-bold text-yellow-400">
+            {count > 9 ? "9+" : count}
+          </span>
+        )}
+      </button>
     </div>
   );
 }
