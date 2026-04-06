@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useCart, type Lang } from "@/context/CartContext";
+import CartDrawer from "@/components/CartDrawer";
 import logoSrc from "@assets/logo_bw.png";
 import trufaImg1 from "@assets/4601CB5C-1354-4ED9-A3C5-D566E3957B7B_1775497051986.JPG";
 import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775497155075.jpeg";
@@ -18,8 +20,6 @@ import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775
 import cabazImg2 from "@assets/6B7C46BB-4F99-4C06-B042-49477038A177_1_105_c_1775498765125.jpeg";
 import cabazImg3 from "@assets/2F27B28B-3481-45FF-9C0A-4F9CA152FA00_1_105_c_1775498790966.jpeg";
 import cabazImg4 from "@assets/B32139AA-0033-43EA-9DD9-C46E629306AC_1_105_c_1775498796966.jpeg";
-
-type Lang = "PT" | "EN" | "DE" | "NL";
 
 const translations: Record<Lang, {
   badge: string;
@@ -57,6 +57,8 @@ const translations: Record<Lang, {
   placeholderMessage: string;
   btnSend: string;
   footer: string;
+  addToCart: string;
+  priceFrom: string;
 }> = {
   PT: {
     badge: "Chocolates Dom José",
@@ -94,6 +96,8 @@ const translations: Record<Lang, {
     placeholderMessage: "A sua mensagem",
     btnSend: "Enviar pedido",
     footer: "Todos os direitos reservados.",
+    addToCart: "Adicionar ao carrinho",
+    priceFrom: "A partir de",
   },
   EN: {
     badge: "Chocolates Dom José",
@@ -131,6 +135,8 @@ const translations: Record<Lang, {
     placeholderMessage: "Your message",
     btnSend: "Send request",
     footer: "All rights reserved.",
+    addToCart: "Add to cart",
+    priceFrom: "From",
   },
   DE: {
     badge: "Chocolates Dom José",
@@ -168,6 +174,8 @@ const translations: Record<Lang, {
     placeholderMessage: "Ihre Nachricht",
     btnSend: "Anfrage senden",
     footer: "Alle Rechte vorbehalten.",
+    addToCart: "In den Warenkorb",
+    priceFrom: "Ab",
   },
   NL: {
     badge: "Chocolates Dom José",
@@ -205,11 +213,15 @@ const translations: Record<Lang, {
     placeholderMessage: "Uw bericht",
     btnSend: "Verzoek verzenden",
     footer: "Alle rechten voorbehouden.",
+    addToCart: "Toevoegen aan winkelwagen",
+    priceFrom: "Vanaf",
   },
 };
 
 const products = [
   {
+    id: "trufas_artesanais",
+    price: 1500,
     name: { PT: "Trufas Artesanais", EN: "Artisan Truffles", DE: "Handwerkliche Trüffeln", NL: "Ambachtelijke Truffels" },
     description: {
       PT: "Sabores elegantes e intensos, feitos artesanalmente para oferecer ou saborear.",
@@ -220,6 +232,8 @@ const products = [
     images: [trufaImg1, trufaImg2, trufaFestImg],
   },
   {
+    id: "peras_bebedas",
+    price: 700,
     name: { PT: "Pêras Bebedas", EN: "Drunken Pears", DE: "Betrunkene Birnen", NL: "Dronken Peren" },
     description: {
       PT: "Pêras em frasco, sofisticadas e diferentes, ideais para cabazes e presentes gourmet.",
@@ -230,6 +244,8 @@ const products = [
     images: [peraImg1, peraImg2, peraImg3, peraImg4],
   },
   {
+    id: "trufas_laranja",
+    price: 1500,
     name: { PT: "Trufas de Laranja", EN: "Orange Truffles", DE: "Orangentrüffeln", NL: "Sinaasappeltruffels" },
     description: {
       PT: "Intensidade cítrica num interior cremoso — trufas artesanais com laranja fresca e chocolate premium.",
@@ -240,6 +256,8 @@ const products = [
     images: [laranjaImg],
   },
   {
+    id: "trufas_chocolate_77",
+    price: 1500,
     name: { PT: "Trufas de Chocolate 77%", EN: "77% Chocolate Truffles", DE: "Schokoladentrüffeln 77%", NL: "Chocoladetruffels 77%" },
     description: {
       PT: "Para os amantes do chocolate puro — trufas intensas com cacau 77%, elegantes e sofisticadas.",
@@ -250,6 +268,8 @@ const products = [
     images: [choc77Img],
   },
   {
+    id: "dom_piri_piri",
+    price: 700,
     name: { PT: "Dom Piri Piri", EN: "Dom Piri Piri", DE: "Dom Piri Piri", NL: "Dom Piri Piri" },
     description: {
       PT: "O picante do rei — um produto com personalidade forte e apresentação premium.",
@@ -260,6 +280,9 @@ const products = [
     images: [piriImg1, piriImg2, piriImg3, piriImg4],
   },
   {
+    id: "cabazes",
+    price: 3000,
+    priceIsFrom: true,
     name: { PT: "Cabazes", EN: "Gift Hampers", DE: "Geschenkkörbe", NL: "Cadeaumanden" },
     description: {
       PT: "Composições exclusivas com os nossos produtos artesanais — ideais para oferta, empresas e ocasiões especiais.",
@@ -271,14 +294,29 @@ const products = [
   },
 ];
 
-function ProductCard({ product, lang, learnMore }: {
+function ProductCard({ product, lang, addToCartLabel, priceFromLabel }: {
   product: typeof products[number];
   lang: Lang;
-  learnMore: string;
+  addToCartLabel: string;
+  priceFromLabel: string;
 }) {
+  const { addItem } = useCart();
   const [imgIdx, setImgIdx] = useState(0);
   const imgs = product.images;
   const hasMultiple = imgs.length > 1;
+
+  const handleAdd = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: imgs[0],
+    });
+  };
+
+  const priceDisplay = product.priceIsFrom
+    ? `${priceFromLabel} €${(product.price / 100).toFixed(0)}`
+    : `€${(product.price / 100).toFixed(2)}`;
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-xl">
@@ -319,9 +357,13 @@ function ProductCard({ product, lang, learnMore }: {
       </div>
       <div className="flex flex-1 flex-col p-6">
         <h3 className="text-2xl font-semibold">{product.name[lang]}</h3>
+        <p className="mt-1 text-lg font-medium text-yellow-300">{priceDisplay}</p>
         <p className="mt-3 flex-1 text-white/70">{product.description[lang]}</p>
-        <button className="mt-6 rounded-xl border border-yellow-300/40 px-4 py-2 text-sm text-yellow-200 transition hover:bg-yellow-300/10">
-          {learnMore}
+        <button
+          onClick={handleAdd}
+          className="mt-6 rounded-xl bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-yellow-300 active:scale-95"
+        >
+          {addToCartLabel}
         </button>
       </div>
     </div>
@@ -331,17 +373,19 @@ function ProductCard({ product, lang, learnMore }: {
 export default function Home() {
   const [lang, setLang] = useState<Lang>("PT");
   const t = translations[lang];
+  const { openCart, count } = useCart();
 
   return (
     <div className="min-h-screen bg-[#0f0a07] text-white">
+      <CartDrawer lang={lang} />
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/10 bg-black">
         <div className="absolute inset-0 bg-gradient-to-b from-[#111111] via-black to-[#111111]" />
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
 
-          {/* Language switcher */}
-          <div className="mb-8 flex justify-end">
+          {/* Language switcher + cart */}
+          <div className="mb-8 flex items-center justify-end gap-4">
             <div className="flex gap-2 text-sm text-white/70">
               {(["PT", "EN", "DE", "NL"] as Lang[]).map((l) => (
                 <button
@@ -358,6 +402,21 @@ export default function Home() {
                 </button>
               ))}
             </div>
+            <button
+              onClick={openCart}
+              data-testid="btn-cart"
+              className="relative rounded-full border border-white/20 bg-white/5 p-2.5 text-white transition hover:bg-white/10"
+              aria-label="Open cart"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+              </svg>
+              {count > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-yellow-400 text-[10px] font-bold text-black">
+                  {count > 9 ? "9+" : count}
+                </span>
+              )}
+            </button>
           </div>
 
           <div className="mx-auto max-w-4xl text-center">
@@ -431,7 +490,12 @@ export default function Home() {
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {products.map((product, idx) => (
             <div key={idx} data-testid={`card-product-${idx}`} className="h-full">
-              <ProductCard product={product} lang={lang} learnMore={t.learnMore} />
+              <ProductCard
+                product={product}
+                lang={lang}
+                addToCartLabel={t.addToCart}
+                priceFromLabel={t.priceFrom}
+              />
             </div>
           ))}
         </div>
