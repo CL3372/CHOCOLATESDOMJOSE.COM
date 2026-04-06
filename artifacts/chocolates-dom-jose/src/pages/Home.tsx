@@ -12,6 +12,7 @@ import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1
 import piriImg1 from "@assets/1A7B88D2-D1EA-4199-A7D2-B37DEF6AB8B2_1_105_c_1775498174881.jpeg";
 import piriImg2 from "@assets/470F55A1-A0DE-438A-8CE6-9420CC02210B_1_105_c_1775498178960.jpeg";
 import piriImg3 from "@assets/5D196451-7C91-40D5-A833-00FFBF39133A_1_105_c_1775498185074.jpeg";
+import piriImg4 from "@assets/piri_extra.jpg";
 
 type Lang = "PT" | "EN" | "DE" | "NL";
 
@@ -251,7 +252,7 @@ const products = [
       DE: "Die Schärfe des Königs — ein Produkt mit starker Persönlichkeit und erstklassiger Präsentation.",
       NL: "De pittigheid van de koning — een product met een sterke persoonlijkheid en premium presentatie.",
     },
-    images: [piriImg1, piriImg2, piriImg3],
+    images: [piriImg1, piriImg2, piriImg3, piriImg4],
   },
   {
     name: { PT: "Cabazes", EN: "Gift Hampers", DE: "Geschenkkörbe", NL: "Cadeaumanden" },
