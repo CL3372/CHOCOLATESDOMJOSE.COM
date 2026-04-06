@@ -276,8 +276,8 @@ function ProductCard({ product, lang, learnMore }: {
   const hasMultiple = imgs.length > 1;
 
   return (
-    <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-xl">
-      <div className="relative h-72 w-full overflow-hidden">
+    <div className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-xl">
+      <div className="relative h-72 w-full flex-shrink-0 overflow-hidden">
         <img
           src={imgs[imgIdx]}
           alt={product.name[lang]}
@@ -312,9 +312,9 @@ function ProductCard({ product, lang, learnMore }: {
           </>
         )}
       </div>
-      <div className="p-6">
+      <div className="flex flex-1 flex-col p-6">
         <h3 className="text-2xl font-semibold">{product.name[lang]}</h3>
-        <p className="mt-3 text-white/70">{product.description[lang]}</p>
+        <p className="mt-3 flex-1 text-white/70">{product.description[lang]}</p>
         <button className="mt-6 rounded-xl border border-yellow-300/40 px-4 py-2 text-sm text-yellow-200 transition hover:bg-yellow-300/10">
           {learnMore}
         </button>
@@ -425,7 +425,7 @@ export default function Home() {
 
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {products.map((product, idx) => (
-            <div key={idx} data-testid={`card-product-${idx}`}>
+            <div key={idx} data-testid={`card-product-${idx}`} className="h-full">
               <ProductCard product={product} lang={lang} learnMore={t.learnMore} />
             </div>
           ))}
