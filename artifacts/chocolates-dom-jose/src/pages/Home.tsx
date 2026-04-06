@@ -253,6 +253,17 @@ const products = [
     },
     images: [piriImg1, piriImg2, piriImg3],
   },
+  {
+    name: { PT: "Cabazes", EN: "Gift Hampers", DE: "Geschenkkörbe", NL: "Cadeaumanden" },
+    description: {
+      PT: "Composições exclusivas com os nossos produtos artesanais — ideais para oferta, empresas e ocasiões especiais.",
+      EN: "Exclusive compositions with our artisan products — ideal for gifts, corporate orders and special occasions.",
+      DE: "Exklusive Zusammenstellungen unserer handwerklichen Produkte — ideal für Geschenke, Firmen und besondere Anlässe.",
+      NL: "Exclusieve samenstellingen met onze ambachtelijke producten — ideaal voor cadeaus, bedrijven en bijzondere gelegenheden.",
+    },
+    images: ["https://images.unsplash.com/photo-1607344645866-009c320b63e0?auto=format&fit=crop&w=900&q=80"],
+    placeholder: true,
+  },
 ];
 
 function ProductCard({ product, lang, learnMore }: {
