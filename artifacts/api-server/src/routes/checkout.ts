@@ -44,7 +44,8 @@ checkoutRouter.post("/checkout", async (req, res) => {
     }
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
+      payment_method_types: ["card", "mb_way"],
+      phone_number_collection: { enabled: true },
       line_items: lineItems,
       mode: "payment",
       shipping_address_collection: {
