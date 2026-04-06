@@ -1,5 +1,7 @@
 import { useState } from "react";
 import logoSrc from "@assets/logo_bw.png";
+import trufaImg1 from "@assets/4601CB5C-1354-4ED9-A3C5-D566E3957B7B_1775497051986.JPG";
+import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775497155075.jpeg";
 
 type Lang = "PT" | "EN" | "DE" | "NL";
 
@@ -199,7 +201,7 @@ const products = [
       DE: "Elegante und intensive Aromen, handgefertigt zum Verschenken oder Genießen.",
       NL: "Elegante en intense smaken, met de hand gemaakt om te geven of te genieten.",
     },
-    image: "https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&w=900&q=80",
+    images: [trufaImg1, trufaImg2],
   },
   {
     name: { PT: "Pêras Bebedas", EN: "Drunken Pears", DE: "Betrunkene Birnen", NL: "Dronken Peren" },
@@ -209,7 +211,7 @@ const products = [
       DE: "Birnen im Glas, anspruchsvoll und einzigartig, ideal für Körbe und Gourmet-Geschenke.",
       NL: "Peren in pot, verfijnd en uniek, ideaal voor manden en gourmetcadeaus.",
     },
-    image: "https://images.unsplash.com/photo-1471943311424-646960669fbc?auto=format&fit=crop&w=900&q=80",
+    images: ["https://images.unsplash.com/photo-1471943311424-646960669fbc?auto=format&fit=crop&w=900&q=80"],
   },
   {
     name: { PT: "Dom Piri Piri", EN: "Dom Piri Piri", DE: "Dom Piri Piri", NL: "Dom Piri Piri" },
@@ -219,9 +221,66 @@ const products = [
       DE: "Die Schärfe des Königs — ein Produkt mit starker Persönlichkeit und erstklassiger Präsentation.",
       NL: "De pittigheid van de koning — een product met een sterke persoonlijkheid en premium presentatie.",
     },
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80",
+    images: ["https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=80"],
   },
 ];
+
+function ProductCard({ product, lang, learnMore }: {
+  product: typeof products[number];
+  lang: Lang;
+  learnMore: string;
+}) {
+  const [imgIdx, setImgIdx] = useState(0);
+  const imgs = product.images;
+  const hasMultiple = imgs.length > 1;
+
+  return (
+    <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-xl">
+      <div className="relative h-72 w-full overflow-hidden">
+        <img
+          src={imgs[imgIdx]}
+          alt={product.name[lang]}
+          className="h-full w-full object-cover transition-opacity duration-300"
+        />
+        {hasMultiple && (
+          <>
+            <button
+              onClick={() => setImgIdx((i) => (i - 1 + imgs.length) % imgs.length)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition"
+              aria-label="Previous image"
+            >
+              ‹
+            </button>
+            <button
+              onClick={() => setImgIdx((i) => (i + 1) % imgs.length)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white hover:bg-black/70 transition"
+              aria-label="Next image"
+            >
+              ›
+            </button>
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+              {imgs.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setImgIdx(i)}
+                  className={`h-1.5 rounded-full transition-all ${i === imgIdx ? "w-5 bg-yellow-300" : "w-1.5 bg-white/50"}`}
+                  aria-label={`Image ${i + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      <div className="p-6">
+        <h3 className="text-2xl font-semibold">{product.name[lang]}</h3>
+        <p className="mt-3 text-white/70">{product.description[lang]}</p>
+        <button className="mt-6 rounded-xl border border-yellow-300/40 px-4 py-2 text-sm text-yellow-200 transition hover:bg-yellow-300/10">
+          {learnMore}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("PT");
@@ -325,22 +384,8 @@ export default function Home() {
 
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {products.map((product, idx) => (
-            <div
-              key={idx}
-              data-testid={`card-product-${idx}`}
-              className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-xl"
-            >
-              <img src={product.image} alt={product.name[lang]} className="h-72 w-full object-cover" />
-              <div className="p-6">
-                <h3 className="text-2xl font-semibold">{product.name[lang]}</h3>
-                <p className="mt-3 text-white/70">{product.description[lang]}</p>
-                <button
-                  data-testid={`btn-saber-mais-${idx}`}
-                  className="mt-6 rounded-xl border border-yellow-300/40 px-4 py-2 text-sm text-yellow-200 transition hover:bg-yellow-300/10"
-                >
-                  {t.learnMore}
-                </button>
-              </div>
+            <div key={idx} data-testid={`card-product-${idx}`}>
+              <ProductCard product={product} lang={lang} learnMore={t.learnMore} />
             </div>
           ))}
         </div>
