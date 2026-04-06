@@ -549,6 +549,14 @@ export default function Home() {
       </div>
 
       <footer className="border-t border-white/10 py-6 text-center text-sm text-white/40">
+        <a
+          href="https://www.chocolatesdomjose.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mb-2 block text-yellow-300/60 hover:text-yellow-300 transition"
+        >
+          www.chocolatesdomjose.com
+        </a>
         <p>&copy; {new Date().getFullYear()} Chocolates Dom José. {t.footer}</p>
       </footer>
     </div>
