@@ -13,6 +13,7 @@ import piriImg1 from "@assets/1A7B88D2-D1EA-4199-A7D2-B37DEF6AB8B2_1_105_c_17754
 import piriImg2 from "@assets/470F55A1-A0DE-438A-8CE6-9420CC02210B_1_105_c_1775498178960.jpeg";
 import piriImg3 from "@assets/5D196451-7C91-40D5-A833-00FFBF39133A_1_105_c_1775498185074.jpeg";
 import piriImg4 from "@assets/piri_extra.jpg";
+import crownSrc from "@assets/logo_crown_transparent.png";
 import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775498751104.jpeg";
 import cabazImg2 from "@assets/6B7C46BB-4F99-4C06-B042-49477038A177_1_105_c_1775498765125.jpeg";
 import cabazImg3 from "@assets/2F27B28B-3481-45FF-9C0A-4F9CA152FA00_1_105_c_1775498790966.jpeg";
@@ -538,6 +539,15 @@ export default function Home() {
       </section>
 
       {/* Footer */}
+      <div className="flex justify-center pb-6 pt-10">
+        <img
+          src={crownSrc}
+          alt="Dom José crown"
+          className="h-12 w-auto opacity-60"
+          style={{ filter: "brightness(0) invert(1)" }}
+        />
+      </div>
+
       <footer className="border-t border-white/10 py-6 text-center text-sm text-white/40">
         <p>&copy; {new Date().getFullYear()} Chocolates Dom José. {t.footer}</p>
       </footer>
