@@ -2,6 +2,9 @@ import { useState } from "react";
 import logoSrc from "@assets/logo_bw.png";
 import trufaImg1 from "@assets/4601CB5C-1354-4ED9-A3C5-D566E3957B7B_1775497051986.JPG";
 import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775497155075.jpeg";
+import peraImg1 from "@assets/D0001014-D8F0-4669-AA75-AA5FC99B9C61_1775497657429.JPG";
+import peraImg2 from "@assets/27402DCF-137B-4302-ADCE-BF183A97BB50_1775497663265.JPG";
+import peraImg3 from "@assets/BA6A154A-4E87-47D8-B74A-FA6FBB7CCE61_1775497678161.JPG";
 
 type Lang = "PT" | "EN" | "DE" | "NL";
 
@@ -211,7 +214,7 @@ const products = [
       DE: "Birnen im Glas, anspruchsvoll und einzigartig, ideal für Körbe und Gourmet-Geschenke.",
       NL: "Peren in pot, verfijnd en uniek, ideaal voor manden en gourmetcadeaus.",
     },
-    images: ["https://images.unsplash.com/photo-1471943311424-646960669fbc?auto=format&fit=crop&w=900&q=80"],
+    images: [peraImg1, peraImg2, peraImg3],
   },
   {
     name: { PT: "Dom Piri Piri", EN: "Dom Piri Piri", DE: "Dom Piri Piri", NL: "Dom Piri Piri" },
