@@ -6,6 +6,9 @@ import peraImg1 from "@assets/D0001014-D8F0-4669-AA75-AA5FC99B9C61_1775497657429
 import peraImg2 from "@assets/27402DCF-137B-4302-ADCE-BF183A97BB50_1775497663265.JPG";
 import peraImg3 from "@assets/BA6A154A-4E87-47D8-B74A-FA6FBB7CCE61_1775497678161.JPG";
 import peraImg4 from "@assets/B1B5018B-896A-4DE6-B3D8-83192AD6FA8D_1775497812771.jpeg";
+import laranjaImg from "@assets/C5049C7D-4C50-4DC6-9FF1-35C328026F8A_1_105_c_1775497857994.jpeg";
+import choc77Img from "@assets/C8C3450E-D74C-4028-8A60-556EA3DA337B_1_105_c_1775497898196.jpeg";
+import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1775497921548.jpeg";
 
 type Lang = "PT" | "EN" | "DE" | "NL";
 
@@ -205,7 +208,7 @@ const products = [
       DE: "Elegante und intensive Aromen, handgefertigt zum Verschenken oder Genießen.",
       NL: "Elegante en intense smaken, met de hand gemaakt om te geven of te genieten.",
     },
-    images: [trufaImg1, trufaImg2],
+    images: [trufaImg1, trufaImg2, trufaFestImg],
   },
   {
     name: { PT: "Pêras Bebedas", EN: "Drunken Pears", DE: "Betrunkene Birnen", NL: "Dronken Peren" },
@@ -216,6 +219,26 @@ const products = [
       NL: "Peren in pot, verfijnd en uniek, ideaal voor manden en gourmetcadeaus.",
     },
     images: [peraImg1, peraImg2, peraImg3, peraImg4],
+  },
+  {
+    name: { PT: "Trufas de Laranja", EN: "Orange Truffles", DE: "Orangentrüffeln", NL: "Sinaasappeltruffels" },
+    description: {
+      PT: "Intensidade cítrica num interior cremoso — trufas artesanais com laranja fresca e chocolate premium.",
+      EN: "Citrus intensity in a creamy centre — handmade truffles with fresh orange and premium chocolate.",
+      DE: "Zitrusintensität in einem cremigen Kern — handgefertigte Trüffeln mit frischer Orange und Premium-Schokolade.",
+      NL: "Citrusintensiteit in een romig hart — ambachtelijke truffels met verse sinaasappel en premium chocolade.",
+    },
+    images: [laranjaImg],
+  },
+  {
+    name: { PT: "Trufas de Chocolate 77%", EN: "77% Chocolate Truffles", DE: "Schokoladentrüffeln 77%", NL: "Chocoladetruffels 77%" },
+    description: {
+      PT: "Para os amantes do chocolate puro — trufas intensas com cacau 77%, elegantes e sofisticadas.",
+      EN: "For pure chocolate lovers — intense truffles with 77% cacao, elegant and sophisticated.",
+      DE: "Für reine Schokoladenliebhaber — intensive Trüffeln mit 77% Kakao, elegant und raffiniert.",
+      NL: "Voor liefhebbers van pure chocolade — intense truffels met 77% cacao, elegant en verfijnd.",
+    },
+    images: [choc77Img],
   },
   {
     name: { PT: "Dom Piri Piri", EN: "Dom Piri Piri", DE: "Dom Piri Piri", NL: "Dom Piri Piri" },
