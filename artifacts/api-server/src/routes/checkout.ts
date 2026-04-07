@@ -44,7 +44,6 @@ checkoutRouter.post("/checkout", async (req, res) => {
     }
 
     const session = await stripe.checkout.sessions.create({
-      automatic_payment_methods: { enabled: true },
       phone_number_collection: { enabled: true },
       line_items: lineItems,
       mode: "payment",

@@ -1,29 +1,44 @@
+import { useState } from "react";
 import { useCart, type Lang } from "../context/CartContext";
 
-const drawerLabels: Record<Lang, { title: string; empty: string; checkout: string; subtotal: string; loading: string; remove: string }> = {
-  PT: { title: "O seu carrinho", empty: "O carrinho está vazio.", checkout: "Finalizar compra", subtotal: "Subtotal", loading: "A processar…", remove: "Remover" },
-  EN: { title: "Your cart", empty: "Your cart is empty.", checkout: "Checkout", subtotal: "Subtotal", loading: "Processing…", remove: "Remove" },
-  DE: { title: "Ihr Warenkorb", empty: "Ihr Warenkorb ist leer.", checkout: "Zur Kasse", subtotal: "Zwischensumme", loading: "Wird verarbeitet…", remove: "Entfernen" },
-  NL: { title: "Uw winkelwagen", empty: "Uw winkelwagen is leeg.", checkout: "Afrekenen", subtotal: "Subtotaal", loading: "Verwerken…", remove: "Verwijderen" },
+const drawerLabels: Record<Lang, { title: string; empty: string; checkout: string; subtotal: string; loading: string; remove: string; error: string }> = {
+  PT: { title: "O seu carrinho", empty: "O carrinho está vazio.", checkout: "Finalizar compra", subtotal: "Subtotal", loading: "A processar…", remove: "Remover", error: "Erro ao processar. Tente novamente." },
+  EN: { title: "Your cart", empty: "Your cart is empty.", checkout: "Checkout", subtotal: "Subtotal", loading: "Processing…", remove: "Remove", error: "Checkout failed. Please try again." },
+  DE: { title: "Ihr Warenkorb", empty: "Ihr Warenkorb ist leer.", checkout: "Zur Kasse", subtotal: "Zwischensumme", loading: "Wird verarbeitet…", remove: "Entfernen", error: "Fehler beim Bezahlen. Bitte erneut versuchen." },
+  NL: { title: "Uw winkelwagen", empty: "Uw winkelwagen is leeg.", checkout: "Afrekenen", subtotal: "Subtotaal", loading: "Verwerken…", remove: "Verwijderen", error: "Afrekenen mislukt. Probeer opnieuw." },
 };
 
 export default function CartDrawer({ lang }: { lang: Lang }) {
   const { items, isOpen, closeCart, removeItem, updateQty, total } = useCart();
   const l = drawerLabels[lang];
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleCheckout = async () => {
-    const origin = window.location.origin;
-    const res = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        items: items.map((i) => ({ id: i.id, quantity: i.quantity })),
-        successUrl: `${origin}/?order=success`,
-        cancelUrl: `${origin}/?order=cancelled`,
-      }),
-    });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
+    setLoading(true);
+    setError(null);
+    try {
+      const origin = window.location.origin;
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items.map((i) => ({ id: i.id, quantity: i.quantity })),
+          successUrl: `${origin}/?order=success`,
+          cancelUrl: `${origin}/?order=cancelled`,
+        }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setError(data.error ?? l.error);
+        setLoading(false);
+      }
+    } catch (err) {
+      setError(l.error);
+      setLoading(false);
+    }
   };
 
   return (
@@ -102,11 +117,17 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
                 €{(total / 100).toFixed(2)}
               </span>
             </div>
+            {error && (
+              <p className="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-2 text-sm text-red-400 text-center">
+                {error}
+              </p>
+            )}
             <button
               onClick={handleCheckout}
-              className="w-full rounded-2xl bg-yellow-400 py-3 font-semibold text-black transition hover:bg-yellow-300 active:scale-95"
+              disabled={loading}
+              className="w-full rounded-2xl bg-yellow-400 py-3 font-semibold text-black transition hover:bg-yellow-300 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {l.checkout}
+              {loading ? l.loading : l.checkout}
             </button>
           </div>
         )}
