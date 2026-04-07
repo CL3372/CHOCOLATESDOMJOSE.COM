@@ -291,3 +291,7 @@
     inset: -1px;
   }
 }
+
+#replit-badge {
+  display: none !important;
+}
