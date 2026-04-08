@@ -13,32 +13,28 @@ async function getCredentials() {
   }
 
   const connectorName = "stripe";
-  const environments = ["production", "development"];
+  const isProduction = process.env.REPLIT_DEPLOYMENT === "1";
+  const targetEnvironment = isProduction ? "production" : "development";
 
-  for (const targetEnvironment of environments) {
-    const url = new URL(`https://${hostname}/api/v2/connection`);
-    url.searchParams.set("include_secrets", "true");
-    url.searchParams.set("connector_names", connectorName);
-    url.searchParams.set("environment", targetEnvironment);
+  const url = new URL(`https://${hostname}/api/v2/connection`);
+  url.searchParams.set("include_secrets", "true");
+  url.searchParams.set("connector_names", connectorName);
+  url.searchParams.set("environment", targetEnvironment);
 
-    const response = await fetch(url.toString(), {
-      headers: {
-        Accept: "application/json",
-        "X-Replit-Token": xReplitToken,
-      },
-    });
+  const response = await fetch(url.toString(), {
+    headers: {
+      Accept: "application/json",
+      "X-Replit-Token": xReplitToken,
+    },
+  });
 
-    const data = await response.json();
-    const connectionSettings = data.items?.[0];
+  const data = await response.json();
 
-    if (
-      connectionSettings &&
-      connectionSettings.settings.publishable &&
-      connectionSettings.settings.secret
-    ) {
+  for (const item of data.items ?? []) {
+    if (item.settings?.publishable && item.settings?.secret) {
       return {
-        publishableKey: connectionSettings.settings.publishable as string,
-        secretKey: connectionSettings.settings.secret as string,
+        publishableKey: item.settings.publishable as string,
+        secretKey: item.settings.secret as string,
       };
     }
   }
@@ -48,7 +44,7 @@ async function getCredentials() {
 
 export async function getUncachableStripeClient() {
   const { secretKey } = await getCredentials();
-  return new Stripe(secretKey, { apiVersion: "2024-06-20" as any });
+  return new Stripe(secretKey, { apiVersion: "2025-08-27.basil" as any });
 }
 
 export async function getStripePublishableKey() {
