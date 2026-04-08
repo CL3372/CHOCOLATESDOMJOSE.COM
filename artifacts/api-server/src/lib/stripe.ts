@@ -13,8 +13,7 @@ async function getCredentials() {
   }
 
   const connectorName = "stripe";
-  const isProduction = process.env.REPLIT_DEPLOYMENT === "1";
-  const environments = isProduction ? ["production", "development"] : ["development"];
+  const environments = ["production", "development"];
 
   for (const targetEnvironment of environments) {
     const url = new URL(`https://${hostname}/api/v2/connection`);
