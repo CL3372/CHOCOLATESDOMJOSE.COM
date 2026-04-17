@@ -1,7 +1,4 @@
-const EASYPAY_BASE =
-  process.env.EASYPAY_ENV === "production"
-    ? "https://api.prod.easypay.pt/2.0"
-    : "https://api.test.easypay.pt/2.0";
+const EASYPAY_BASE = "https://api.prod.easypay.pt/2.0";
 
 function getHeaders(): Record<string, string> {
   const accountId = process.env.EASYPAY_ACCOUNT_ID;
