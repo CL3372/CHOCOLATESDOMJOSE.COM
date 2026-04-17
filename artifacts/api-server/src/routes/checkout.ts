@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUncachableStripeClient } from "../lib/stripe.js";
+import { createEasyPayCheckout } from "../lib/easypay.js";
 
 const checkoutRouter = Router();
 
@@ -14,10 +14,11 @@ const PRODUCTS: Record<string, { name: string; price: number }> = {
 
 checkoutRouter.post("/checkout", async (req, res) => {
   try {
-    const { items, successUrl, cancelUrl } = req.body as {
+    const { items, successUrl, cancelUrl, customer } = req.body as {
       items: { id: string; quantity: number }[];
       successUrl: string;
       cancelUrl: string;
+      customer?: { name?: string; email?: string; phone?: string };
     };
 
     if (!items?.length) {
@@ -25,42 +26,27 @@ checkoutRouter.post("/checkout", async (req, res) => {
       return;
     }
 
-    const stripe = await getUncachableStripeClient();
-
-    const lineItems = items
-      .filter((item) => PRODUCTS[item.id])
-      .map((item) => ({
-        price_data: {
-          currency: "eur",
-          product_data: { name: PRODUCTS[item.id].name },
-          unit_amount: PRODUCTS[item.id].price,
-        },
-        quantity: item.quantity,
-      }));
-
-    if (!lineItems.length) {
+    const validItems = items.filter((i) => PRODUCTS[i.id]);
+    if (!validItems.length) {
       res.status(400).json({ error: "No valid products in cart" });
       return;
     }
 
-    const session = await stripe.checkout.sessions.create({
-      phone_number_collection: { enabled: true },
-      line_items: lineItems,
-      mode: "payment",
-      shipping_address_collection: {
-        allowed_countries: [
-          "PT", "ES", "FR", "DE", "NL", "BE", "IT", "GB", "AT", "CH",
-          "SE", "NO", "DK", "FI", "IE", "LU", "PL", "CZ", "SK", "HU",
-          "RO", "HR", "SI", "EE", "LV", "LT", "US", "CA", "AU", "BR",
-        ],
-      },
-      success_url: successUrl,
-      cancel_url: cancelUrl,
+    const amountCents = validItems.reduce(
+      (sum, i) => sum + PRODUCTS[i.id].price * i.quantity,
+      0
+    );
+
+    const url = await createEasyPayCheckout({
+      amountCents,
+      returnUrl: successUrl,
+      cancelUrl,
+      customer,
     });
 
-    res.json({ url: session.url });
+    res.json({ url });
   } catch (err: any) {
-    console.error("Stripe checkout error:", err);
+    console.error("EasyPay checkout error:", err);
     res.status(500).json({ error: err.message ?? "Checkout failed" });
   }
 });
