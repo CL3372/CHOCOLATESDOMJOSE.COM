@@ -28,3 +28,16 @@ timeoutMs = 20000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+
+[userenv.shared."curl -i -X GET \\   'https:"]
+
+[userenv.shared."curl -i -X GET \\   'https:".""]
+
+[userenv.shared."curl -i -X GET \\   'https:".""."api.test.easypay.pt"]
+
+[userenv.shared."curl -i -X GET \\   'https:".""."api.test.easypay.pt"."2.0"]
+"frequent?page=1&records_per_page=20&expiration_time=interval%282006-01-02+15" = ""
