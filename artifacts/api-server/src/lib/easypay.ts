@@ -23,12 +23,22 @@ export async function createEasyPayCheckout(params: {
 }): Promise<string> {
   const amountEur = parseFloat((params.amountCents / 100).toFixed(2));
 
+  const orderKey = `ORDER-${Date.now()}`;
+  const txKey = `TXN-${Date.now()}`;
+
   const body: Record<string, unknown> = {
     type: ["single"],
     payment: {
       methods: ["CC", "MB", "MBW"],
-      amount: amountEur,
       currency: "EUR",
+      capture: {
+        transaction_key: txKey,
+        descriptive: "Chocolates Dom Jose",
+      },
+    },
+    order: {
+      key: orderKey,
+      value: amountEur,
     },
     return_url: params.returnUrl,
     cancel_url: params.cancelUrl,
