@@ -63,17 +63,13 @@ export async function createEasyPayCheckout(params: {
     throw new Error(`EasyPay error (${res.status}): ${msg}`);
   }
 
-  const session = data?.session ?? data?.id;
-
-  const url: string | undefined =
-    data?.payment?.url ??
-    data?.url ??
-    data?.checkout_url ??
-    (session ? `https://pay.easypay.pt/?s=${session}` : undefined);
-
-  if (!url) {
-    throw new Error("EasyPay did not return a payment URL. Response: " + JSON.stringify(data));
+  if (!data?.id || !data?.session) {
+    throw new Error("EasyPay did not return id/session. Response: " + JSON.stringify(data));
   }
 
-  return url;
+  const manifest = Buffer.from(
+    JSON.stringify({ id: data.id, session: data.session, config: data.config ?? null })
+  ).toString("base64");
+
+  return `https://pay.easypay.pt/?manifest=${encodeURIComponent(manifest)}`;
 }
