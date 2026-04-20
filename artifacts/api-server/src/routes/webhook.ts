@@ -1,24 +1,87 @@
 import { Router } from "express";
+import nodemailer from "nodemailer";
 
 const webhookRouter = Router();
+
+function buildOrderMessage(data: {
+  customerName: string;
+  customerPhone: string;
+  amount: string;
+  methodLabel: string;
+  paymentId: string;
+}) {
+  return (
+    `🍫 Nova encomenda - Chocolates Dom José!\n\n` +
+    `👤 Cliente: ${data.customerName}\n` +
+    `📱 Telemóvel: ${data.customerPhone || "não fornecido"}\n` +
+    `💶 Valor: ${data.amount}\n` +
+    `💳 Método: ${data.methodLabel}\n` +
+    `🆔 ID: ${data.paymentId}\n\n` +
+    `Verifique o painel EasyPay para detalhes.`
+  );
+}
+
+async function sendEmail(subject: string, text: string) {
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+  const notifyEmail = process.env.NOTIFY_EMAIL ?? gmailUser;
+
+  if (!gmailUser || !gmailPass) {
+    console.warn("GMAIL_USER or GMAIL_APP_PASSWORD not set — skipping email");
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: gmailUser, pass: gmailPass },
+  });
+
+  await transporter.sendMail({
+    from: `"Chocolates Dom José" <${gmailUser}>`,
+    to: notifyEmail,
+    subject,
+    text,
+  });
+
+  console.log("Email notification sent to", notifyEmail);
+}
+
+async function sendTelegram(message: string) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (!token || !chatId) {
+    console.warn("TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set — skipping Telegram");
+    return;
+  }
+
+  const url = `https://api.telegram.org/bot${token}/sendMessage`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, text: message }),
+  });
+
+  if (!res.ok) {
+    console.error("Telegram error:", res.status, await res.text());
+  } else {
+    console.log("Telegram notification sent");
+  }
+}
 
 async function sendWhatsApp(message: string) {
   const apiKey = process.env.CALLMEBOT_API_KEY;
   const phone = process.env.NOTIFY_PHONE ?? "351912630054";
 
-  if (!apiKey) {
-    console.warn("CALLMEBOT_API_KEY not set — skipping WhatsApp notification");
-    return;
-  }
+  if (!apiKey) return;
 
   const encoded = encodeURIComponent(message);
   const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encoded}&apikey=${apiKey}`;
-
   const res = await fetch(url);
   if (!res.ok) {
     console.error("CallMeBot error:", res.status, await res.text());
   } else {
-    console.log("WhatsApp notification sent successfully");
+    console.log("WhatsApp notification sent");
   }
 }
 
@@ -79,16 +142,22 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
       method === "CC" ? "Cartão de crédito" :
       method;
 
-    const message =
-      `🍫 *Nova encomenda - Chocolates Dom José!*\n\n` +
-      `👤 Cliente: ${customerName}\n` +
-      `📱 Telemóvel: ${customerPhone || "não fornecido"}\n` +
-      `💶 Valor: ${amountFormatted}\n` +
-      `💳 Método: ${methodLabel}\n` +
-      `🆔 ID: ${paymentId}\n\n` +
-      `Verifique o painel EasyPay para detalhes.`;
+    const messageData = {
+      customerName,
+      customerPhone,
+      amount: amountFormatted,
+      methodLabel,
+      paymentId,
+    };
 
-    await sendWhatsApp(message);
+    const message = buildOrderMessage(messageData);
+    const subject = `🍫 Nova encomenda ${amountFormatted} — Chocolates Dom José`;
+
+    await Promise.allSettled([
+      sendEmail(subject, message),
+      sendTelegram(message),
+      sendWhatsApp(message),
+    ]);
 
     res.json({ received: true });
   } catch (err: any) {
