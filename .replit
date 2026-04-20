@@ -28,4 +28,4 @@ timeoutMs = 20000
 [userenv]
 
 [userenv.shared]
-"'ApiKey: eae4aa59-8e5b-4ec2-887d-b02768481a92'" = ''''AccountId: 2b0f63e2-9fb5-4e52-aca0-b4bf0339bbe6' \'''
+EASYPAYMBW = "eba973a5-a6ce-44f3-adfa-01a4fd4129d7"
