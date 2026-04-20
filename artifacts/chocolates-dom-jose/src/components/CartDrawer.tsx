@@ -18,6 +18,11 @@ const labels: Record<
     pay: string;
     back: string;
     customerTitle: string;
+    address: string;
+    postcode: string;
+    city: string;
+    country: string;
+    shippingTitle: string;
   }
 > = {
   PT: {
@@ -35,6 +40,11 @@ const labels: Record<
     pay: "Pagar com EasyPay",
     back: "← Voltar",
     customerTitle: "Os seus dados",
+    address: "Morada (rua e número)",
+    postcode: "Código Postal",
+    city: "Cidade",
+    country: "País",
+    shippingTitle: "Morada de envio",
   },
   EN: {
     title: "Your cart",
@@ -51,6 +61,11 @@ const labels: Record<
     pay: "Pay with EasyPay",
     back: "← Back",
     customerTitle: "Your details",
+    address: "Address (street and number)",
+    postcode: "Postcode",
+    city: "City",
+    country: "Country",
+    shippingTitle: "Shipping address",
   },
   DE: {
     title: "Ihr Warenkorb",
@@ -67,6 +82,11 @@ const labels: Record<
     pay: "Mit EasyPay bezahlen",
     back: "← Zurück",
     customerTitle: "Ihre Daten",
+    address: "Adresse (Straße und Nummer)",
+    postcode: "Postleitzahl",
+    city: "Stadt",
+    country: "Land",
+    shippingTitle: "Lieferadresse",
   },
   NL: {
     title: "Uw winkelwagen",
@@ -83,6 +103,11 @@ const labels: Record<
     pay: "Betalen met EasyPay",
     back: "← Terug",
     customerTitle: "Uw gegevens",
+    address: "Adres (straat en nummer)",
+    postcode: "Postcode",
+    city: "Stad",
+    country: "Land",
+    shippingTitle: "Verzendadres",
   },
 };
 
@@ -96,6 +121,10 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("Portugal");
 
   const handleCheckout = async () => {
     setLoading(true);
@@ -113,6 +142,12 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
             name: name.trim() || undefined,
             email: email.trim() || undefined,
             phone: phone.trim() || undefined,
+          },
+          shipping: {
+            address: address.trim() || undefined,
+            postcode: postcode.trim() || undefined,
+            city: city.trim() || undefined,
+            country: country.trim() || undefined,
           },
         }),
       });
@@ -270,6 +305,53 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
                   className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
                   placeholder={l.phoneTip}
                 />
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <p className="text-xs uppercase tracking-wide text-white/40 mb-2">{l.shippingTitle}</p>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-white/50 mb-1">{l.address}</label>
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
+                    placeholder={l.address}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-white/50 mb-1">{l.postcode}</label>
+                    <input
+                      type="text"
+                      value={postcode}
+                      onChange={(e) => setPostcode(e.target.value)}
+                      className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
+                      placeholder="1000-001"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-white/50 mb-1">{l.city}</label>
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
+                      placeholder="Lisboa"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs text-white/50 mb-1">{l.country}</label>
+                  <input
+                    type="text"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
+                  />
+                </div>
               </div>
             </div>
 

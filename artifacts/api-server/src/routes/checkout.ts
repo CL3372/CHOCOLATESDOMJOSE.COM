@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createEasyPayCheckout } from "../lib/easypay.js";
+import { notifyOrder } from "../lib/notify.js";
 
 const checkoutRouter = Router();
 
@@ -14,11 +15,17 @@ const PRODUCTS: Record<string, { name: string; price: number }> = {
 
 checkoutRouter.post("/checkout", async (req, res) => {
   try {
-    const { items, successUrl, cancelUrl, customer } = req.body as {
+    const { items, successUrl, cancelUrl, customer, shipping } = req.body as {
       items: { id: string; quantity: number }[];
       successUrl: string;
       cancelUrl: string;
       customer?: { name?: string; email?: string; phone?: string };
+      shipping?: {
+        address?: string;
+        postcode?: string;
+        city?: string;
+        country?: string;
+      };
     };
 
     if (!items?.length) {
@@ -43,6 +50,23 @@ checkoutRouter.post("/checkout", async (req, res) => {
       cancelUrl,
       customer,
     });
+
+    notifyOrder({
+      customerName: customer?.name ?? "",
+      customerEmail: customer?.email ?? "",
+      customerPhone: customer?.phone ?? "",
+      shippingAddress: shipping?.address ?? "",
+      shippingPostcode: shipping?.postcode ?? "",
+      shippingCity: shipping?.city ?? "",
+      shippingCountry: shipping?.country ?? "Portugal",
+      items: validItems.map((i) => ({
+        name: PRODUCTS[i.id].name,
+        quantity: i.quantity,
+        unitPriceEur: PRODUCTS[i.id].price / 100,
+      })),
+      totalEur: amountCents / 100,
+      status: "pending",
+    }).catch((err) => console.error("Notify error (non-blocking):", err));
 
     res.json({ url });
   } catch (err: any) {
