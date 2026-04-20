@@ -439,6 +439,17 @@ export default function Home() {
         </div>
       )}
 
+      {/* Free shipping announcement bar */}
+      <div className="bg-gradient-to-r from-[#5a2a0a] via-[#7a3a14] to-[#5a2a0a] px-4 py-2 text-center text-xs font-medium text-amber-100 sm:text-sm">
+        🚚 {lang === "PT"
+          ? "Portes grátis em Portugal · Envios internacionais grátis em encomendas acima de €75"
+          : lang === "DE"
+          ? "Kostenloser Versand in Portugal · Internationaler Versand kostenlos ab €75"
+          : lang === "NL"
+          ? "Gratis verzending in Portugal · Internationale verzending gratis vanaf €75"
+          : "Free shipping in Portugal · Free international shipping on orders over €75"}
+      </div>
+
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/10 bg-black">
         <div className="absolute inset-0 bg-gradient-to-b from-[#111111] via-black to-[#111111]" />
