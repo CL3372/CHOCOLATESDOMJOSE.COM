@@ -30,3 +30,5 @@ timeoutMs = 20000
 [userenv.shared]
 EASYPAYMBW = "eba973a5-a6ce-44f3-adfa-01a4fd4129d7"
 EASYPAYMB = "f14a8250-1701-4ef1-bbe2-430d4e111dc4"
+GMAIL_APP_PASSWORD = "ouke mplz ipkx jcqf"
+NOTIFY_EMAIL = "ouke mplz ipkx jcqf"
