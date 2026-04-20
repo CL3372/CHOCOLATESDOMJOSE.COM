@@ -40,7 +40,44 @@ export function buildOrderText(o: OrderDetails): string {
   );
 }
 
-export async function sendEmail(subject: string, text: string) {
+function buildOrderHtml(o: OrderDetails): string {
+  const itemsRows = o.items
+    .map(
+      (i) =>
+        `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee">${i.quantity}× ${i.name}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">€${(i.unitPriceEur * i.quantity).toFixed(2)}</td></tr>`
+    )
+    .join("");
+
+  const statusLabel = o.status === "paid" ? "✅ PAGAMENTO CONFIRMADO" : "🛒 NOVA ENCOMENDA (a aguardar pagamento)";
+
+  return `
+  <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#333">
+    <h2 style="background:#5a2a0a;color:#fff;padding:14px;margin:0;border-radius:6px 6px 0 0">${statusLabel}</h2>
+    <div style="border:1px solid #ddd;border-top:0;padding:18px;border-radius:0 0 6px 6px">
+      <h3 style="margin-top:0">🍫 Chocolates Dom José</h3>
+
+      <h4 style="margin-bottom:4px">👤 Cliente</h4>
+      <p style="margin:2px 0"><strong>Nome:</strong> ${o.customerName || "-"}</p>
+      <p style="margin:2px 0"><strong>Email:</strong> ${o.customerEmail || "-"}</p>
+      <p style="margin:2px 0"><strong>Telemóvel:</strong> ${o.customerPhone || "-"}</p>
+
+      <h4 style="margin-bottom:4px;margin-top:18px">📦 Morada de envio</h4>
+      <div style="background:#fff8ef;border:1px solid #f0d9b5;padding:12px;border-radius:6px;line-height:1.6">
+        <div>${o.shippingAddress || "-"}</div>
+        <div>${o.shippingPostcode || ""} ${o.shippingCity || ""}</div>
+        <div>${o.shippingCountry || ""}</div>
+      </div>
+
+      <h4 style="margin-bottom:4px;margin-top:18px">🛍 Artigos</h4>
+      <table style="width:100%;border-collapse:collapse">${itemsRows}</table>
+
+      <p style="margin-top:18px;font-size:18px"><strong>💶 Total: €${o.totalEur.toFixed(2)}</strong></p>
+      ${o.paymentId ? `<p style="color:#666;font-size:12px">ID: ${o.paymentId}</p>` : ""}
+    </div>
+  </div>`;
+}
+
+export async function sendEmail(subject: string, text: string, html?: string) {
   const gmailUser = process.env.GMAIL_USER;
   const gmailPass = process.env.GMAIL_APP_PASSWORD;
   const notifyEmail = process.env.NOTIFY_EMAIL ?? gmailUser;
@@ -60,6 +97,7 @@ export async function sendEmail(subject: string, text: string) {
     to: notifyEmail,
     subject,
     text,
+    html,
   });
   console.log("Email notification sent to", notifyEmail);
 }
@@ -93,5 +131,6 @@ export async function notifyOrder(order: OrderDetails) {
       ? `✅ Pagamento confirmado €${order.totalEur.toFixed(2)} — Chocolates Dom José`
       : `🛒 Nova encomenda €${order.totalEur.toFixed(2)} — Chocolates Dom José`;
 
-  await Promise.allSettled([sendEmail(subject, text), sendTelegram(text)]);
+  const html = buildOrderHtml(order);
+  await Promise.allSettled([sendEmail(subject, text, html), sendTelegram(text)]);
 }
