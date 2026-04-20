@@ -67,8 +67,13 @@ export async function createEasyPayCheckout(params: {
     throw new Error("EasyPay did not return id/session. Response: " + JSON.stringify(data));
   }
 
+  const manifestConfig = {
+    ...(data.config ?? {}),
+    redirect: { auto: true, time: 3 },
+  };
+
   const manifest = Buffer.from(
-    JSON.stringify({ id: data.id, session: data.session, config: data.config ?? null })
+    JSON.stringify({ id: data.id, session: data.session, config: manifestConfig })
   ).toString("base64");
 
   return `https://pay.easypay.pt/?manifest=${encodeURIComponent(manifest)}`;
