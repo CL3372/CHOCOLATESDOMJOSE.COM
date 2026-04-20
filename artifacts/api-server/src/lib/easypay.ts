@@ -24,7 +24,7 @@ export async function createEasyPayCheckout(params: {
   const amountEur = parseFloat((params.amountCents / 100).toFixed(2));
 
   const body: Record<string, unknown> = {
-    type: ["CC", "MB", "MBW"],
+    type: ["single"],
     payment: { amount: amountEur, currency: "EUR" },
     return_url: params.returnUrl,
     cancel_url: params.cancelUrl,
