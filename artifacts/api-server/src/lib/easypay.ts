@@ -25,7 +25,11 @@ export async function createEasyPayCheckout(params: {
 
   const body: Record<string, unknown> = {
     type: ["single"],
-    payment: { amount: amountEur, currency: "EUR" },
+    payment: {
+      methods: ["CC", "MB", "MBW"],
+      amount: amountEur,
+      currency: "EUR",
+    },
     return_url: params.returnUrl,
     cancel_url: params.cancelUrl,
   };
