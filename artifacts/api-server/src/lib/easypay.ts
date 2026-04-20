@@ -56,16 +56,20 @@ export async function createEasyPayCheckout(params: {
 
   const data = await res.json() as Record<string, any>;
 
+  console.log("EasyPay checkout response:", JSON.stringify(data, null, 2));
+
   if (!res.ok) {
     const msg = data?.message ?? data?.error ?? JSON.stringify(data);
     throw new Error(`EasyPay error (${res.status}): ${msg}`);
   }
 
+  const session = data?.session ?? data?.id;
+
   const url: string | undefined =
     data?.payment?.url ??
     data?.url ??
     data?.checkout_url ??
-    (data?.id ? `https://checkout.easypay.pt/${data.id}` : undefined);
+    (session ? `https://pay.easypay.pt/?s=${session}` : undefined);
 
   if (!url) {
     throw new Error("EasyPay did not return a payment URL. Response: " + JSON.stringify(data));
