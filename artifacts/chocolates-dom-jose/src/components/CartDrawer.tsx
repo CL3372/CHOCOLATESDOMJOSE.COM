@@ -17,6 +17,9 @@ const labels: Record<
     phoneTip: string;
     nif: string;
     nifTip: string;
+    invoiceQuestion: string;
+    yes: string;
+    no: string;
     pay: string;
     back: string;
     customerTitle: string;
@@ -39,8 +42,11 @@ const labels: Record<
     email: "E-mail",
     phone: "Telemóvel (para MB WAY)",
     phoneTip: "Ex: 912345678",
-    nif: "NIF (opcional, para fatura)",
+    nif: "NIF",
     nifTip: "9 dígitos",
+    invoiceQuestion: "Fatura com NIF?",
+    yes: "Sim",
+    no: "Não",
     pay: "Pagar com EasyPay",
     back: "← Voltar",
     customerTitle: "Os seus dados",
@@ -62,8 +68,11 @@ const labels: Record<
     email: "Email",
     phone: "Mobile (for MB WAY)",
     phoneTip: "e.g. 912345678",
-    nif: "Tax ID / NIF (optional, for invoice)",
+    nif: "Tax ID / NIF",
     nifTip: "9 digits",
+    invoiceQuestion: "Invoice with NIF?",
+    yes: "Yes",
+    no: "No",
     pay: "Pay with EasyPay",
     back: "← Back",
     customerTitle: "Your details",
@@ -85,8 +94,11 @@ const labels: Record<
     email: "E-Mail",
     phone: "Mobilnummer (für MB WAY)",
     phoneTip: "z. B. 912345678",
-    nif: "Steuernummer / NIF (optional, für Rechnung)",
+    nif: "Steuernummer / NIF",
     nifTip: "9 Ziffern",
+    invoiceQuestion: "Rechnung mit NIF?",
+    yes: "Ja",
+    no: "Nein",
     pay: "Mit EasyPay bezahlen",
     back: "← Zurück",
     customerTitle: "Ihre Daten",
@@ -108,8 +120,11 @@ const labels: Record<
     email: "E-mail",
     phone: "Mobiel (voor MB WAY)",
     phoneTip: "bijv. 912345678",
-    nif: "Btw-nummer / NIF (optioneel, voor factuur)",
+    nif: "Btw-nummer / NIF",
     nifTip: "9 cijfers",
+    invoiceQuestion: "Factuur met NIF?",
+    yes: "Ja",
+    no: "Nee",
     pay: "Betalen met EasyPay",
     back: "← Terug",
     customerTitle: "Uw gegevens",
@@ -131,6 +146,7 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [wantsInvoice, setWantsInvoice] = useState(false);
   const [nif, setNif] = useState("");
   const [address, setAddress] = useState("");
   const [postcode, setPostcode] = useState("");
@@ -153,7 +169,7 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
             name: name.trim() || undefined,
             email: email.trim() || undefined,
             phone: phone.trim() || undefined,
-            nif: nif.trim() || undefined,
+            nif: wantsInvoice ? (nif.trim() || undefined) : undefined,
           },
           shipping: {
             address: address.trim() || undefined,
@@ -319,17 +335,46 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
                 />
               </div>
               <div>
-                <label className="block text-xs text-white/50 mb-1">{l.nif}</label>
-                <input
-                  type="text"
-                  value={nif}
-                  onChange={(e) => setNif(e.target.value)}
-                  inputMode="numeric"
-                  maxLength={15}
-                  className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
-                  placeholder={l.nifTip}
-                />
+                <label className="block text-xs text-white/50 mb-2">{l.invoiceQuestion}</label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setWantsInvoice(true)}
+                    className={`flex-1 rounded-xl border px-4 py-2 text-sm font-medium transition ${
+                      wantsInvoice
+                        ? "border-yellow-400 bg-yellow-400 text-black"
+                        : "border-white/10 bg-white/10 text-white/70 hover:bg-white/15"
+                    }`}
+                  >
+                    {l.yes}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setWantsInvoice(false); setNif(""); }}
+                    className={`flex-1 rounded-xl border px-4 py-2 text-sm font-medium transition ${
+                      !wantsInvoice
+                        ? "border-yellow-400 bg-yellow-400 text-black"
+                        : "border-white/10 bg-white/10 text-white/70 hover:bg-white/15"
+                    }`}
+                  >
+                    {l.no}
+                  </button>
+                </div>
               </div>
+              {wantsInvoice && (
+                <div>
+                  <label className="block text-xs text-white/50 mb-1">{l.nif}</label>
+                  <input
+                    type="text"
+                    value={nif}
+                    onChange={(e) => setNif(e.target.value)}
+                    inputMode="numeric"
+                    maxLength={15}
+                    className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
+                    placeholder={l.nifTip}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="pt-2">
