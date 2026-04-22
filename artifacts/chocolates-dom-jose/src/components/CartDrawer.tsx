@@ -15,6 +15,8 @@ const labels: Record<
     email: string;
     phone: string;
     phoneTip: string;
+    nif: string;
+    nifTip: string;
     pay: string;
     back: string;
     customerTitle: string;
@@ -37,6 +39,8 @@ const labels: Record<
     email: "E-mail",
     phone: "Telemóvel (para MB WAY)",
     phoneTip: "Ex: 912345678",
+    nif: "NIF (opcional, para fatura)",
+    nifTip: "9 dígitos",
     pay: "Pagar com EasyPay",
     back: "← Voltar",
     customerTitle: "Os seus dados",
@@ -58,6 +62,8 @@ const labels: Record<
     email: "Email",
     phone: "Mobile (for MB WAY)",
     phoneTip: "e.g. 912345678",
+    nif: "Tax ID / NIF (optional, for invoice)",
+    nifTip: "9 digits",
     pay: "Pay with EasyPay",
     back: "← Back",
     customerTitle: "Your details",
@@ -79,6 +85,8 @@ const labels: Record<
     email: "E-Mail",
     phone: "Mobilnummer (für MB WAY)",
     phoneTip: "z. B. 912345678",
+    nif: "Steuernummer / NIF (optional, für Rechnung)",
+    nifTip: "9 Ziffern",
     pay: "Mit EasyPay bezahlen",
     back: "← Zurück",
     customerTitle: "Ihre Daten",
@@ -100,6 +108,8 @@ const labels: Record<
     email: "E-mail",
     phone: "Mobiel (voor MB WAY)",
     phoneTip: "bijv. 912345678",
+    nif: "Btw-nummer / NIF (optioneel, voor factuur)",
+    nifTip: "9 cijfers",
     pay: "Betalen met EasyPay",
     back: "← Terug",
     customerTitle: "Uw gegevens",
@@ -121,6 +131,7 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [nif, setNif] = useState("");
   const [address, setAddress] = useState("");
   const [postcode, setPostcode] = useState("");
   const [city, setCity] = useState("");
@@ -142,6 +153,7 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
             name: name.trim() || undefined,
             email: email.trim() || undefined,
             phone: phone.trim() || undefined,
+            nif: nif.trim() || undefined,
           },
           shipping: {
             address: address.trim() || undefined,
@@ -304,6 +316,18 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
                   placeholder={l.phoneTip}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-white/50 mb-1">{l.nif}</label>
+                <input
+                  type="text"
+                  value={nif}
+                  onChange={(e) => setNif(e.target.value)}
+                  inputMode="numeric"
+                  maxLength={15}
+                  className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
+                  placeholder={l.nifTip}
                 />
               </div>
             </div>

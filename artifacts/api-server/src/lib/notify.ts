@@ -4,6 +4,7 @@ export type OrderDetails = {
   customerName: string;
   customerEmail: string;
   customerPhone: string;
+  customerNif?: string;
   shippingAddress: string;
   shippingPostcode: string;
   shippingCity: string;
@@ -29,7 +30,8 @@ export function buildOrderText(o: OrderDetails): string {
     `🍫 Chocolates Dom José\n\n` +
     `👤 Cliente: ${o.customerName || "-"}\n` +
     `📧 Email: ${o.customerEmail || "-"}\n` +
-    `📱 Telemóvel: ${o.customerPhone || "-"}\n\n` +
+    `📱 Telemóvel: ${o.customerPhone || "-"}\n` +
+    `🧾 NIF: ${o.customerNif || "-"}\n\n` +
     `📦 Morada de envio:\n` +
     `   ${o.shippingAddress || "-"}\n` +
     `   ${o.shippingPostcode || ""} ${o.shippingCity || ""}\n` +
@@ -60,6 +62,7 @@ function buildOrderHtml(o: OrderDetails): string {
       <p style="margin:2px 0"><strong>Nome:</strong> ${o.customerName || "-"}</p>
       <p style="margin:2px 0"><strong>Email:</strong> ${o.customerEmail || "-"}</p>
       <p style="margin:2px 0"><strong>Telemóvel:</strong> ${o.customerPhone || "-"}</p>
+      <p style="margin:2px 0"><strong>NIF:</strong> ${o.customerNif || "-"}</p>
 
       <h4 style="margin-bottom:4px;margin-top:18px">📦 Morada de envio</h4>
       <div style="background:#fff8ef;border:1px solid #f0d9b5;padding:12px;border-radius:6px;line-height:1.6">

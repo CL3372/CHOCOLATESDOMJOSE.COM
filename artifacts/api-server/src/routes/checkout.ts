@@ -19,7 +19,7 @@ checkoutRouter.post("/checkout", async (req, res) => {
       items: { id: string; quantity: number }[];
       successUrl: string;
       cancelUrl: string;
-      customer?: { name?: string; email?: string; phone?: string };
+      customer?: { name?: string; email?: string; phone?: string; nif?: string };
       shipping?: {
         address?: string;
         postcode?: string;
@@ -55,6 +55,7 @@ checkoutRouter.post("/checkout", async (req, res) => {
       customerName: customer?.name ?? "",
       customerEmail: customer?.email ?? "",
       customerPhone: customer?.phone ?? "",
+      customerNif: customer?.nif ?? "",
       shippingAddress: shipping?.address ?? "",
       shippingPostcode: shipping?.postcode ?? "",
       shippingCity: shipping?.city ?? "",
