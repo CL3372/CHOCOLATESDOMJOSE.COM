@@ -127,6 +127,72 @@ export async function sendTelegram(message: string) {
   }
 }
 
+function buildCustomerHtml(o: OrderDetails): string {
+  const itemsRows = o.items
+    .map(
+      (i) =>
+        `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee">${i.quantity}× ${i.name}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">€${(i.unitPriceEur * i.quantity).toFixed(2)}</td></tr>`
+    )
+    .join("");
+
+  return `
+  <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#333">
+    <h2 style="background:#5a2a0a;color:#fff;padding:14px;margin:0;border-radius:6px 6px 0 0">🍫 Chocolates Dom José</h2>
+    <div style="border:1px solid #ddd;border-top:0;padding:18px;border-radius:0 0 6px 6px">
+      <p>Olá ${o.customerName || ""},</p>
+      <p>Obrigado pela sua encomenda! Recebemos os seus dados e iremos processar o seu pedido em breve.</p>
+
+      <h4 style="margin-bottom:4px;margin-top:18px">📦 Morada de envio</h4>
+      <div style="background:#fff8ef;border:1px solid #f0d9b5;padding:12px;border-radius:6px;line-height:1.6">
+        <div>${o.shippingAddress || "-"}</div>
+        <div>${o.shippingPostcode || ""} ${o.shippingCity || ""}</div>
+        <div>${o.shippingCountry || ""}</div>
+      </div>
+
+      <h4 style="margin-bottom:4px;margin-top:18px">🛍 Resumo da encomenda</h4>
+      <table style="width:100%;border-collapse:collapse">${itemsRows}</table>
+      <p style="margin-top:14px;font-size:18px"><strong>Total: €${o.totalEur.toFixed(2)}</strong></p>
+
+      ${o.customerNif ? `<p style="font-size:13px;color:#666">NIF para fatura: <strong>${o.customerNif}</strong></p>` : ""}
+
+      <hr style="border:0;border-top:1px solid #eee;margin:20px 0" />
+
+      <p style="font-size:13px;color:#555">
+        <strong>📄 Fatura:</strong> A fatura oficial será emitida pelo nosso sistema de faturação certificado e enviada para este email assim que possível${o.customerNif ? ", com o seu NIF" : ""}.
+      </p>
+
+      <p style="margin-top:24px;color:#555">
+        Com os melhores cumprimentos,<br/>
+        <strong>Chocolates Dom José</strong><br/>
+        <a href="https://chocolatesdomjose.com" style="color:#5a2a0a">chocolatesdomjose.com</a>
+      </p>
+    </div>
+  </div>`;
+}
+
+async function sendCustomerConfirmation(order: OrderDetails) {
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+
+  if (!gmailUser || !gmailPass || !order.customerEmail) return;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: gmailUser, pass: gmailPass },
+  });
+
+  const subject = `Confirmação da sua encomenda — Chocolates Dom José`;
+  const html = buildCustomerHtml(order);
+
+  await transporter.sendMail({
+    from: `"Chocolates Dom José" <${gmailUser}>`,
+    to: order.customerEmail,
+    subject,
+    html,
+  });
+  console.log("Customer confirmation sent to", order.customerEmail);
+}
+
 export async function notifyOrder(order: OrderDetails) {
   const text = buildOrderText(order);
   const subject =
@@ -135,5 +201,9 @@ export async function notifyOrder(order: OrderDetails) {
       : `🛒 Nova encomenda €${order.totalEur.toFixed(2)} — Chocolates Dom José`;
 
   const html = buildOrderHtml(order);
-  await Promise.allSettled([sendEmail(subject, text, html), sendTelegram(text)]);
+  await Promise.allSettled([
+    sendEmail(subject, text, html),
+    sendTelegram(text),
+    sendCustomerConfirmation(order).catch((e) => console.error("Customer email error:", e)),
+  ]);
 }

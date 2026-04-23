@@ -18,6 +18,7 @@ const labels: Record<
     nif: string;
     nifTip: string;
     invoiceQuestion: string;
+    invoiceNote: string;
     yes: string;
     no: string;
     pay: string;
@@ -44,7 +45,8 @@ const labels: Record<
     phoneTip: "Ex: 912345678",
     nif: "NIF",
     nifTip: "9 dígitos",
-    invoiceQuestion: "Fatura com NIF?",
+    invoiceQuestion: "Quer o seu NIF na fatura?",
+    invoiceNote: "A fatura é sempre enviada por email após o pagamento.",
     yes: "Sim",
     no: "Não",
     pay: "Pagar com EasyPay",
@@ -70,7 +72,8 @@ const labels: Record<
     phoneTip: "e.g. 912345678",
     nif: "Tax ID / NIF",
     nifTip: "9 digits",
-    invoiceQuestion: "Invoice with NIF?",
+    invoiceQuestion: "Add your NIF to the invoice?",
+    invoiceNote: "An invoice is always emailed after payment.",
     yes: "Yes",
     no: "No",
     pay: "Pay with EasyPay",
@@ -96,7 +99,8 @@ const labels: Record<
     phoneTip: "z. B. 912345678",
     nif: "Steuernummer / NIF",
     nifTip: "9 Ziffern",
-    invoiceQuestion: "Rechnung mit NIF?",
+    invoiceQuestion: "NIF auf der Rechnung?",
+    invoiceNote: "Die Rechnung wird nach der Zahlung immer per E-Mail gesendet.",
     yes: "Ja",
     no: "Nein",
     pay: "Mit EasyPay bezahlen",
@@ -122,7 +126,8 @@ const labels: Record<
     phoneTip: "bijv. 912345678",
     nif: "Btw-nummer / NIF",
     nifTip: "9 cijfers",
-    invoiceQuestion: "Factuur met NIF?",
+    invoiceQuestion: "NIF op de factuur?",
+    invoiceNote: "De factuur wordt altijd per e-mail verzonden na betaling.",
     yes: "Ja",
     no: "Nee",
     pay: "Betalen met EasyPay",
@@ -336,6 +341,7 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
               </div>
               <div>
                 <label className="block text-xs text-white/50 mb-2">{l.invoiceQuestion}</label>
+                <p className="text-[11px] text-white/40 mb-2 italic">{l.invoiceNote}</p>
                 <div className="flex gap-2">
                   <button
                     type="button"
