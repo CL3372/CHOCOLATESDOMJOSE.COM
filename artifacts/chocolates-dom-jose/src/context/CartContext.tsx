@@ -21,6 +21,7 @@ interface CartContextValue {
   addItem: (product: CartProduct) => void;
   removeItem: (id: string) => void;
   updateQty: (id: string, qty: number) => void;
+  clearCart: () => void;
   total: number;
   count: number;
 }
@@ -65,6 +66,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         addItem,
         removeItem,
         updateQty,
+        clearCart: () => setItems([]),
         total,
         count,
       }}

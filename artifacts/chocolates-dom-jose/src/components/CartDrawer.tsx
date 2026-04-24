@@ -147,13 +147,18 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
     setError(null);
     try {
       const origin = window.location.origin;
+      try {
+        localStorage.setItem("lang", lang);
+      } catch {
+        // ignore storage errors (e.g. private mode)
+      }
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: items.map((i) => ({ id: i.id, quantity: i.quantity })),
-          successUrl: `${origin}/?order=success`,
-          cancelUrl: `${origin}/?order=cancelled`,
+          successUrl: `${origin}/checkout/success?lang=${lang}`,
+          cancelUrl: `${origin}/checkout/cancel?lang=${lang}`,
           customer: {
             name: name.trim() || undefined,
             email: email.trim() || undefined,
