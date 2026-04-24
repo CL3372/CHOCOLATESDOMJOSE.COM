@@ -37,13 +37,32 @@ export async function createEasyPayCheckout(params: {
         transaction_key: orderKey,
         descriptive: "Chocolates Dom Jose",
       },
+      // EasyPay Forms-checkout: redirect URLs after payment.
+      // Different EasyPay account profiles accept different field names —
+      // we send them all; unknown fields are ignored by the API.
+      config: {
+        success_url: params.returnUrl,
+        failed_url: params.cancelUrl,
+        back_url: params.cancelUrl,
+        redirect_url: params.returnUrl,
+      },
     },
     order: {
       key: orderKey,
       value: amountEur,
     },
+    // Top-level variants for backward compatibility with older EasyPay
+    // checkout profiles.
+    success_url: params.returnUrl,
+    failed_url: params.cancelUrl,
+    back_url: params.cancelUrl,
     return_url: params.returnUrl,
     cancel_url: params.cancelUrl,
+    url: {
+      success: params.returnUrl,
+      failed: params.cancelUrl,
+      back: params.cancelUrl,
+    },
   };
 
   if (params.customer && Object.values(params.customer).some(Boolean)) {
