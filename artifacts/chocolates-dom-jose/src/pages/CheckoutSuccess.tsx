@@ -10,6 +10,7 @@ const COPY: Record<Lang, {
   body: string;
   bodyEmail: string;
   cta: string;
+  closing: string;
   thanks: string;
 }> = {
   PT: {
@@ -18,6 +19,7 @@ const COPY: Record<Lang, {
     body: "Recebemos a sua encomenda e estamos a prepará-la com todo o cuidado.",
     bodyEmail: "Em breve receberá a fatura-recibo no seu email.",
     cta: "Voltar à loja",
+    closing: "A Chocolates Dom José agradece-lhe",
     thanks: "Chocolates Dom José",
   },
   EN: {
@@ -26,6 +28,7 @@ const COPY: Record<Lang, {
     body: "We have received your order and are preparing it with great care.",
     bodyEmail: "You will receive your invoice by email shortly.",
     cta: "Back to shop",
+    closing: "Chocolates Dom José thanks you",
     thanks: "Chocolates Dom José",
   },
   DE: {
@@ -34,6 +37,7 @@ const COPY: Record<Lang, {
     body: "Wir haben Ihre Bestellung erhalten und bereiten sie sorgfältig vor.",
     bodyEmail: "Sie erhalten in Kürze Ihre Rechnung per E-Mail.",
     cta: "Zurück zum Shop",
+    closing: "Chocolates Dom José bedankt sich bei Ihnen",
     thanks: "Chocolates Dom José",
   },
   NL: {
@@ -42,6 +46,7 @@ const COPY: Record<Lang, {
     body: "We hebben uw bestelling ontvangen en bereiden deze met zorg voor.",
     bodyEmail: "U ontvangt binnenkort uw factuur per e-mail.",
     cta: "Terug naar de winkel",
+    closing: "Chocolates Dom José dankt u",
     thanks: "Chocolates Dom José",
   },
 };
@@ -103,7 +108,10 @@ export default function CheckoutSuccess() {
           {c.cta}
         </Link>
 
-        <p className="mt-12 font-serif italic text-amber-200/70">{c.thanks}</p>
+        <p className="mt-12 text-sm text-white/70">
+          {c.closing} <span className="text-rose-400">♥</span>
+        </p>
+        <p className="mt-1 font-serif italic text-amber-200/70">{c.thanks}</p>
       </div>
     </div>
   );
