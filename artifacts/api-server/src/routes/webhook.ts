@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { sendEmail, sendTelegram } from "../lib/notify.js";
-import { getPendingOrder, deletePendingOrder } from "../lib/orderStore.js";
+import {
+  getPendingOrder,
+  deletePendingOrder,
+  tryReservePayment,
+  releasePayment,
+} from "../lib/orderStore.js";
 import { issueInvoiceReceipt } from "../lib/moloni.js";
 
 const webhookRouter = Router();
@@ -16,11 +21,8 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
       body?.status ??
       "";
 
-    const isPaid =
-      status === "success" ||
-      status === "paid" ||
-      status === "authorisation" ||
-      body?.type === "authorisation";
+    // Only treat fully settled payments as paid. Skip "authorisation" — it's pre-capture.
+    const isPaid = status === "success" || status === "paid";
 
     if (!isPaid) {
       res.json({ received: true });
@@ -53,6 +55,13 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
       body?.key ??
       "";
 
+    // Idempotency — if EasyPay re-delivers, don't double-issue or double-notify
+    if (!tryReservePayment(paymentId)) {
+      console.log(`Webhook duplicate for paymentId=${paymentId} — ignoring`);
+      res.json({ received: true, deduped: true });
+      return;
+    }
+
     const methodLabel =
       method === "MB" ? "Multibanco" :
       method === "MBW" ? "MB WAY" :
@@ -65,23 +74,33 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
     const stored = orderKey ? getPendingOrder(orderKey) : undefined;
 
     if (stored) {
-      try {
-        const result = await issueInvoiceReceipt({
-          customer: stored.customer,
-          shipping: stored.shipping,
-          items: stored.items,
-          totalEur: stored.totalEur,
-          paymentMethodLabel: methodLabel,
-          paymentRef: paymentId,
-        });
+      // Reconcile webhook amount vs stored cart total — guard against tampering / mismatches
+      const storedTotalCents = Math.round(stored.totalEur * 100);
+      const paidCents = Math.round(Number(amount) * 100);
+      if (paidCents > 0 && Math.abs(storedTotalCents - paidCents) > 1) {
         faturaLine =
-          `📄 Fatura-Recibo: ${result.document_number || result.document_id}` +
-          (result.emailedTo ? ` (enviada para ${result.emailedTo})` : ` (NÃO enviada por email — verifique Moloni)`) +
-          `\n`;
-        deletePendingOrder(orderKey);
-      } catch (e: any) {
-        console.error("Moloni invoice error:", e);
-        faturaLine = `⚠️ ERRO ao emitir fatura no Moloni: ${e?.message ?? e}\n   → Emita manualmente em https://www.moloni.pt\n`;
+          `⚠️ Fatura NÃO emitida — valor pago (€${amountStr}) não corresponde ao total da encomenda (€${stored.totalEur.toFixed(2)}). Verifique manualmente.\n`;
+      } else {
+        try {
+          const result = await issueInvoiceReceipt({
+            customer: stored.customer,
+            shipping: stored.shipping,
+            items: stored.items,
+            totalEur: stored.totalEur,
+            paymentMethodLabel: methodLabel,
+            paymentRef: paymentId,
+          });
+          faturaLine =
+            `📄 Fatura-Recibo: ${result.document_number || result.document_id}` +
+            (result.emailedTo ? ` (enviada para ${result.emailedTo})` : ` (NÃO enviada por email — verifique Moloni)`) +
+            `\n`;
+          deletePendingOrder(orderKey);
+        } catch (e: any) {
+          console.error("Moloni invoice error:", e);
+          faturaLine = `⚠️ ERRO ao emitir fatura no Moloni: ${e?.message ?? e}\n   → Emita manualmente em https://www.moloni.pt\n`;
+          // release reservation so a manual retry/EasyPay re-delivery can try again
+          releasePayment(paymentId);
+        }
       }
     } else {
       faturaLine = orderKey

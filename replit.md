@@ -25,3 +25,20 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - `pnpm --filter @workspace/api-server run dev` — run API server locally
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+
+## Chocolates Dom José — Moloni invoicing integration
+
+Auto-issues a Fatura-Recibo (FR) in Moloni after every paid order and emails it to the customer.
+
+- Library: `artifacts/api-server/src/lib/moloni.ts`
+- Pending order store: `artifacts/api-server/src/lib/orderStore.ts` (in-memory, 24h TTL — not persistent across restarts)
+- Wired in: `routes/checkout.ts` stores order; `routes/webhook.ts` issues fatura on payment confirmation
+- Auth: OAuth2 password grant (Moloni requires this for custom dev apps)
+- Body format: `application/x-www-form-urlencoded` (Moloni rejects JSON bodies)
+- VAT: 23% (IVA Normal); article prices stored excluding VAT, recomputed from gross
+- Articles: one per product (auto-created in Moloni on first sale, cached in memory)
+- Customer: looked up by NIF then by email; created if missing (NIF defaults to 999999990 / Consumidor Final)
+- Email: fatura is sent automatically from Moloni to customer's email after issuance
+- Document type: invoiceReceipts/insert (Fatura-Recibo, status=1 = closed)
+- Required secrets: `MOLONI_CLIENT_ID` (the Developer ID/Slug, not the numeric app ID), `MOLONI_CLIENT_SECRET`, `MOLONI_USERNAME` (login email), `MOLONI_PASSWORD`, `MOLONI_COMPANY_ID` (numeric — verify via `companies/getAll`)
+- Failure handling: if Moloni call fails, payment still succeeds and merchant gets a notification with the error so they can issue manually in moloni.pt
