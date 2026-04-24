@@ -455,7 +455,7 @@ export async function issueInvoiceReceipt(
   let emailedTo: string | undefined;
   if (order.customer.email) {
     try {
-      await moloniCall("documents/sendByEmail", {
+      await moloniCall("documents/sendEmailDocumentToCustomer", {
         company_id,
         document_id: inv.document_id,
         email: order.customer.email,
@@ -465,7 +465,7 @@ export async function issueInvoiceReceipt(
       });
       emailedTo = order.customer.email;
     } catch (e) {
-      console.error("Moloni sendByEmail (non-fatal):", e);
+      console.error("Moloni sendEmailDocumentToCustomer (non-fatal):", e);
     }
   }
 
