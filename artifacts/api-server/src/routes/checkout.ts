@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createEasyPayCheckout } from "../lib/easypay.js";
 import { notifyOrder } from "../lib/notify.js";
+import { setPendingOrder } from "../lib/orderStore.js";
 
 const checkoutRouter = Router();
 
@@ -44,11 +45,35 @@ checkoutRouter.post("/checkout", async (req, res) => {
       0
     );
 
-    const url = await createEasyPayCheckout({
+    const { url, orderKey } = await createEasyPayCheckout({
       amountCents,
       returnUrl: successUrl,
       cancelUrl,
       customer,
+    });
+
+    const itemsForStore = validItems.map((i) => ({
+      reference: i.id,
+      name: PRODUCTS[i.id].name,
+      quantity: i.quantity,
+      unitPriceEur: PRODUCTS[i.id].price / 100,
+    }));
+
+    setPendingOrder(orderKey, {
+      customer: {
+        name: customer?.name ?? "",
+        email: customer?.email ?? "",
+        phone: customer?.phone ?? "",
+        nif: customer?.nif,
+      },
+      shipping: {
+        address: shipping?.address ?? "",
+        postcode: shipping?.postcode ?? "",
+        city: shipping?.city ?? "",
+        country: shipping?.country ?? "Portugal",
+      },
+      items: itemsForStore,
+      totalEur: amountCents / 100,
     });
 
     notifyOrder({
@@ -60,10 +85,10 @@ checkoutRouter.post("/checkout", async (req, res) => {
       shippingPostcode: shipping?.postcode ?? "",
       shippingCity: shipping?.city ?? "",
       shippingCountry: shipping?.country ?? "Portugal",
-      items: validItems.map((i) => ({
-        name: PRODUCTS[i.id].name,
+      items: itemsForStore.map((i) => ({
+        name: i.name,
         quantity: i.quantity,
-        unitPriceEur: PRODUCTS[i.id].price / 100,
+        unitPriceEur: i.unitPriceEur,
       })),
       totalEur: amountCents / 100,
       status: "pending",

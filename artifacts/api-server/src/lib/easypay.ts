@@ -20,11 +20,13 @@ export async function createEasyPayCheckout(params: {
   returnUrl: string;
   cancelUrl: string;
   customer?: { name?: string; email?: string; phone?: string };
-}): Promise<string> {
+  orderKey?: string;
+}): Promise<{ url: string; orderKey: string }> {
   const amountEur = parseFloat((params.amountCents / 100).toFixed(2));
 
-  const orderKey = `ORDER-${Date.now()}`;
-  const txKey = `TXN-${Date.now()}`;
+  const orderKey =
+    params.orderKey ??
+    `ORDER-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
   const body: Record<string, unknown> = {
     type: ["single"],
@@ -32,7 +34,7 @@ export async function createEasyPayCheckout(params: {
       methods: ["CC", "MB", "MBW"],
       currency: "EUR",
       capture: {
-        transaction_key: txKey,
+        transaction_key: orderKey,
         descriptive: "Chocolates Dom Jose",
       },
     },
@@ -71,5 +73,8 @@ export async function createEasyPayCheckout(params: {
     JSON.stringify({ id: data.id, session: data.session, config: data.config ?? null })
   ).toString("base64");
 
-  return `https://pay.easypay.pt/?manifest=${encodeURIComponent(manifest)}`;
+  return {
+    url: `https://pay.easypay.pt/?manifest=${encodeURIComponent(manifest)}`,
+    orderKey,
+  };
 }

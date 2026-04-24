@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { sendEmail, sendTelegram } from "../lib/notify.js";
+import { getPendingOrder, deletePendingOrder } from "../lib/orderStore.js";
+import { issueInvoiceReceipt } from "../lib/moloni.js";
 
 const webhookRouter = Router();
 
@@ -44,21 +46,60 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
       body?.id ??
       "-";
 
+    const orderKey: string =
+      body?.order?.key ??
+      body?.transaction?.key ??
+      body?.payment?.key ??
+      body?.key ??
+      "";
+
     const methodLabel =
       method === "MB" ? "Multibanco" :
       method === "MBW" ? "MB WAY" :
       method === "CC" ? "Cartão de crédito" :
       method;
 
+    const amountStr = Number(amount).toFixed(2);
+
+    let faturaLine = "";
+    const stored = orderKey ? getPendingOrder(orderKey) : undefined;
+
+    if (stored) {
+      try {
+        const result = await issueInvoiceReceipt({
+          customer: stored.customer,
+          shipping: stored.shipping,
+          items: stored.items,
+          totalEur: stored.totalEur,
+          paymentMethodLabel: methodLabel,
+          paymentRef: paymentId,
+        });
+        faturaLine =
+          `📄 Fatura-Recibo: ${result.document_number || result.document_id}` +
+          (result.emailedTo ? ` (enviada para ${result.emailedTo})` : ` (NÃO enviada por email — verifique Moloni)`) +
+          `\n`;
+        deletePendingOrder(orderKey);
+      } catch (e: any) {
+        console.error("Moloni invoice error:", e);
+        faturaLine = `⚠️ ERRO ao emitir fatura no Moloni: ${e?.message ?? e}\n   → Emita manualmente em https://www.moloni.pt\n`;
+      }
+    } else {
+      faturaLine = orderKey
+        ? `⚠️ Fatura NÃO emitida (encomenda ${orderKey} não encontrada no servidor — pode ter expirado ou reiniciado). Emita manualmente.\n`
+        : `⚠️ Fatura NÃO emitida (sem chave da encomenda no webhook). Emita manualmente.\n`;
+    }
+
     const text =
       `✅ PAGAMENTO CONFIRMADO\n\n` +
       `🍫 Chocolates Dom José\n\n` +
-      `💶 Valor: €${Number(amount).toFixed(2)}\n` +
+      `💶 Valor: €${amountStr}\n` +
       `💳 Método: ${methodLabel}\n` +
-      `🆔 ID: ${paymentId}\n\n` +
-      `Pode preparar a encomenda. Verifique a morada de envio na encomenda original.`;
+      `🆔 ID: ${paymentId}\n` +
+      (orderKey ? `🔑 Encomenda: ${orderKey}\n` : "") +
+      `\n${faturaLine}` +
+      `\nPode preparar a encomenda. Verifique a morada de envio na encomenda original.`;
 
-    const subject = `✅ Pagamento confirmado €${Number(amount).toFixed(2)} — Chocolates Dom José`;
+    const subject = `✅ Pagamento confirmado €${amountStr} — Chocolates Dom José`;
 
     await Promise.allSettled([sendEmail(subject, text), sendTelegram(text)]);
 
