@@ -42,3 +42,14 @@ Auto-issues a Fatura-Recibo (FR) in Moloni after every paid order and emails it 
 - Document type: invoiceReceipts/insert (Fatura-Recibo, status=1 = closed)
 - Required secrets: `MOLONI_CLIENT_ID` (the Developer ID/Slug, not the numeric app ID), `MOLONI_CLIENT_SECRET`, `MOLONI_USERNAME` (login email), `MOLONI_PASSWORD`, `MOLONI_COMPANY_ID` (numeric — verify via `companies/getAll`)
 - Failure handling: if Moloni call fails, payment still succeeds and merchant gets a notification with the error so they can issue manually in moloni.pt
+
+## Chocolates Dom José — Customer notifications
+
+When EasyPay confirms payment (webhook), the customer automatically receives a friendly multilingual confirmation email in their browsing language (PT/EN/DE/NL).
+
+- Library: `artifacts/api-server/src/lib/notify.ts` — `sendCustomerConfirmation()`
+- Triggered from: `routes/webhook.ts` after successful payment, alongside merchant email + Telegram + Moloni fatura
+- Language: cart sends `lang` field to `/api/checkout`; stored on the pending order; webhook reads it and picks the right copy
+- Content: greeting + "Thank you for your order, your payment has been confirmed and your order is being processed" + shipping address + order summary + total + (if NIF given) note that fatura will arrive separately
+- Merchant fallback: even if customer email fails, merchant still gets the order notification via Gmail and Telegram
+- Required secrets (deployment + dev): `GMAIL_USER` and `GMAIL_APP_PASSWORD` — without these all email is silently skipped (Telegram still works)

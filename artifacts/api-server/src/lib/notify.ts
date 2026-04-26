@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import type { Lang } from "./orderStore.js";
 
 export type OrderDetails = {
   customerName: string;
@@ -13,6 +14,84 @@ export type OrderDetails = {
   totalEur: number;
   paymentId?: string;
   status: "pending" | "paid";
+  lang?: Lang;
+};
+
+type CustomerCopy = {
+  subject: string;
+  greeting: (name: string) => string;
+  thanks: string;
+  processing: string;
+  shippingTitle: string;
+  orderTitle: string;
+  totalLabel: string;
+  nifLine: (nif: string) => string;
+  faturaNote: string;
+  signature: string;
+  team: string;
+};
+
+const CUSTOMER_COPY: Record<Lang, CustomerCopy> = {
+  PT: {
+    subject: "Obrigado pela sua encomenda — Chocolates Dom José",
+    greeting: (n) => `Olá ${n || ""},`.trim(),
+    thanks: "Obrigado pela sua encomenda!",
+    processing:
+      "O seu pagamento foi confirmado e a sua encomenda está a ser processada. Iremos prepará-la com todo o cuidado e enviá-la o mais brevemente possível.",
+    shippingTitle: "📦 Morada de envio",
+    orderTitle: "🛍 Resumo da encomenda",
+    totalLabel: "Total",
+    nifLine: (nif) => `NIF para fatura: <strong>${nif}</strong>`,
+    faturaNote:
+      "A fatura oficial será emitida pelo nosso sistema de faturação certificado e enviada para este email.",
+    signature: "Com os melhores cumprimentos,",
+    team: "Chocolates Dom José ♥",
+  },
+  EN: {
+    subject: "Thank you for your order — Chocolates Dom José",
+    greeting: (n) => `Hello ${n || ""},`.trim(),
+    thanks: "Thank you for your order!",
+    processing:
+      "Your payment has been confirmed and your order is now being processed. We will prepare it with great care and ship it as soon as possible.",
+    shippingTitle: "📦 Shipping address",
+    orderTitle: "🛍 Order summary",
+    totalLabel: "Total",
+    nifLine: (nif) => `Tax number for invoice: <strong>${nif}</strong>`,
+    faturaNote:
+      "The official invoice will be issued by our certified invoicing system and sent to this email.",
+    signature: "Kind regards,",
+    team: "Chocolates Dom José ♥",
+  },
+  DE: {
+    subject: "Vielen Dank für Ihre Bestellung — Chocolates Dom José",
+    greeting: (n) => `Hallo ${n || ""},`.trim(),
+    thanks: "Vielen Dank für Ihre Bestellung!",
+    processing:
+      "Ihre Zahlung wurde bestätigt und Ihre Bestellung wird jetzt bearbeitet. Wir werden sie mit größter Sorgfalt vorbereiten und so schnell wie möglich versenden.",
+    shippingTitle: "📦 Lieferadresse",
+    orderTitle: "🛍 Bestellübersicht",
+    totalLabel: "Gesamt",
+    nifLine: (nif) => `Steuernummer für Rechnung: <strong>${nif}</strong>`,
+    faturaNote:
+      "Die offizielle Rechnung wird von unserem zertifizierten Rechnungssystem ausgestellt und an diese E-Mail-Adresse gesendet.",
+    signature: "Mit freundlichen Grüßen,",
+    team: "Chocolates Dom José ♥",
+  },
+  NL: {
+    subject: "Bedankt voor uw bestelling — Chocolates Dom José",
+    greeting: (n) => `Hallo ${n || ""},`.trim(),
+    thanks: "Bedankt voor uw bestelling!",
+    processing:
+      "Uw betaling is bevestigd en uw bestelling wordt nu verwerkt. We zullen deze met de grootste zorg voorbereiden en zo snel mogelijk verzenden.",
+    shippingTitle: "📦 Verzendadres",
+    orderTitle: "🛍 Besteloverzicht",
+    totalLabel: "Totaal",
+    nifLine: (nif) => `Btw-nummer voor factuur: <strong>${nif}</strong>`,
+    faturaNote:
+      "De officiële factuur wordt uitgegeven door ons gecertificeerde factureringssysteem en naar dit e-mailadres verzonden.",
+    signature: "Met vriendelijke groet,",
+    team: "Chocolates Dom José ♥",
+  },
 };
 
 export function buildOrderText(o: OrderDetails): string {
@@ -127,7 +206,7 @@ export async function sendTelegram(message: string) {
   }
 }
 
-function buildCustomerHtml(o: OrderDetails): string {
+function buildCustomerHtml(o: OrderDetails, copy: CustomerCopy): string {
   const itemsRows = o.items
     .map(
       (i) =>
@@ -139,58 +218,68 @@ function buildCustomerHtml(o: OrderDetails): string {
   <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#333">
     <h2 style="background:#5a2a0a;color:#fff;padding:14px;margin:0;border-radius:6px 6px 0 0">🍫 Chocolates Dom José</h2>
     <div style="border:1px solid #ddd;border-top:0;padding:18px;border-radius:0 0 6px 6px">
-      <p>Olá ${o.customerName || ""},</p>
-      <p>Obrigado pela sua encomenda! Recebemos os seus dados e iremos processar o seu pedido em breve.</p>
+      <p style="font-size:16px">${copy.greeting(o.customerName || "")}</p>
+      <p style="font-size:16px"><strong>${copy.thanks}</strong></p>
+      <p>${copy.processing}</p>
 
-      <h4 style="margin-bottom:4px;margin-top:18px">📦 Morada de envio</h4>
+      <h4 style="margin-bottom:4px;margin-top:18px">${copy.shippingTitle}</h4>
       <div style="background:#fff8ef;border:1px solid #f0d9b5;padding:12px;border-radius:6px;line-height:1.6">
         <div>${o.shippingAddress || "-"}</div>
         <div>${o.shippingPostcode || ""} ${o.shippingCity || ""}</div>
         <div>${o.shippingCountry || ""}</div>
       </div>
 
-      <h4 style="margin-bottom:4px;margin-top:18px">🛍 Resumo da encomenda</h4>
+      <h4 style="margin-bottom:4px;margin-top:18px">${copy.orderTitle}</h4>
       <table style="width:100%;border-collapse:collapse">${itemsRows}</table>
-      <p style="margin-top:14px;font-size:18px"><strong>Total: €${o.totalEur.toFixed(2)}</strong></p>
+      <p style="margin-top:14px;font-size:18px"><strong>${copy.totalLabel}: €${o.totalEur.toFixed(2)}</strong></p>
 
-      ${o.customerNif ? `<p style="font-size:13px;color:#666">NIF para fatura: <strong>${o.customerNif}</strong></p>` : ""}
+      ${o.customerNif ? `<p style="font-size:13px;color:#666">${copy.nifLine(o.customerNif)}</p>` : ""}
 
       <hr style="border:0;border-top:1px solid #eee;margin:20px 0" />
 
       <p style="font-size:13px;color:#555">
-        <strong>📄 Fatura:</strong> A fatura oficial será emitida pelo nosso sistema de faturação certificado e enviada para este email assim que possível${o.customerNif ? ", com o seu NIF" : ""}.
+        <strong>📄</strong> ${copy.faturaNote}
       </p>
 
       <p style="margin-top:24px;color:#555">
-        Com os melhores cumprimentos,<br/>
-        <strong>Chocolates Dom José</strong><br/>
+        ${copy.signature}<br/>
+        <strong>${copy.team}</strong><br/>
         <a href="https://chocolatesdomjose.com" style="color:#5a2a0a">chocolatesdomjose.com</a>
       </p>
     </div>
   </div>`;
 }
 
-async function sendCustomerConfirmation(order: OrderDetails) {
+export async function sendCustomerConfirmation(order: OrderDetails): Promise<void> {
   const gmailUser = process.env.GMAIL_USER;
   const gmailPass = process.env.GMAIL_APP_PASSWORD;
 
-  if (!gmailUser || !gmailPass || !order.customerEmail) return;
+  if (!gmailUser || !gmailPass) {
+    console.warn("GMAIL_USER or GMAIL_APP_PASSWORD not set — skipping customer confirmation email");
+    return;
+  }
+  if (!order.customerEmail) {
+    console.warn("No customer email — skipping customer confirmation");
+    return;
+  }
+
+  const lang: Lang = order.lang ?? "PT";
+  const copy = CUSTOMER_COPY[lang] ?? CUSTOMER_COPY.PT;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: { user: gmailUser, pass: gmailPass },
   });
 
-  const subject = `Confirmação da sua encomenda — Chocolates Dom José`;
-  const html = buildCustomerHtml(order);
+  const html = buildCustomerHtml(order, copy);
 
   await transporter.sendMail({
     from: `"Chocolates Dom José" <${gmailUser}>`,
     to: order.customerEmail,
-    subject,
+    subject: copy.subject,
     html,
   });
-  console.log("Customer confirmation sent to", order.customerEmail);
+  console.log(`Customer confirmation (${lang}) sent to ${order.customerEmail}`);
 }
 
 export async function notifyOrder(order: OrderDetails) {
@@ -201,9 +290,11 @@ export async function notifyOrder(order: OrderDetails) {
       : `🛒 Nova encomenda €${order.totalEur.toFixed(2)} — Chocolates Dom José`;
 
   const html = buildOrderHtml(order);
+  // Note: customer confirmation is intentionally NOT sent here.
+  // It is sent from the EasyPay webhook once payment is actually confirmed,
+  // so the customer doesn't get "your order is being processed" before they pay.
   await Promise.allSettled([
     sendEmail(subject, text, html),
     sendTelegram(text),
-    sendCustomerConfirmation(order).catch((e) => console.error("Customer email error:", e)),
   ]);
 }

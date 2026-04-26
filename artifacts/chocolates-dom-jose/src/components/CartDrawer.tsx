@@ -171,6 +171,7 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
             city: city.trim() || undefined,
             country: country.trim() || undefined,
           },
+          lang,
         }),
       });
       const data = await res.json();

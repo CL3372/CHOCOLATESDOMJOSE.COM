@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { createEasyPayCheckout } from "../lib/easypay.js";
 import { notifyOrder } from "../lib/notify.js";
-import { setPendingOrder } from "../lib/orderStore.js";
+import { setPendingOrder, type Lang } from "../lib/orderStore.js";
+
+const VALID_LANGS: Lang[] = ["PT", "EN", "DE", "NL"];
 
 const checkoutRouter = Router();
 
@@ -16,7 +18,7 @@ const PRODUCTS: Record<string, { name: string; price: number }> = {
 
 checkoutRouter.post("/checkout", async (req, res) => {
   try {
-    const { items, successUrl, cancelUrl, customer, shipping } = req.body as {
+    const { items, successUrl, cancelUrl, customer, shipping, lang: rawLang } = req.body as {
       items: { id: string; quantity: number }[];
       successUrl: string;
       cancelUrl: string;
@@ -27,7 +29,12 @@ checkoutRouter.post("/checkout", async (req, res) => {
         city?: string;
         country?: string;
       };
+      lang?: string;
     };
+
+    const lang: Lang = VALID_LANGS.includes((rawLang ?? "").toUpperCase() as Lang)
+      ? ((rawLang as string).toUpperCase() as Lang)
+      : "PT";
 
     if (!items?.length) {
       res.status(400).json({ error: "No items in cart" });
@@ -74,6 +81,7 @@ checkoutRouter.post("/checkout", async (req, res) => {
       },
       items: itemsForStore,
       totalEur: amountCents / 100,
+      lang,
     });
 
     notifyOrder({
@@ -92,6 +100,7 @@ checkoutRouter.post("/checkout", async (req, res) => {
       })),
       totalEur: amountCents / 100,
       status: "pending",
+      lang,
     }).catch((err) => console.error("Notify error (non-blocking):", err));
 
     res.json({ url });

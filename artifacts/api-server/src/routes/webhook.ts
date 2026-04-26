@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { sendEmail, sendTelegram } from "../lib/notify.js";
+import { sendEmail, sendTelegram, sendCustomerConfirmation } from "../lib/notify.js";
 import {
   getPendingOrder,
   deletePendingOrder,
@@ -120,7 +120,35 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
 
     const subject = `✅ Pagamento confirmado €${amountStr} — Chocolates Dom José`;
 
-    await Promise.allSettled([sendEmail(subject, text), sendTelegram(text)]);
+    const tasks: Promise<unknown>[] = [sendEmail(subject, text), sendTelegram(text)];
+
+    // Send the customer their "thank you, your order is being processed"
+    // confirmation email in their language (PT/EN/DE/NL).
+    if (stored && stored.customer.email) {
+      tasks.push(
+        sendCustomerConfirmation({
+          customerName: stored.customer.name,
+          customerEmail: stored.customer.email,
+          customerPhone: stored.customer.phone,
+          customerNif: stored.customer.nif,
+          shippingAddress: stored.shipping.address,
+          shippingPostcode: stored.shipping.postcode,
+          shippingCity: stored.shipping.city,
+          shippingCountry: stored.shipping.country,
+          items: stored.items.map((i) => ({
+            name: i.name,
+            quantity: i.quantity,
+            unitPriceEur: i.unitPriceEur,
+          })),
+          totalEur: stored.totalEur,
+          paymentId,
+          status: "paid",
+          lang: stored.lang,
+        }).catch((e) => console.error("Customer confirmation email error:", e))
+      );
+    }
+
+    await Promise.allSettled(tasks);
 
     res.json({ received: true });
   } catch (err: any) {

@@ -5,6 +5,8 @@ export type StoredOrderItem = {
   unitPriceEur: number;
 };
 
+export type Lang = "PT" | "EN" | "DE" | "NL";
+
 export type StoredOrder = {
   customer: {
     name: string;
@@ -20,6 +22,7 @@ export type StoredOrder = {
   };
   items: StoredOrderItem[];
   totalEur: number;
+  lang: Lang;
 };
 
 const TTL_MS = 24 * 60 * 60 * 1000;
