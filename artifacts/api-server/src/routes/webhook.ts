@@ -56,7 +56,7 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
       "";
 
     // Idempotency — if EasyPay re-delivers, don't double-issue or double-notify
-    if (!tryReservePayment(paymentId)) {
+    if (!(await tryReservePayment(paymentId))) {
       console.log(`Webhook duplicate for paymentId=${paymentId} — ignoring`);
       res.json({ received: true, deduped: true });
       return;
@@ -71,7 +71,7 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
     const amountStr = Number(amount).toFixed(2);
 
     let faturaLine = "";
-    const stored = orderKey ? getPendingOrder(orderKey) : undefined;
+    const stored = orderKey ? await getPendingOrder(orderKey) : undefined;
 
     if (stored) {
       // Reconcile webhook amount vs stored cart total — guard against tampering / mismatches
@@ -94,12 +94,12 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
             `📄 Fatura-Recibo: ${result.document_number || result.document_id}` +
             (result.emailedTo ? ` (enviada para ${result.emailedTo})` : ` (NÃO enviada por email — verifique Moloni)`) +
             `\n`;
-          deletePendingOrder(orderKey);
+          await deletePendingOrder(orderKey);
         } catch (e: any) {
           console.error("Moloni invoice error:", e);
           faturaLine = `⚠️ ERRO ao emitir fatura no Moloni: ${e?.message ?? e}\n   → Emita manualmente em https://www.moloni.pt\n`;
           // release reservation so a manual retry/EasyPay re-delivery can try again
-          releasePayment(paymentId);
+          await releasePayment(paymentId);
         }
       }
     } else {

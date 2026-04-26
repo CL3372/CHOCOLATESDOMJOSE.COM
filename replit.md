@@ -31,7 +31,7 @@ See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and pa
 Auto-issues a Fatura-Recibo (FR) in Moloni after every paid order and emails it to the customer.
 
 - Library: `artifacts/api-server/src/lib/moloni.ts`
-- Pending order store: `artifacts/api-server/src/lib/orderStore.ts` (in-memory, 24h TTL — not persistent across restarts)
+- Pending order store: `artifacts/api-server/src/lib/orderStore.ts` (Postgres-backed via `@workspace/db`, 24h TTL). Uses two tables: `pending_orders` (order JSON keyed by orderKey) and `processed_payments` (idempotency for webhooks). Postgres-backed because the deployment runs multiple server instances behind a load balancer — checkout request and webhook may hit different PIDs, so in-memory state would not be visible to the webhook.
 - Wired in: `routes/checkout.ts` stores order; `routes/webhook.ts` issues fatura on payment confirmation
 - Auth: OAuth2 password grant (Moloni requires this for custom dev apps)
 - Body format: `application/x-www-form-urlencoded` (Moloni rejects JSON bodies)

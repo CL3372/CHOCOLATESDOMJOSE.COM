@@ -1,3 +1,6 @@
+import { db, pendingOrdersTable, processedPaymentsTable } from "@workspace/db";
+import { eq, lt } from "drizzle-orm";
+
 export type StoredOrderItem = {
   reference: string;
   name: string;
@@ -26,49 +29,68 @@ export type StoredOrder = {
 };
 
 const TTL_MS = 24 * 60 * 60 * 1000;
-const store = new Map<string, { order: StoredOrder; createdAt: number }>();
-
-function gc() {
-  const now = Date.now();
-  for (const [k, v] of store) {
-    if (now - v.createdAt > TTL_MS) store.delete(k);
-  }
-}
-
-export function setPendingOrder(orderKey: string, order: StoredOrder): void {
-  gc();
-  store.set(orderKey, { order, createdAt: Date.now() });
-}
-
-export function getPendingOrder(orderKey: string): StoredOrder | undefined {
-  return store.get(orderKey)?.order;
-}
-
-export function deletePendingOrder(orderKey: string): void {
-  store.delete(orderKey);
-}
-
-// --- Idempotency: track processed payment IDs so duplicate webhooks don't double-issue ---
-const processed = new Map<string, number>();
 const PROCESSED_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-function gcProcessed() {
-  const now = Date.now();
-  for (const [k, t] of processed) {
-    if (now - t > PROCESSED_TTL_MS) processed.delete(k);
-  }
+/**
+ * Persist a pending order keyed by orderKey. Uses Postgres so it survives
+ * container restarts and works across multiple server instances (the
+ * deployment may run more than one process behind a load balancer).
+ */
+export async function setPendingOrder(orderKey: string, order: StoredOrder): Promise<void> {
+  await db
+    .insert(pendingOrdersTable)
+    .values({ orderKey, data: order })
+    .onConflictDoUpdate({
+      target: pendingOrdersTable.orderKey,
+      set: { data: order, createdAt: new Date() },
+    });
 }
 
-/** Atomically reserve a payment for processing. Returns true if this caller wins the race, false if already processed/in-flight. */
-export function tryReservePayment(paymentId: string): boolean {
-  gcProcessed();
-  if (!paymentId || paymentId === "-") return true; // can't dedupe without an id
-  if (processed.has(paymentId)) return false;
-  processed.set(paymentId, Date.now());
-  return true;
+export async function getPendingOrder(orderKey: string): Promise<StoredOrder | undefined> {
+  const rows = await db
+    .select()
+    .from(pendingOrdersTable)
+    .where(eq(pendingOrdersTable.orderKey, orderKey))
+    .limit(1);
+
+  const row = rows[0];
+  if (!row) return undefined;
+
+  if (Date.now() - row.createdAt.getTime() > TTL_MS) {
+    await db.delete(pendingOrdersTable).where(eq(pendingOrdersTable.orderKey, orderKey));
+    return undefined;
+  }
+
+  return row.data as StoredOrder;
+}
+
+export async function deletePendingOrder(orderKey: string): Promise<void> {
+  await db.delete(pendingOrdersTable).where(eq(pendingOrdersTable.orderKey, orderKey));
+}
+
+/**
+ * Atomically reserve a payment id so duplicate webhook deliveries from EasyPay
+ * don't double-issue invoices or double-send notifications. Returns true if
+ * this caller wins the race, false if another caller already reserved it.
+ */
+export async function tryReservePayment(paymentId: string): Promise<boolean> {
+  if (!paymentId || paymentId === "-") return true;
+
+  // Best-effort GC of expired entries (cheap, runs in same connection)
+  const cutoff = new Date(Date.now() - PROCESSED_TTL_MS);
+  await db.delete(processedPaymentsTable).where(lt(processedPaymentsTable.processedAt, cutoff));
+
+  const inserted = await db
+    .insert(processedPaymentsTable)
+    .values({ paymentId })
+    .onConflictDoNothing()
+    .returning({ paymentId: processedPaymentsTable.paymentId });
+
+  return inserted.length > 0;
 }
 
 /** Release a reservation (call on failure so retries can proceed). */
-export function releasePayment(paymentId: string): void {
-  if (paymentId) processed.delete(paymentId);
+export async function releasePayment(paymentId: string): Promise<void> {
+  if (!paymentId) return;
+  await db.delete(processedPaymentsTable).where(eq(processedPaymentsTable.paymentId, paymentId));
 }

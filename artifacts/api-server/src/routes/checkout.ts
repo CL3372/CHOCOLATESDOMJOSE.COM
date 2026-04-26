@@ -66,7 +66,10 @@ checkoutRouter.post("/checkout", async (req, res) => {
       unitPriceEur: PRODUCTS[i.id].price / 100,
     }));
 
-    setPendingOrder(orderKey, {
+    // Persist BEFORE returning the EasyPay URL so the order is durably stored
+    // even if the webhook arrives within milliseconds (and on a different
+    // server instance behind the load balancer).
+    await setPendingOrder(orderKey, {
       customer: {
         name: customer?.name ?? "",
         email: customer?.email ?? "",
