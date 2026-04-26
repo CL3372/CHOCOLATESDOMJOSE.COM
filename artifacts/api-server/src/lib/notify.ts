@@ -159,23 +159,63 @@ function buildOrderHtml(o: OrderDetails): string {
   </div>`;
 }
 
-export async function sendEmail(subject: string, text: string, html?: string) {
+/**
+ * Build a nodemailer transport. Prefers generic SMTP (works with cPanel /
+ * Dominios.pt / any provider) when SMTP_HOST is configured. Falls back to
+ * Gmail when only GMAIL_USER + GMAIL_APP_PASSWORD are set. Returns null +
+ * sender address if no email provider is configured.
+ */
+function buildTransport(): { transporter: nodemailer.Transporter; from: string } | null {
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+
+  if (smtpHost && smtpUser && smtpPass) {
+    const port = Number(process.env.SMTP_PORT ?? 465);
+    // 465 = implicit TLS (SMTPS), 587 = STARTTLS
+    const secure = port === 465;
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port,
+      secure,
+      auth: { user: smtpUser, pass: smtpPass },
+    });
+    return { transporter, from: `"Chocolates Dom José" <${smtpUser}>` };
+  }
+
   const gmailUser = process.env.GMAIL_USER;
   const gmailPass = process.env.GMAIL_APP_PASSWORD;
-  const notifyEmail = process.env.NOTIFY_EMAIL ?? gmailUser;
+  if (gmailUser && gmailPass) {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: gmailUser, pass: gmailPass },
+    });
+    return { transporter, from: `"Chocolates Dom José" <${gmailUser}>` };
+  }
 
-  if (!gmailUser || !gmailPass) {
-    console.warn("GMAIL_USER or GMAIL_APP_PASSWORD not set — skipping email");
+  return null;
+}
+
+export async function sendEmail(subject: string, text: string, html?: string) {
+  const cfg = buildTransport();
+  if (!cfg) {
+    console.warn("No SMTP/Gmail credentials configured — skipping email");
     return;
   }
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user: gmailUser, pass: gmailPass },
-  });
+  const notifyEmail =
+    process.env.NOTIFY_EMAIL ??
+    process.env.SMTP_USER ??
+    process.env.GMAIL_USER ??
+    "";
 
-  await transporter.sendMail({
-    from: `"Chocolates Dom José" <${gmailUser}>`,
+  if (!notifyEmail) {
+    console.warn("No notify recipient resolved — skipping email");
+    return;
+  }
+
+  await cfg.transporter.sendMail({
+    from: cfg.from,
     to: notifyEmail,
     subject,
     text,
@@ -251,11 +291,9 @@ function buildCustomerHtml(o: OrderDetails, copy: CustomerCopy): string {
 }
 
 export async function sendCustomerConfirmation(order: OrderDetails): Promise<void> {
-  const gmailUser = process.env.GMAIL_USER;
-  const gmailPass = process.env.GMAIL_APP_PASSWORD;
-
-  if (!gmailUser || !gmailPass) {
-    console.warn("GMAIL_USER or GMAIL_APP_PASSWORD not set — skipping customer confirmation email");
+  const cfg = buildTransport();
+  if (!cfg) {
+    console.warn("No SMTP/Gmail credentials configured — skipping customer confirmation email");
     return;
   }
   if (!order.customerEmail) {
@@ -266,15 +304,10 @@ export async function sendCustomerConfirmation(order: OrderDetails): Promise<voi
   const lang: Lang = order.lang ?? "PT";
   const copy = CUSTOMER_COPY[lang] ?? CUSTOMER_COPY.PT;
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user: gmailUser, pass: gmailPass },
-  });
-
   const html = buildCustomerHtml(order, copy);
 
-  await transporter.sendMail({
-    from: `"Chocolates Dom José" <${gmailUser}>`,
+  await cfg.transporter.sendMail({
+    from: cfg.from,
     to: order.customerEmail,
     subject: copy.subject,
     html,
