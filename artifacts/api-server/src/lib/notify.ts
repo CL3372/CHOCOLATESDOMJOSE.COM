@@ -45,7 +45,7 @@ const CUSTOMER_COPY: Record<Lang, CustomerCopy> = {
     faturaNote:
       "A fatura oficial será emitida pelo nosso sistema de faturação certificado e enviada para este email.",
     signature: "Com os melhores cumprimentos,",
-    team: "Chocolates Dom José ♥",
+    team: 'Chocolates Dom José <span style="color:#c0392b">♥</span>',
   },
   EN: {
     subject: "Thank you for your order — Chocolates Dom José",
@@ -60,7 +60,7 @@ const CUSTOMER_COPY: Record<Lang, CustomerCopy> = {
     faturaNote:
       "The official invoice will be issued by our certified invoicing system and sent to this email.",
     signature: "Kind regards,",
-    team: "Chocolates Dom José ♥",
+    team: 'Chocolates Dom José <span style="color:#c0392b">♥</span>',
   },
   DE: {
     subject: "Vielen Dank für Ihre Bestellung — Chocolates Dom José",
@@ -75,7 +75,7 @@ const CUSTOMER_COPY: Record<Lang, CustomerCopy> = {
     faturaNote:
       "Die offizielle Rechnung wird von unserem zertifizierten Rechnungssystem ausgestellt und an diese E-Mail-Adresse gesendet.",
     signature: "Mit freundlichen Grüßen,",
-    team: "Chocolates Dom José ♥",
+    team: 'Chocolates Dom José <span style="color:#c0392b">♥</span>',
   },
   NL: {
     subject: "Bedankt voor uw bestelling — Chocolates Dom José",
@@ -90,7 +90,7 @@ const CUSTOMER_COPY: Record<Lang, CustomerCopy> = {
     faturaNote:
       "De officiële factuur wordt uitgegeven door ons gecertificeerde factureringssysteem en naar dit e-mailadres verzonden.",
     signature: "Met vriendelijke groet,",
-    team: "Chocolates Dom José ♥",
+    team: 'Chocolates Dom José <span style="color:#c0392b">♥</span>',
   },
 };
 
