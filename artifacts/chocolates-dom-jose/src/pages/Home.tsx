@@ -56,6 +56,10 @@ const translations: Record<Lang, {
   placeholderSubject: string;
   placeholderMessage: string;
   btnSend: string;
+  btnSending: string;
+  contactSuccess: string;
+  contactError: string;
+  contactRequired: string;
   footer: string;
   addToCart: string;
   priceFrom: string;
@@ -95,6 +99,10 @@ const translations: Record<Lang, {
     placeholderSubject: "Assunto",
     placeholderMessage: "A sua mensagem",
     btnSend: "Enviar pedido",
+    btnSending: "A enviar…",
+    contactSuccess: "Mensagem enviada com sucesso! Entraremos em contacto em breve.",
+    contactError: "Não foi possível enviar a sua mensagem. Por favor tente novamente ou escreva para geral@chocolatesdomjose.com.",
+    contactRequired: "Por favor preencha nome, email e mensagem.",
     footer: "Todos os direitos reservados.",
     addToCart: "Adicionar ao carrinho",
     priceFrom: "A partir de",
@@ -134,6 +142,10 @@ const translations: Record<Lang, {
     placeholderSubject: "Subject",
     placeholderMessage: "Your message",
     btnSend: "Send request",
+    btnSending: "Sending…",
+    contactSuccess: "Message sent successfully! We'll be in touch shortly.",
+    contactError: "We couldn't send your message. Please try again or email geral@chocolatesdomjose.com.",
+    contactRequired: "Please fill in your name, email and message.",
     footer: "All rights reserved.",
     addToCart: "Add to cart",
     priceFrom: "From",
@@ -173,6 +185,10 @@ const translations: Record<Lang, {
     placeholderSubject: "Betreff",
     placeholderMessage: "Ihre Nachricht",
     btnSend: "Anfrage senden",
+    btnSending: "Wird gesendet…",
+    contactSuccess: "Nachricht erfolgreich gesendet! Wir melden uns in Kürze.",
+    contactError: "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut oder schreiben Sie an geral@chocolatesdomjose.com.",
+    contactRequired: "Bitte geben Sie Name, E-Mail und Nachricht ein.",
     footer: "Alle Rechte vorbehalten.",
     addToCart: "In den Warenkorb",
     priceFrom: "Ab",
@@ -212,6 +228,10 @@ const translations: Record<Lang, {
     placeholderSubject: "Onderwerp",
     placeholderMessage: "Uw bericht",
     btnSend: "Verzoek verzenden",
+    btnSending: "Versturen…",
+    contactSuccess: "Bericht succesvol verzonden! We nemen spoedig contact op.",
+    contactError: "Uw bericht kon niet worden verzonden. Probeer het opnieuw of mail naar geral@chocolatesdomjose.com.",
+    contactRequired: "Vul a.u.b. uw naam, e-mail en bericht in.",
     footer: "Alle rechten voorbehouden.",
     addToCart: "Toevoegen aan winkelwagen",
     priceFrom: "Vanaf",
@@ -315,6 +335,128 @@ function FadeIn({ children, className = "", delay = 0 }: { children: ReactNode; 
     >
       {children}
     </div>
+  );
+}
+
+type ContactT = {
+  placeholderName: string;
+  placeholderEmail: string;
+  placeholderSubject: string;
+  placeholderMessage: string;
+  btnSend: string;
+  btnSending: string;
+  contactSuccess: string;
+  contactError: string;
+  contactRequired: string;
+};
+
+function ContactForm({ lang, t }: { lang: Lang; t: ContactT }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      setStatus("error");
+      setErrorMsg(t.contactRequired);
+      return;
+    }
+    setStatus("sending");
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, subject, message, lang }),
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      setStatus("success");
+      setName("");
+      setEmail("");
+      setSubject("");
+      setMessage("");
+    } catch {
+      setStatus("error");
+      setErrorMsg(t.contactError);
+    }
+  }
+
+  const sending = status === "sending";
+
+  return (
+    <form
+      className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-xl"
+      onSubmit={handleSubmit}
+    >
+      <div className="grid gap-4">
+        <input
+          data-testid="input-name"
+          className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:border-yellow-400/40 disabled:opacity-50"
+          placeholder={t.placeholderName}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          disabled={sending}
+        />
+        <input
+          data-testid="input-email"
+          type="email"
+          className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:border-yellow-400/40 disabled:opacity-50"
+          placeholder={t.placeholderEmail}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={sending}
+        />
+        <input
+          data-testid="input-subject"
+          className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:border-yellow-400/40 disabled:opacity-50"
+          placeholder={t.placeholderSubject}
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          disabled={sending}
+        />
+        <textarea
+          data-testid="input-message"
+          className="min-h-[140px] rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:border-yellow-400/40 resize-none disabled:opacity-50"
+          placeholder={t.placeholderMessage}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          disabled={sending}
+        />
+        <button
+          type="submit"
+          data-testid="btn-submit"
+          disabled={sending}
+          className="rounded-xl bg-yellow-400 px-5 py-3 font-medium text-black transition hover:bg-yellow-300 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {sending ? t.btnSending : t.btnSend}
+        </button>
+
+        {status === "success" && (
+          <div
+            data-testid="contact-success"
+            className="rounded-xl border border-green-400/30 bg-green-400/10 px-4 py-3 text-sm text-green-200"
+            role="status"
+          >
+            ✓ {t.contactSuccess}
+          </div>
+        )}
+        {status === "error" && (
+          <div
+            data-testid="contact-error"
+            className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200"
+            role="alert"
+          >
+            {errorMsg || t.contactError}
+          </div>
+        )}
+      </div>
+    </form>
   );
 }
 
@@ -669,38 +811,8 @@ export default function Home() {
             </div>
           </div>
 
-          <form className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-xl" onSubmit={(e) => e.preventDefault()}>
-            <div className="grid gap-4">
-              <input
-                data-testid="input-name"
-                className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:border-yellow-400/40"
-                placeholder={t.placeholderName}
-              />
-              <input
-                data-testid="input-email"
-                type="email"
-                className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:border-yellow-400/40"
-                placeholder={t.placeholderEmail}
-              />
-              <input
-                data-testid="input-subject"
-                className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:border-yellow-400/40"
-                placeholder={t.placeholderSubject}
-              />
-              <textarea
-                data-testid="input-message"
-                className="min-h-[140px] rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white placeholder:text-white/35 focus:outline-none focus:border-yellow-400/40 resize-none"
-                placeholder={t.placeholderMessage}
-              />
-              <button
-                type="submit"
-                data-testid="btn-submit"
-                className="rounded-xl bg-yellow-400 px-5 py-3 font-medium text-black transition hover:bg-yellow-300"
-              >
-                {t.btnSend}
-              </button>
-            </div>
-          </form>
+          <ContactForm lang={lang} t={t} />
+
         </div>
       </section>
 
