@@ -862,7 +862,22 @@ export default function Home() {
             </svg>
           </a>
         </div>
-        <p>&copy; {new Date().getFullYear()} Chocolates Dom José. {t.footer}</p>
+        <div className="mb-3 flex items-center justify-center gap-4 text-xs">
+          <a
+            href={`/termos?lang=${lang}`}
+            className="text-white/50 hover:text-yellow-300 transition"
+          >
+            {lang === "PT" ? "Termos e Condições" : lang === "DE" ? "AGB" : lang === "NL" ? "Algemene Voorwaarden" : "Terms & Conditions"}
+          </a>
+          <span className="text-white/20">·</span>
+          <a
+            href={`/privacidade?lang=${lang}`}
+            className="text-white/50 hover:text-yellow-300 transition"
+          >
+            {lang === "PT" ? "Política de Privacidade" : lang === "DE" ? "Datenschutz" : lang === "NL" ? "Privacybeleid" : "Privacy Policy"}
+          </a>
+        </div>
+        <p>&copy; {new Date().getFullYear()} Nelson &amp; Carla Louro Lda · NIPC 513070389. {t.footer}</p>
       </footer>
 
       {/* WhatsApp floating button */}

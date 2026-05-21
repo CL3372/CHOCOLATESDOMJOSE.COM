@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import CheckoutSuccess from "@/pages/CheckoutSuccess";
 import CheckoutCancel from "@/pages/CheckoutCancel";
+import { TermsPage, PrivacyPage } from "@/pages/Legal";
 import { CartProvider } from "@/context/CartContext";
 
 const queryClient = new QueryClient();
@@ -16,6 +17,10 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/checkout/cancel" component={CheckoutCancel} />
+      <Route path="/termos" component={TermsPage} />
+      <Route path="/terms" component={TermsPage} />
+      <Route path="/privacidade" component={PrivacyPage} />
+      <Route path="/privacy" component={PrivacyPage} />
       <Route component={NotFound} />
     </Switch>
   );

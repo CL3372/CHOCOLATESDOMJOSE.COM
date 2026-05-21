@@ -43,6 +43,10 @@ Auto-issues a Fatura-Recibo (FR) in Moloni after every paid order and emails it 
 - Required secrets: `MOLONI_CLIENT_ID` (the Developer ID/Slug, not the numeric app ID), `MOLONI_CLIENT_SECRET`, `MOLONI_USERNAME` (login email), `MOLONI_PASSWORD`, `MOLONI_COMPANY_ID` (numeric — verify via `companies/getAll`)
 - Failure handling: if Moloni call fails, payment still succeeds and merchant gets a notification with the error so they can issue manually in moloni.pt
 
+## Chocolates Dom José — Legal pages (Terms & Privacy)
+
+Required by EasyPay to enable Visa/Mastercard. Routes: `/termos` `/terms` `/privacidade` `/privacy`. Source: `artifacts/chocolates-dom-jose/src/pages/Legal.tsx` (exports `TermsPage` and `PrivacyPage`). Multilingual PT/EN/DE/NL with `?lang=` query param + localStorage detection. Footer links added on Home.tsx. Full company identification (Nelson & Carla Louro Lda, NIPC 513070389, Rua Dr. Alberto Martins dos Santos n.º 4, 2540-087 Bombarral) + RGPD compliance: data collected, legal basis, processors (EasyPay/Moloni/SMTP/couriers), retention (10 years for tax data), CNPD complaint right, ODR platform link. Right of withdrawal correctly excluded for perishable goods per DL 24/2014 art. 17(1)(d).
+
 ## Chocolates Dom José — Customer notifications
 
 When EasyPay confirms payment (webhook), the customer automatically receives a friendly multilingual confirmation email in their browsing language (PT/EN/DE/NL).
