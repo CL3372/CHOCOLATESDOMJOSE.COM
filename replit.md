@@ -51,6 +51,10 @@ Required by EasyPay to enable Visa/Mastercard. Routes: `/termos` `/terms` `/priv
 
 `index.html` has full SEO meta: title with keywords, description, canonical, hreflang (pt/en/de/nl/x-default), Open Graph (image `public/opengraph.jpg` 1280x720), Twitter card, theme-color, and JSON-LD `Store` structured data (legalName, vatID PT513070389, address Bombarral, geo, telephone, sameAs Instagram/Facebook). `public/robots.txt` allows all + points to sitemap. `public/sitemap.xml` lists home (with hreflang alternates) + /termos + /privacidade. Legal pages set `document.title` dynamically per language via useEffect. Home.tsx injects per-product `ItemList`/`Product` JSON-LD (id `product-jsonld`) at runtime via useEffect — name/description in PT, absolute image URLs, Offer with price (EUR, from cents), InStock availability, seller Nelson & Carla Louro Lda. Enables Google Shopping-style rich results.
 
+## Chocolates Dom José — Google Shopping feed
+
+Static product feed for Google Merchant Center at `public/google-feed.xml` (RSS 2.0 + `g:` namespace), served at `https://chocolatesdomjose.com/google-feed.xml`. 6 products with id/title/description/link/image_link/availability/price (EUR)/condition/brand/google_product_category (5697 = Candy & Chocolate)/identifier_exists=no. Product images copied with clean permanent names into `public/feed/*.jpg` (Vite hashes the bundled asset names, so feed needs stable copies). NOTE: feed is hand-maintained and must be kept in sync with the `products` array in `src/pages/Home.tsx` (prices in cents there → EUR here; cabazes listed at 30.00 as "from"). When products/prices change, update both files and re-copy images if needed.
+
 ## Chocolates Dom José — Customer notifications
 
 When EasyPay confirms payment (webhook), the customer automatically receives a friendly multilingual confirmation email in their browsing language (PT/EN/DE/NL).

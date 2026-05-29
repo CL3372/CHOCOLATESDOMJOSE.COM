@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>Chocolates Dom José</title>
+    <link>https://chocolatesdomjose.com/</link>
+    <description>Chocolates artesanais gourmet de Portugal</description>
+
+    <item>
+      <g:id>trufas_artesanais</g:id>
+      <g:title>Trufas Artesanais</g:title>
+      <g:description>Sabores elegantes e intensos, feitos artesanalmente para oferecer ou saborear. Chocolates artesanais portugueses de produção cuidada.</g:description>
+      <g:link>https://chocolatesdomjose.com/</g:link>
+      <g:image_link>https://chocolatesdomjose.com/feed/trufas-artesanais.jpg</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>15.00 EUR</g:price>
+      <g:condition>new</g:condition>
+      <g:brand>Chocolates Dom José</g:brand>
+      <g:google_product_category>5697</g:google_product_category>
+      <g:product_type>Chocolates &gt; Trufas</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
+
+    <item>
+      <g:id>peras_bebedas</g:id>
+      <g:title>Pêras Bebedas</g:title>
+      <g:description>Pêras em frasco, sofisticadas e diferentes, ideais para cabazes e presentes gourmet.</g:description>
+      <g:link>https://chocolatesdomjose.com/</g:link>
+      <g:image_link>https://chocolatesdomjose.com/feed/peras-bebedas.jpg</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>7.00 EUR</g:price>
+      <g:condition>new</g:condition>
+      <g:brand>Chocolates Dom José</g:brand>
+      <g:google_product_category>5697</g:google_product_category>
+      <g:product_type>Gourmet &gt; Frutas em Calda</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
+
+    <item>
+      <g:id>trufas_laranja</g:id>
+      <g:title>Trufas de Laranja</g:title>
+      <g:description>Intensidade cítrica num interior cremoso — trufas artesanais com laranja fresca e chocolate premium.</g:description>
+      <g:link>https://chocolatesdomjose.com/</g:link>
+      <g:image_link>https://chocolatesdomjose.com/feed/trufas-laranja.jpg</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>15.00 EUR</g:price>
+      <g:condition>new</g:condition>
+      <g:brand>Chocolates Dom José</g:brand>
+      <g:google_product_category>5697</g:google_product_category>
+      <g:product_type>Chocolates &gt; Trufas</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
+
+    <item>
+      <g:id>trufas_chocolate_77</g:id>
+      <g:title>Trufas de Chocolate 77%</g:title>
+      <g:description>Para os amantes do chocolate puro — trufas intensas com cacau 77%, elegantes e sofisticadas.</g:description>
+      <g:link>https://chocolatesdomjose.com/</g:link>
+      <g:image_link>https://chocolatesdomjose.com/feed/trufas-chocolate-77.jpg</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>15.00 EUR</g:price>
+      <g:condition>new</g:condition>
+      <g:brand>Chocolates Dom José</g:brand>
+      <g:google_product_category>5697</g:google_product_category>
+      <g:product_type>Chocolates &gt; Trufas</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
+
+    <item>
+      <g:id>dom_piri_piri</g:id>
+      <g:title>Dom Piri Piri</g:title>
+      <g:description>O picante do rei — um produto com personalidade forte e apresentação premium.</g:description>
+      <g:link>https://chocolatesdomjose.com/</g:link>
+      <g:image_link>https://chocolatesdomjose.com/feed/dom-piri-piri.jpg</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>7.00 EUR</g:price>
+      <g:condition>new</g:condition>
+      <g:brand>Chocolates Dom José</g:brand>
+      <g:google_product_category>5697</g:google_product_category>
+      <g:product_type>Chocolates &gt; Especiais</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
+
+    <item>
+      <g:id>cabazes</g:id>
+      <g:title>Cabazes</g:title>
+      <g:description>Composições exclusivas com os nossos produtos artesanais — ideais para oferta, empresas e ocasiões especiais.</g:description>
+      <g:link>https://chocolatesdomjose.com/</g:link>
+      <g:image_link>https://chocolatesdomjose.com/feed/cabazes.jpg</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>30.00 EUR</g:price>
+      <g:condition>new</g:condition>
+      <g:brand>Chocolates Dom José</g:brand>
+      <g:google_product_category>5697</g:google_product_category>
+      <g:product_type>Gourmet &gt; Cabazes de Oferta</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
+
+  </channel>
+</rss>
