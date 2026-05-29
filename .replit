@@ -17,6 +17,26 @@ env = { "CI" = "true" }
 [workflows]
 runButton = "Project"
 
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "secret-scan"
+
+[[workflows.workflow]]
+name = "secret-scan"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/scripts run secret-scan"
+
+[workflows.workflow.metadata]
+isValidation = true
+
 [agent]
 stack = "PNPM_WORKSPACE"
 expertMode = true
@@ -28,9 +48,4 @@ timeoutMs = 20000
 [userenv]
 
 [userenv.shared]
-GMAIL_APP_PASSWORD = "ouke mplz ipkx jcqf"
-NOTIFY_EMAIL = "ouke mplz ipkx jcqf"
-TELEGRAM_BOT_TOKEN = "8763192473:AAGhDS_twI3MNoYrQArIkEN0if6kxJ1VlAo"
-EASYPAY_ACCOUNT_ID = "188b97e0-f086-4994-abcb-6693ac1c9ea9"
-EASYPAY_API_KEY = "44b7441b-1530-46c9-b81a-37757f2c8ba4"
 TELEGRAM_CHAT_ID = "1906773862"
