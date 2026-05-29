@@ -49,7 +49,7 @@ Required by EasyPay to enable Visa/Mastercard. Routes: `/termos` `/terms` `/priv
 
 ## Chocolates Dom José — SEO
 
-`index.html` has full SEO meta: title with keywords, description, canonical, hreflang (pt/en/de/nl/x-default), Open Graph (image `public/opengraph.jpg` 1280x720), Twitter card, theme-color, and JSON-LD `Store` structured data (legalName, vatID PT513070389, address Bombarral, geo, telephone, sameAs Instagram/Facebook). `public/robots.txt` allows all + points to sitemap. `public/sitemap.xml` lists home (with hreflang alternates) + /termos + /privacidade. Legal pages set `document.title` dynamically per language via useEffect.
+`index.html` has full SEO meta: title with keywords, description, canonical, hreflang (pt/en/de/nl/x-default), Open Graph (image `public/opengraph.jpg` 1280x720), Twitter card, theme-color, and JSON-LD `Store` structured data (legalName, vatID PT513070389, address Bombarral, geo, telephone, sameAs Instagram/Facebook). `public/robots.txt` allows all + points to sitemap. `public/sitemap.xml` lists home (with hreflang alternates) + /termos + /privacidade. Legal pages set `document.title` dynamically per language via useEffect. Home.tsx injects per-product `ItemList`/`Product` JSON-LD (id `product-jsonld`) at runtime via useEffect — name/description in PT, absolute image URLs, Offer with price (EUR, from cents), InStock availability, seller Nelson & Carla Louro Lda. Enables Google Shopping-style rich results.
 
 ## Chocolates Dom José — Customer notifications
 

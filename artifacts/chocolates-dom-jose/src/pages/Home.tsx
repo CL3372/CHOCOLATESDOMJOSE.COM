@@ -563,6 +563,48 @@ export default function Home() {
     orderStatus === "success" ? "success" : orderStatus === "cancelled" ? "cancelled" : null
   );
 
+  useEffect(() => {
+    const origin = window.location.origin;
+    const toAbs = (src: string) =>
+      src.startsWith("http") ? src : `${origin}${src.startsWith("/") ? "" : "/"}${src}`;
+    const itemList = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      itemListElement: products.map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: {
+          "@type": "Product",
+          name: p.name.PT,
+          description: p.description.PT,
+          image: p.images.map(toAbs),
+          brand: { "@type": "Brand", name: "Chocolates Dom José" },
+          category: "Chocolate",
+          offers: {
+            "@type": "Offer",
+            url: `${origin}/`,
+            price: (p.price / 100).toFixed(2),
+            priceCurrency: "EUR",
+            availability: "https://schema.org/InStock",
+            seller: { "@type": "Organization", name: "Nelson & Carla Louro Lda" },
+          },
+        },
+      })),
+    };
+    const id = "product-jsonld";
+    let script = document.getElementById(id) as HTMLScriptElement | null;
+    if (!script) {
+      script = document.createElement("script");
+      script.id = id;
+      script.type = "application/ld+json";
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(itemList);
+    return () => {
+      document.getElementById(id)?.remove();
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0f0a07] text-white">
       <CartDrawer lang={lang} />
