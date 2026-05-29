@@ -47,6 +47,10 @@ Auto-issues a Fatura-Recibo (FR) in Moloni after every paid order and emails it 
 
 Required by EasyPay to enable Visa/Mastercard. Routes: `/termos` `/terms` `/privacidade` `/privacy`. Source: `artifacts/chocolates-dom-jose/src/pages/Legal.tsx` (exports `TermsPage` and `PrivacyPage`). Multilingual PT/EN/DE/NL with `?lang=` query param + localStorage detection. Footer links added on Home.tsx. Full company identification (Nelson & Carla Louro Lda, NIPC 513070389, Rua Dr. Alberto Martins dos Santos n.º 4, 2540-087 Bombarral) + RGPD compliance: data collected, legal basis, processors (EasyPay/Moloni/SMTP/couriers), retention (10 years for tax data), CNPD complaint right, ODR platform link. Right of withdrawal correctly excluded for perishable goods per DL 24/2014 art. 17(1)(d).
 
+## Chocolates Dom José — SEO
+
+`index.html` has full SEO meta: title with keywords, description, canonical, hreflang (pt/en/de/nl/x-default), Open Graph (image `public/opengraph.jpg` 1280x720), Twitter card, theme-color, and JSON-LD `Store` structured data (legalName, vatID PT513070389, address Bombarral, geo, telephone, sameAs Instagram/Facebook). `public/robots.txt` allows all + points to sitemap. `public/sitemap.xml` lists home (with hreflang alternates) + /termos + /privacidade. Legal pages set `document.title` dynamically per language via useEffect.
+
 ## Chocolates Dom José — Customer notifications
 
 When EasyPay confirms payment (webhook), the customer automatically receives a friendly multilingual confirmation email in their browsing language (PT/EN/DE/NL).

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import type { Lang } from "../context/CartContext";
 
@@ -247,6 +247,10 @@ function LegalLayout({
   lang: Lang;
   setLang: (l: Lang) => void;
 }) {
+  useEffect(() => {
+    document.title = `${doc.title} | ${COMPANY.brand}`;
+  }, [doc.title]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1a0f08] via-[#0e0805] to-black text-white">
       <div className="mx-auto max-w-3xl px-6 py-12">
