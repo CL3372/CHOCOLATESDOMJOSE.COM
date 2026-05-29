@@ -1,0 +1,1 @@
+- [Replit config can contain live secrets](replit-config-secrets.md) — Always inspect tracked `.replit` for `userenv.shared` credentials during security scans.
