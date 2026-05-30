@@ -1,25 +1,26 @@
 import { Router } from "express";
-import { sendEmail, sendTelegram } from "../lib/notify.js";
+import { sendEmail, sendTelegram, escapeHtml } from "../lib/notify.js";
+import { rateLimit } from "../lib/rateLimit.js";
 
 type Lang = "PT" | "EN" | "DE" | "NL";
 const VALID_LANGS: Lang[] = ["PT", "EN", "DE", "NL"];
 
 const contactRouter = Router();
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+// Public, unauthenticated form wired straight to merchant email + Telegram.
+// Throttle per IP, with a global backstop so spoofed IPs can't flood operators.
+const contactLimiter = rateLimit({
+  bucket: "contact",
+  perIp: 5,
+  global: 60,
+  windowMs: 10 * 60 * 1000,
+});
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-contactRouter.post("/contact", async (req, res) => {
+contactRouter.post("/contact", contactLimiter, async (req, res) => {
   try {
     const { name, email, subject, message, lang: rawLang } = req.body as {
       name?: string;

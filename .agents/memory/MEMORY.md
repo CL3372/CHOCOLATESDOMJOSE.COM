@@ -1,1 +1,2 @@
 - [Replit config can contain live secrets](replit-config-secrets.md) — Always inspect tracked `.replit` for `userenv.shared` credentials during security scans.
+- [Notification endpoint hardening](notification-abuse-hardening.md) — contact/checkout: Postgres-backed per-IP + global-backstop rate limit (XFF spoofable); escapeHtml all untrusted email fields.

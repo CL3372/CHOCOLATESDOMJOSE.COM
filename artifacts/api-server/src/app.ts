@@ -6,6 +6,11 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Requests arrive through the Replit reverse proxy, so the real client IP is in
+// X-Forwarded-For. Trust the proxy so req.ip reflects the client (used for logs;
+// the rate limiter also reads XFF directly and is backed by a global limit).
+app.set("trust proxy", true);
+
 app.use(
   pinoHttp({
     logger,

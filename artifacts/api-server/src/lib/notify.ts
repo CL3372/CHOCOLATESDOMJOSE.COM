@@ -1,6 +1,21 @@
 import nodemailer from "nodemailer";
 import type { Lang } from "./orderStore.js";
 
+/**
+ * Escape untrusted text before interpolating it into an HTML email template.
+ * Checkout/shipping fields are attacker-controlled, so without this they could
+ * inject clickable links or styled blocks into merchant/customer inboxes
+ * (a realistic phishing channel).
+ */
+export function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export type OrderDetails = {
   customerName: string;
   customerEmail: string;
@@ -125,7 +140,7 @@ function buildOrderHtml(o: OrderDetails): string {
   const itemsRows = o.items
     .map(
       (i) =>
-        `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee">${i.quantity}× ${i.name}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">€${(i.unitPriceEur * i.quantity).toFixed(2)}</td></tr>`
+        `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee">${i.quantity}× ${escapeHtml(i.name)}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">€${(i.unitPriceEur * i.quantity).toFixed(2)}</td></tr>`
     )
     .join("");
 
@@ -138,23 +153,23 @@ function buildOrderHtml(o: OrderDetails): string {
       <h3 style="margin-top:0">🍫 Chocolates Dom José</h3>
 
       <h4 style="margin-bottom:4px">👤 Cliente</h4>
-      <p style="margin:2px 0"><strong>Nome:</strong> ${o.customerName || "-"}</p>
-      <p style="margin:2px 0"><strong>Email:</strong> ${o.customerEmail || "-"}</p>
-      <p style="margin:2px 0"><strong>Telemóvel:</strong> ${o.customerPhone || "-"}</p>
-      <p style="margin:2px 0"><strong>NIF:</strong> ${o.customerNif || "-"}</p>
+      <p style="margin:2px 0"><strong>Nome:</strong> ${escapeHtml(o.customerName) || "-"}</p>
+      <p style="margin:2px 0"><strong>Email:</strong> ${escapeHtml(o.customerEmail) || "-"}</p>
+      <p style="margin:2px 0"><strong>Telemóvel:</strong> ${escapeHtml(o.customerPhone) || "-"}</p>
+      <p style="margin:2px 0"><strong>NIF:</strong> ${escapeHtml(o.customerNif ?? "") || "-"}</p>
 
       <h4 style="margin-bottom:4px;margin-top:18px">📦 Morada de envio</h4>
       <div style="background:#fff8ef;border:1px solid #f0d9b5;padding:12px;border-radius:6px;line-height:1.6">
-        <div>${o.shippingAddress || "-"}</div>
-        <div>${o.shippingPostcode || ""} ${o.shippingCity || ""}</div>
-        <div>${o.shippingCountry || ""}</div>
+        <div>${escapeHtml(o.shippingAddress) || "-"}</div>
+        <div>${escapeHtml(o.shippingPostcode)} ${escapeHtml(o.shippingCity)}</div>
+        <div>${escapeHtml(o.shippingCountry)}</div>
       </div>
 
       <h4 style="margin-bottom:4px;margin-top:18px">🛍 Artigos</h4>
       <table style="width:100%;border-collapse:collapse">${itemsRows}</table>
 
       <p style="margin-top:18px;font-size:18px"><strong>💶 Total: €${o.totalEur.toFixed(2)}</strong></p>
-      ${o.paymentId ? `<p style="color:#666;font-size:12px">ID: ${o.paymentId}</p>` : ""}
+      ${o.paymentId ? `<p style="color:#666;font-size:12px">ID: ${escapeHtml(o.paymentId)}</p>` : ""}
     </div>
   </div>`;
 }
@@ -250,7 +265,7 @@ function buildCustomerHtml(o: OrderDetails, copy: CustomerCopy): string {
   const itemsRows = o.items
     .map(
       (i) =>
-        `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee">${i.quantity}× ${i.name}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">€${(i.unitPriceEur * i.quantity).toFixed(2)}</td></tr>`
+        `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee">${i.quantity}× ${escapeHtml(i.name)}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">€${(i.unitPriceEur * i.quantity).toFixed(2)}</td></tr>`
     )
     .join("");
 
@@ -258,22 +273,22 @@ function buildCustomerHtml(o: OrderDetails, copy: CustomerCopy): string {
   <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#333">
     <h2 style="background:#5a2a0a;color:#fff;padding:14px;margin:0;border-radius:6px 6px 0 0">🍫 Chocolates Dom José</h2>
     <div style="border:1px solid #ddd;border-top:0;padding:18px;border-radius:0 0 6px 6px">
-      <p style="font-size:16px">${copy.greeting(o.customerName || "")}</p>
+      <p style="font-size:16px">${copy.greeting(escapeHtml(o.customerName || ""))}</p>
       <p style="font-size:16px"><strong>${copy.thanks}</strong></p>
       <p>${copy.processing}</p>
 
       <h4 style="margin-bottom:4px;margin-top:18px">${copy.shippingTitle}</h4>
       <div style="background:#fff8ef;border:1px solid #f0d9b5;padding:12px;border-radius:6px;line-height:1.6">
-        <div>${o.shippingAddress || "-"}</div>
-        <div>${o.shippingPostcode || ""} ${o.shippingCity || ""}</div>
-        <div>${o.shippingCountry || ""}</div>
+        <div>${escapeHtml(o.shippingAddress) || "-"}</div>
+        <div>${escapeHtml(o.shippingPostcode)} ${escapeHtml(o.shippingCity)}</div>
+        <div>${escapeHtml(o.shippingCountry)}</div>
       </div>
 
       <h4 style="margin-bottom:4px;margin-top:18px">${copy.orderTitle}</h4>
       <table style="width:100%;border-collapse:collapse">${itemsRows}</table>
       <p style="margin-top:14px;font-size:18px"><strong>${copy.totalLabel}: €${o.totalEur.toFixed(2)}</strong></p>
 
-      ${o.customerNif ? `<p style="font-size:13px;color:#666">${copy.nifLine(o.customerNif)}</p>` : ""}
+      ${o.customerNif ? `<p style="font-size:13px;color:#666">${copy.nifLine(escapeHtml(o.customerNif))}</p>` : ""}
 
       <hr style="border:0;border-top:1px solid #eee;margin:20px 0" />
 

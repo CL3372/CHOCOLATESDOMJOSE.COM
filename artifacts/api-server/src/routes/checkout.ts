@@ -2,10 +2,21 @@ import { Router } from "express";
 import { createEasyPayCheckout } from "../lib/easypay.js";
 import { notifyOrder } from "../lib/notify.js";
 import { setPendingOrder, type Lang } from "../lib/orderStore.js";
+import { rateLimit } from "../lib/rateLimit.js";
 
 const VALID_LANGS: Lang[] = ["PT", "EN", "DE", "NL"];
 
 const checkoutRouter = Router();
+
+// Each accepted checkout creates an EasyPay session, a pending-order row, and a
+// merchant notification — all before any payment. Throttle to stop a flood of
+// fake orders from spamming the operator and exhausting EasyPay quota.
+const checkoutLimiter = rateLimit({
+  bucket: "checkout",
+  perIp: 10,
+  global: 120,
+  windowMs: 10 * 60 * 1000,
+});
 
 const PRODUCTS: Record<string, { name: string; price: number }> = {
   trufas_artesanais: { name: "Trufas Artesanais", price: 1500 },
@@ -16,7 +27,7 @@ const PRODUCTS: Record<string, { name: string; price: number }> = {
   cabazes: { name: "Cabazes", price: 3000 },
 };
 
-checkoutRouter.post("/checkout", async (req, res) => {
+checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
   try {
     const { items, successUrl, cancelUrl, customer, shipping, lang: rawLang } = req.body as {
       items: { id: string; quantity: number }[];
