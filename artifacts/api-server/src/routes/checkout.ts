@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createEasyPayCheckout } from "../lib/easypay.js";
+import { createEasyPayCheckout, SITE_URL } from "../lib/easypay.js";
 import { notifyOrder } from "../lib/notify.js";
 import { setPendingOrder, type Lang } from "../lib/orderStore.js";
 import { rateLimit } from "../lib/rateLimit.js";
@@ -29,10 +29,8 @@ const PRODUCTS: Record<string, { name: string; price: number }> = {
 
 checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
   try {
-    const { items, successUrl, cancelUrl, customer, shipping, lang: rawLang } = req.body as {
+    const { items, customer, shipping, lang: rawLang } = req.body as {
       items: { id: string; quantity: number }[];
-      successUrl: string;
-      cancelUrl: string;
       customer?: { name?: string; email?: string; phone?: string; nif?: string };
       shipping?: {
         address?: string;
@@ -42,6 +40,11 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       };
       lang?: string;
     };
+
+    // Return URLs are generated server-side from the canonical site origin.
+    // Client-supplied redirect targets are never trusted.
+    const successUrl = `${SITE_URL}/?payment=success`;
+    const cancelUrl = `${SITE_URL}/?payment=cancel`;
 
     const lang: Lang = VALID_LANGS.includes((rawLang ?? "").toUpperCase() as Lang)
       ? ((rawLang as string).toUpperCase() as Lang)
@@ -115,11 +118,11 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       totalEur: amountCents / 100,
       status: "pending",
       lang,
-    }).catch((err) => console.error("Notify error (non-blocking):", err));
+    }).catch((err: any) => req.log.error({ err: err?.message }, "Notify error (non-blocking)"));
 
     res.json({ url });
   } catch (err: any) {
-    console.error("EasyPay checkout error:", err);
+    req.log.error({ err: err?.message }, "EasyPay checkout error");
     res.status(500).json({ error: err.message ?? "Checkout failed" });
   }
 });

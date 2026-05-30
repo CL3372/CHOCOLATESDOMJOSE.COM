@@ -7,76 +7,82 @@ import {
   releasePayment,
 } from "../lib/orderStore.js";
 import { issueInvoiceReceipt } from "../lib/moloni.js";
+import { verifyEasyPayTransaction } from "../lib/easypay.js";
 
 const webhookRouter = Router();
 
 webhookRouter.post("/webhook/easypay", async (req, res) => {
   try {
     const body = req.body as Record<string, any>;
-    console.log("EasyPay webhook received:", JSON.stringify(body, null, 2));
 
-    const status: string =
-      body?.transaction?.status ??
-      body?.payment?.status ??
-      body?.status ??
+    // Extract the transaction ID from the webhook body — this is the only
+    // field we trust from the untrusted caller at this stage. Everything else
+    // (status, amount, orderKey, method) is derived from EasyPay's own API.
+    const rawTransactionId: string =
+      body?.transaction?.id ??
+      body?.payment?.id ??
+      body?.id ??
       "";
 
-    // Only treat fully settled payments as paid. Skip "authorisation" — it's pre-capture.
-    const isPaid = status === "success" || status === "paid";
-
-    if (!isPaid) {
+    if (!rawTransactionId) {
+      req.log.warn("Webhook rejected: no transaction id to verify");
       res.json({ received: true });
       return;
     }
 
-    const amount: number =
-      body?.transaction?.values?.paid ??
-      body?.payment?.amount ??
-      body?.order?.value ??
-      body?.amount ??
-      0;
+    // Authenticate + fetch authoritative details: confirm with EasyPay that
+    // this transaction actually exists, is paid, and retrieve its canonical
+    // orderKey and paid amount — never from req.body.
+    let txn;
+    try {
+      txn = await verifyEasyPayTransaction(rawTransactionId);
+    } catch (verifyErr: any) {
+      req.log.error(
+        { transactionId: rawTransactionId, err: verifyErr?.message },
+        "EasyPay transaction verification error"
+      );
+      // Return 200 so EasyPay does not retry indefinitely.
+      res.json({ received: true });
+      return;
+    }
 
-    const method: string =
-      body?.transaction?.type ??
-      body?.payment?.method ??
-      body?.method ??
-      "Cartão";
+    if (!txn) {
+      // Transaction exists but EasyPay does not report it as "success".
+      req.log.warn(
+        { transactionId: rawTransactionId },
+        "Webhook rejected: EasyPay did not confirm transaction as paid"
+      );
+      res.json({ received: true });
+      return;
+    }
 
-    const paymentId: string =
-      body?.transaction?.id ??
-      body?.payment?.id ??
-      body?.id ??
-      "-";
+    // From here, all business-critical fields come from the verified EasyPay
+    // response — not from the attacker-controlled webhook body.
+    const { orderKey, paidAmount, method } = txn;
+    const paymentId = rawTransactionId;
 
-    const orderKey: string =
-      body?.order?.key ??
-      body?.transaction?.key ??
-      body?.payment?.key ??
-      body?.key ??
-      "";
-
-    // Idempotency — if EasyPay re-delivers, don't double-issue or double-notify
+    // Idempotency — if EasyPay re-delivers, don't double-issue or double-notify.
     if (!(await tryReservePayment(paymentId))) {
-      console.log(`Webhook duplicate for paymentId=${paymentId} — ignoring`);
+      req.log.info({ paymentId }, "Webhook duplicate — ignoring");
       res.json({ received: true, deduped: true });
       return;
     }
 
     const methodLabel =
-      method === "MB" ? "Multibanco" :
+      method === "MB"  ? "Multibanco" :
       method === "MBW" ? "MB WAY" :
-      method === "CC" ? "Cartão de crédito" :
-      method;
+      method === "CC"  ? "Cartão de crédito" :
+      method || "Cartão";
 
-    const amountStr = Number(amount).toFixed(2);
+    const amountStr = paidAmount.toFixed(2);
 
     let faturaLine = "";
     const stored = orderKey ? await getPendingOrder(orderKey) : undefined;
 
     if (stored) {
-      // Reconcile webhook amount vs stored cart total — guard against tampering / mismatches
+      // Reconcile EasyPay-confirmed paid amount vs stored cart total.
       const storedTotalCents = Math.round(stored.totalEur * 100);
-      const paidCents = Math.round(Number(amount) * 100);
+      const paidCents = Math.round(paidAmount * 100);
       if (paidCents > 0 && Math.abs(storedTotalCents - paidCents) > 1) {
         faturaLine =
           `⚠️ Fatura NÃO emitida — valor pago (€${amountStr}) não corresponde ao total da encomenda (€${stored.totalEur.toFixed(2)}). Verifique manualmente.\n`;
@@ -92,13 +98,15 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
           });
           faturaLine =
             `📄 Fatura-Recibo: ${result.document_number || result.document_id}` +
-            (result.emailedTo ? ` (enviada para ${result.emailedTo})` : ` (NÃO enviada por email — verifique Moloni)`) +
+            (result.emailedTo
+              ? ` (enviada para ${result.emailedTo})`
+              : ` (NÃO enviada por email — verifique Moloni)`) +
             `\n`;
           await deletePendingOrder(orderKey);
         } catch (e: any) {
-          console.error("Moloni invoice error:", e);
+          req.log.error({ err: e?.message }, "Moloni invoice error");
           faturaLine = `⚠️ ERRO ao emitir fatura no Moloni: ${e?.message ?? e}\n   → Emita manualmente em https://www.moloni.pt\n`;
-          // release reservation so a manual retry/EasyPay re-delivery can try again
+          // Release reservation so a manual retry/EasyPay re-delivery can try again.
           await releasePayment(paymentId);
         }
       }
@@ -122,8 +130,7 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
 
     const tasks: Promise<unknown>[] = [sendEmail(subject, text), sendTelegram(text)];
 
-    // Send the customer their "thank you, your order is being processed"
-    // confirmation email in their language (PT/EN/DE/NL).
+    // Send the customer their confirmation email in their language (PT/EN/DE/NL).
     if (stored && stored.customer.email) {
       tasks.push(
         sendCustomerConfirmation({
@@ -144,7 +151,9 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
           paymentId,
           status: "paid",
           lang: stored.lang,
-        }).catch((e) => console.error("Customer confirmation email error:", e))
+        }).catch((e: any) =>
+          req.log.error({ err: e?.message }, "Customer confirmation email error")
+        )
       );
     }
 
@@ -152,7 +161,7 @@ webhookRouter.post("/webhook/easypay", async (req, res) => {
 
     res.json({ received: true });
   } catch (err: any) {
-    console.error("Webhook error:", err);
+    req.log.error({ err: err?.message }, "Webhook error");
     res.status(500).json({ error: err.message });
   }
 });

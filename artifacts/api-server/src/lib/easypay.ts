@@ -1,5 +1,11 @@
 const EASYPAY_BASE = "https://api.prod.easypay.pt/2.0";
 
+/**
+ * Canonical first-party origin for return URL generation.
+ * Must be set in production. Falls back to the production domain.
+ */
+export const SITE_URL = (process.env.SITE_URL ?? "https://chocolatesdomjose.com").replace(/\/$/, "");
+
 function getHeaders(): Record<string, string> {
   const accountId = process.env.EASYPAY_ACCOUNT_ID;
   const apiKey = process.env.EASYPAY_API_KEY;
@@ -12,6 +18,60 @@ function getHeaders(): Record<string, string> {
     AccountId: accountId,
     ApiKey: apiKey,
     "Content-Type": "application/json",
+  };
+}
+
+export type VerifiedTransaction = {
+  /** EasyPay-confirmed payment status ("success"). */
+  status: string;
+  /**
+   * The transaction key set during checkout creation — equals the internal
+   * orderKey stored in our database. Authoritative; never trust the webhook body.
+   */
+  orderKey: string;
+  /** Amount actually captured, in EUR (authoritative). */
+  paidAmount: number;
+  /** Payment method code: "CC", "MB", "MBW", etc. */
+  method: string;
+};
+
+/**
+ * Fetch and verify a transaction from EasyPay server-side.
+ *
+ * Returns a VerifiedTransaction when EasyPay confirms status === "success",
+ * or null when the transaction exists but is not (yet) paid.
+ * Throws on network errors or non-2xx responses so the caller can decide
+ * whether to retry or log and drop the webhook.
+ *
+ * The returned fields are authoritative — callers must use them instead of
+ * the untrusted webhook body for any business-critical decisions
+ * (order lookup, amount reconciliation, invoice issuance).
+ */
+export async function verifyEasyPayTransaction(
+  transactionId: string
+): Promise<VerifiedTransaction | null> {
+  const res = await fetch(
+    `${EASYPAY_BASE}/transaction/${encodeURIComponent(transactionId)}`,
+    { method: "GET", headers: getHeaders() }
+  );
+
+  if (!res.ok) {
+    throw new Error(
+      `EasyPay transaction lookup failed (${res.status}) for id=${transactionId}`
+    );
+  }
+
+  const data = await res.json() as Record<string, any>;
+
+  if (data?.status !== "success") {
+    return null;
+  }
+
+  return {
+    status: data.status as string,
+    orderKey: (data?.key ?? data?.transaction_key ?? "") as string,
+    paidAmount: Number(data?.values?.paid ?? data?.amount ?? 0),
+    method: (data?.type ?? data?.method ?? "") as string,
   };
 }
 
