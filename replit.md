@@ -65,3 +65,13 @@ When EasyPay confirms payment (webhook), the customer automatically receives a f
 - Content: greeting + "Thank you for your order, your payment has been confirmed and your order is being processed" + shipping address + order summary + total + (if NIF given) note that fatura will arrive separately
 - Merchant fallback: even if customer email fails, merchant still gets the order notification via Gmail and Telegram
 - Required secrets (deployment + dev): `GMAIL_USER` and `GMAIL_APP_PASSWORD` — without these all email is silently skipped (Telegram still works)
+
+## Chocolates Dom José — EasyPay Visa/Mastercard validation
+
+Site elements required by EasyPay to enable Visa/Mastercard card payments (checklist supplied in PT).
+
+- Payment-method logos: `src/components/PaymentLogos.tsx` renders Visa / Mastercard / MB WAY / Multibanco / EasyPay marks in the footer (`Home.tsx`). These are hand-coded SVG/text recreations (white chips), NOT official brand-center files. If EasyPay's reviewer rejects them, swap in the official assets from https://www.easypay.pt/brand-center/. The set must stay consistent with the payment methods listed in the Terms (currently MB WAY / Multibanco / Visa / Mastercard) — do not advertise methods that aren't actually offered (PayPal/Revolut were removed for this reason).
+- Contact requirement (email + phone): contact section in `Home.tsx` shows both, as clickable `mailto:`/`tel:` links. Phone `+351 912 630 054` (also in WhatsApp float + `COMPANY` const in Legal.tsx).
+- VAT visibility: `ivaIncluded` string per language rendered under every product price in `ProductCard`, plus stated in Terms ("incluem IVA … 23%").
+- Delivery policy (Terms §5, all 4 langs): names carriers **GLS / CTT**; shipping free in mainland Portugal and on international orders ≥ €75; below that, international portes depend on package volume/weight and are shown at checkout (merchant declined to give a fixed under-€75 rate because it varies by volume).
+- +18 pop-up: NOT required — products are food, not alcoholic beverages. "Pêras Bebedas" is cooked with wine but the alcohol is boiled off; a multilingual advisory (pregnant-women caution) was added to that product's description instead of an age gate.
