@@ -61,6 +61,17 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       return;
     }
 
+    const hasInvalidQuantity = validItems.some(
+      (i) =>
+        !Number.isInteger(i.quantity) ||
+        i.quantity < 1 ||
+        i.quantity > 100
+    );
+    if (hasInvalidQuantity) {
+      res.status(400).json({ error: "Invalid quantity: must be a whole number between 1 and 100" });
+      return;
+    }
+
     const amountCents = validItems.reduce(
       (sum, i) => sum + PRODUCTS[i.id].price * i.quantity,
       0
