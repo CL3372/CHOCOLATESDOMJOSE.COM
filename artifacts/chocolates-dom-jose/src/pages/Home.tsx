@@ -20,6 +20,7 @@ import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775
 import cabazImg2 from "@assets/6B7C46BB-4F99-4C06-B042-49477038A177_1_105_c_1775498765125.jpeg";
 import cabazImg3 from "@assets/2F27B28B-3481-45FF-9C0A-4F9CA152FA00_1_105_c_1775498790966.jpeg";
 import cabazImg4 from "@assets/B32139AA-0033-43EA-9DD9-C46E629306AC_1_105_c_1775498796966.jpeg";
+import { PaymentLogos } from "../components/PaymentLogos";
 
 const translations: Record<Lang, {
   badge: string;
@@ -49,6 +50,7 @@ const translations: Record<Lang, {
   contactHeading: string;
   contactDesc: string;
   contactEmail: string;
+  contactPhone: string;
   contactInstagram: string;
   contactLocation: string;
   placeholderName: string;
@@ -60,6 +62,7 @@ const translations: Record<Lang, {
   contactSuccess: string;
   contactError: string;
   contactRequired: string;
+  ivaIncluded: string;
   footer: string;
   addToCart: string;
   priceFrom: string;
@@ -92,6 +95,7 @@ const translations: Record<Lang, {
     contactHeading: "Vamos criar algo delicioso juntos",
     contactDesc: "Use esta secção para receber pedidos, contactos de revenda ou mensagens de clientes interessados nos seus produtos.",
     contactEmail: "Email: geral@chocolatesdomjose.com",
+    contactPhone: "Telefone: +351 912 630 054",
     contactInstagram: "Instagram: @chocolatesdomjose",
     contactLocation: "Localização: Portugal",
     placeholderName: "O seu nome",
@@ -103,6 +107,7 @@ const translations: Record<Lang, {
     contactSuccess: "Mensagem enviada com sucesso! Entraremos em contacto em breve.",
     contactError: "Não foi possível enviar a sua mensagem. Por favor tente novamente ou escreva para geral@chocolatesdomjose.com.",
     contactRequired: "Por favor preencha nome, email e mensagem.",
+    ivaIncluded: "Preços com IVA incluído (23%)",
     footer: "Todos os direitos reservados.",
     addToCart: "Adicionar ao carrinho",
     priceFrom: "A partir de",
@@ -135,6 +140,7 @@ const translations: Record<Lang, {
     contactHeading: "Let's create something delicious together",
     contactDesc: "Use this section to receive orders, resale enquiries or messages from customers interested in your products.",
     contactEmail: "Email: geral@chocolatesdomjose.com",
+    contactPhone: "Phone: +351 912 630 054",
     contactInstagram: "Instagram: @chocolatesdomjose",
     contactLocation: "Location: Portugal",
     placeholderName: "Your name",
@@ -146,6 +152,7 @@ const translations: Record<Lang, {
     contactSuccess: "Message sent successfully! We'll be in touch shortly.",
     contactError: "We couldn't send your message. Please try again or email geral@chocolatesdomjose.com.",
     contactRequired: "Please fill in your name, email and message.",
+    ivaIncluded: "Prices include VAT (23%)",
     footer: "All rights reserved.",
     addToCart: "Add to cart",
     priceFrom: "From",
@@ -178,6 +185,7 @@ const translations: Record<Lang, {
     contactHeading: "Lassen Sie uns gemeinsam etwas Köstliches schaffen",
     contactDesc: "Nutzen Sie diesen Bereich für Bestellungen, Wiederverkaufsanfragen oder Nachrichten von Kunden, die an Ihren Produkten interessiert sind.",
     contactEmail: "E-Mail: geral@chocolatesdomjose.com",
+    contactPhone: "Telefon: +351 912 630 054",
     contactInstagram: "Instagram: @chocolatesdomjose",
     contactLocation: "Standort: Portugal",
     placeholderName: "Ihr Name",
@@ -189,6 +197,7 @@ const translations: Record<Lang, {
     contactSuccess: "Nachricht erfolgreich gesendet! Wir melden uns in Kürze.",
     contactError: "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut oder schreiben Sie an geral@chocolatesdomjose.com.",
     contactRequired: "Bitte geben Sie Name, E-Mail und Nachricht ein.",
+    ivaIncluded: "Preise inkl. MwSt. (23%)",
     footer: "Alle Rechte vorbehalten.",
     addToCart: "In den Warenkorb",
     priceFrom: "Ab",
@@ -221,6 +230,7 @@ const translations: Record<Lang, {
     contactHeading: "Laten we samen iets heerlijks creëren",
     contactDesc: "Gebruik dit gedeelte voor bestellingen, wederverkoopvragen of berichten van klanten die geïnteresseerd zijn in uw producten.",
     contactEmail: "E-mail: geral@chocolatesdomjose.com",
+    contactPhone: "Telefoon: +351 912 630 054",
     contactInstagram: "Instagram: @chocolatesdomjose",
     contactLocation: "Locatie: Portugal",
     placeholderName: "Uw naam",
@@ -232,6 +242,7 @@ const translations: Record<Lang, {
     contactSuccess: "Bericht succesvol verzonden! We nemen spoedig contact op.",
     contactError: "Uw bericht kon niet worden verzonden. Probeer het opnieuw of mail naar geral@chocolatesdomjose.com.",
     contactRequired: "Vul a.u.b. uw naam, e-mail en bericht in.",
+    ivaIncluded: "Prijzen incl. btw (23%)",
     footer: "Alle rechten voorbehouden.",
     addToCart: "Toevoegen aan winkelwagen",
     priceFrom: "Vanaf",
@@ -460,27 +471,12 @@ function ContactForm({ lang, t }: { lang: Lang; t: ContactT }) {
   );
 }
 
-function PaymentBadges() {
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
-      {[
-        { label: "Visa", cls: "border-blue-400/20 bg-blue-400/5 text-blue-200/80" },
-        { label: "Mastercard", cls: "border-orange-400/20 bg-orange-400/5 text-orange-200/80" },
-        { label: "MB WAY", cls: "border-red-400/20 bg-red-400/5 text-red-300/80" },
-        { label: "PayPal", cls: "border-blue-500/20 bg-blue-500/5 text-blue-300/80" },
-        { label: "Revolut Pay", cls: "border-violet-400/20 bg-violet-400/5 text-violet-300/80" },
-      ].map(({ label, cls }) => (
-        <span key={label} className={`rounded-full border px-3 py-1 text-xs font-medium ${cls}`}>{label}</span>
-      ))}
-    </div>
-  );
-}
-
-function ProductCard({ product, lang, addToCartLabel, priceFromLabel }: {
+function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel }: {
   product: typeof products[number];
   lang: Lang;
   addToCartLabel: string;
   priceFromLabel: string;
+  ivaLabel: string;
 }) {
   const { addItem } = useCart();
   const [imgIdx, setImgIdx] = useState(0);
@@ -540,6 +536,7 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel }: {
       <div className="flex flex-1 flex-col p-6">
         <h3 className="text-2xl font-semibold">{product.name[lang]}</h3>
         <p className="mt-1 text-lg font-medium text-yellow-300">{priceDisplay}</p>
+        <p className="text-[11px] text-white/40">{ivaLabel}</p>
         <p className="mt-3 flex-1 text-white/70">{product.description[lang]}</p>
         <button
           onClick={handleAdd}
@@ -755,6 +752,7 @@ export default function Home() {
                   lang={lang}
                   addToCartLabel={t.addToCart}
                   priceFromLabel={t.priceFrom}
+                  ivaLabel={t.ivaIncluded}
                 />
               </div>
             </FadeIn>
@@ -826,7 +824,8 @@ export default function Home() {
             <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">{t.contactHeading}</h2>
             <p className="mt-4 max-w-xl text-white/75">{t.contactDesc}</p>
             <div className="mt-8 space-y-3 text-white/70">
-              <p>{t.contactEmail}</p>
+              <a href="mailto:geral@chocolatesdomjose.com" className="block transition hover:text-yellow-300">{t.contactEmail}</a>
+              <a href="tel:+351912630054" className="block transition hover:text-yellow-300">{t.contactPhone}</a>
               <a
                 href="https://www.instagram.com/chocolatesdomjose/"
                 target="_blank"
@@ -870,7 +869,7 @@ export default function Home() {
 
       <footer className="border-t border-white/10 py-8 text-center text-sm text-white/40">
         <div className="mb-5">
-          <PaymentBadges />
+          <PaymentLogos />
         </div>
         <div className="mb-3 flex items-center justify-center gap-5">
           <a
