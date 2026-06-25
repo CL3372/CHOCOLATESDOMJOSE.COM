@@ -8,10 +8,22 @@ import {
 } from "../lib/orderStore.js";
 import { issueInvoiceReceipt } from "../lib/moloni.js";
 import { verifyEasyPayTransaction } from "../lib/easypay.js";
+import { rateLimit } from "../lib/rateLimit.js";
 
 const webhookRouter = Router();
 
-webhookRouter.post("/webhook/easypay", async (req, res) => {
+// Guard the webhook against unauthenticated spam that would force an outbound
+// EasyPay verification call for every inbound request and burn third-party quota.
+// Limits are generous enough to accommodate EasyPay's own retry attempts from
+// their shared IP ranges, while capping a single attacker to 30 hits per 10 min.
+const webhookLimiter = rateLimit({
+  bucket: "webhook_easypay",
+  perIp: 30,
+  global: 300,
+  windowMs: 10 * 60 * 1000,
+});
+
+webhookRouter.post("/webhook/easypay", webhookLimiter, async (req, res) => {
   try {
     const body = req.body as Record<string, any>;
 

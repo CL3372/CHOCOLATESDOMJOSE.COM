@@ -45,22 +45,19 @@ function maybeGc(): void {
 }
 
 /**
- * Extract the client IP. Behind the Replit proxy the real client is in
- * X-Forwarded-For; the left-most entry is the original client. This value is
- * spoofable, which is why every limiter is paired with an IP-independent global
- * backstop (see `limit()` options).
+ * Extract the client IP from req.ip, which Express derives from X-Forwarded-For
+ * using the `trust proxy` setting in app.ts. With `trust proxy: 1`, Express
+ * strips the rightmost XFF entry (added by Replit's proxy) and sets req.ip to
+ * that value — the actual client IP as observed by Replit's load balancer.
+ * This is NOT spoofable by a client: any attacker-injected leftmost XFF values
+ * are ignored by Express because only one hop is trusted.
+ *
+ * Do NOT parse XFF manually here — reading the leftmost value directly would
+ * allow an attacker to rotate fake IPs and bypass the per-IP bucket entirely.
  */
 function clientIp(req: Request): string {
-  let ip = req.ip ?? req.socket.remoteAddress ?? "";
-  const xff = req.headers["x-forwarded-for"];
-  if (typeof xff === "string" && xff.length > 0) {
-    const first = xff.split(",")[0]?.trim();
-    if (first) ip = first;
-  } else if (Array.isArray(xff) && xff[0]) {
-    ip = xff[0];
-  }
-  if (!ip) ip = "unknown";
-  // Bound the identifier so a hostile, oversized X-Forwarded-For can't bloat keys.
+  const ip = req.ip ?? req.socket.remoteAddress ?? "unknown";
+  // Bound the identifier so an oversized IP string can't bloat Postgres keys.
   return ip.slice(0, 64);
 }
 

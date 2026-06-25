@@ -1,3 +1,3 @@
 - [Replit config can contain live secrets](replit-config-secrets.md) — Always inspect tracked `.replit` for `userenv.shared` credentials during security scans.
-- [Notification endpoint hardening](notification-abuse-hardening.md) — contact/checkout: Postgres-backed per-IP + global-backstop rate limit (XFF spoofable); escapeHtml all untrusted email fields.
+- [Notification endpoint hardening](notification-abuse-hardening.md) — contact/checkout/webhook: Postgres-backed per-IP + global-backstop rate limit; trust proxy:1 + req.ip prevents XFF spoofing; escapeHtml all untrusted email fields.
 - [EasyPay card validation](easypay-card-validation.md) — Visa/MC validation checklist: footer brand logos (hand-coded, may need brand-center swap), email+phone, IVA shown, delivery must name carrier; +18 only for alcoholic beverages.
