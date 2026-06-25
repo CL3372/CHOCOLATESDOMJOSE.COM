@@ -46,7 +46,7 @@ The application handles customer PII and multiple third-party credentials. Secre
 
 ### Denial of Service
 
-All public endpoints are unauthenticated. The application must prevent cheap abuse of `/api/contact`, `/api/checkout`, and `/api/webhook/easypay` that can spam operators, exhaust third-party quotas, create unbounded pending-order records, or otherwise degrade service. External API calls should remain bounded and resilient to repeated attacker-triggered requests.
+All public endpoints are unauthenticated. The application must prevent cheap abuse of `/api/contact`, `/api/checkout`, and `/api/webhook/easypay` that can spam operators, exhaust third-party quotas, create unbounded pending-order records, or otherwise degrade service. External API calls should remain bounded and resilient to repeated attacker-triggered requests, especially before the server fans unauthenticated webhook traffic out to EasyPay. Any IP-based throttling must treat forwarding headers as attacker-controlled unless they are derived from trusted proxy state rather than raw request headers.
 
 ### Elevation of Privilege
 
