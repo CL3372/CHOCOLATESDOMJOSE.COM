@@ -13,6 +13,10 @@ globalThis.require = createRequire(import.meta.url);
 const artifactDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(artifactDir, "..", "..");
 
+// Output is committed to git (not gitignored): Vercel only detects /api
+// serverless functions from the pre-build repo tree, so a file generated
+// purely by buildCommand is invisible to it. Re-run this script and commit
+// api/index.mjs whenever artifacts/api-server/src changes.
 await esbuild({
   entryPoints: [path.resolve(artifactDir, "src/app.ts")],
   platform: "node",
@@ -96,7 +100,7 @@ await esbuild({
     "puppeteer-core",
     "electron",
   ],
-  sourcemap: "linked",
+  sourcemap: false,
   banner: {
     js: `import { createRequire as __bannerCrReq } from 'node:module';
 import __bannerPath from 'node:path';

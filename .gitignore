@@ -2,8 +2,6 @@
 
 # compiled output
 dist
-/api/index.mjs
-/api/index.mjs.map
 tmp
 out-tsc
 *.tsbuildinfo
