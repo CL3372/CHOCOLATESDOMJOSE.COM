@@ -2,12 +2,13 @@ import { useState, useEffect, useRef, type ReactNode } from "react";
 import { useCart, type Lang } from "@/context/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import logoSrc from "@assets/logo_bw.png";
+// Product photos below are phone shots pending the professional Bombarral shoot.
+// When those land, swap the imports in place — ProductCard already renders any
+// source through a fixed object-cover frame, so new photos don't need matching dimensions.
 import trufaImg1 from "@assets/4601CB5C-1354-4ED9-A3C5-D566E3957B7B_1775497051986.JPG";
 import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775497155075.jpeg";
 import peraImg1 from "@assets/D0001014-D8F0-4669-AA75-AA5FC99B9C61_1775497657429.JPG";
 import peraImg2 from "@assets/27402DCF-137B-4302-ADCE-BF183A97BB50_1775497663265.JPG";
-import peraImg3 from "@assets/BA6A154A-4E87-47D8-B74A-FA6FBB7CCE61_1775497678161.JPG";
-import peraImg4 from "@assets/B1B5018B-896A-4DE6-B3D8-83192AD6FA8D_1775497812771.jpeg";
 import laranjaImg from "@assets/C5049C7D-4C50-4DC6-9FF1-35C328026F8A_1_105_c_1775497857994.jpeg";
 import choc77Img from "@assets/C8C3450E-D74C-4028-8A60-556EA3DA337B_1_105_c_1775497898196.jpeg";
 import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1775497921548.jpeg";
@@ -272,7 +273,10 @@ const products = [
       DE: "Birnen im Glas, anspruchsvoll und einzigartig, ideal für Körbe und Gourmet-Geschenke. Mit Wein zubereitet (Alkohol verdampft); Schwangeren wird Vorsicht empfohlen.",
       NL: "Peren in pot, verfijnd en uniek, ideaal voor manden en gourmetcadeaus. Bereid met wijn (alcohol weggekookt); voorzichtigheid aangeraden voor zwangere vrouwen.",
     },
-    images: [peraImg1, peraImg2, peraImg3, peraImg4],
+    // peraImg3/peraImg4 (region seal + PT-only promo graphic) were dropped: they broke
+    // the EN/DE/NL carousel with untranslatable baked-in text. Swap all peraImg* for the
+    // professional shoot once it's ready.
+    images: [peraImg1, peraImg2],
   },
   {
     id: "trufas_laranja",
