@@ -29,9 +29,11 @@ const PRODUCTS: Record<string, { name: string; price: number; weightGrams: numbe
   cabazes: { name: "Cabazes", price: 3000, weightGrams: 2000 },
 };
 
-// PostLog/GLS PT rates (24h-48h service), each with a flat +€1.50 markup already
-// applied. Tiers are "up to N grams"; PT_SHIPPING_ADIC_CENTS is the per-extra-kg
-// rate PostLog charges above the 30kg tier (no markup added to that marginal rate).
+// PostLog/GLS rates (24h-48h service). Tiers are "up to N grams". PT carries a
+// flat +€1.50 markup and is free above €100 subtotal; international (the
+// PostLog "ES" column, used for any non-PT destination) carries a +€2.00
+// markup and is always charged — no free threshold. The *_ADIC_CENTS_PER_KG
+// rates PostLog charges above the 30kg tier carry no markup (marginal rate).
 const PT_SHIPPING_TIERS: { maxGrams: number; cents: number }[] = [
   { maxGrams: 1000, cents: 475 },
   { maxGrams: 3000, cents: 532 },
@@ -45,23 +47,38 @@ const PT_SHIPPING_TIERS: { maxGrams: number; cents: number }[] = [
 const PT_SHIPPING_ADIC_CENTS_PER_KG = 28;
 const PT_FREE_SHIPPING_THRESHOLD_CENTS = 10000; // €100
 
+const INTL_SHIPPING_TIERS: { maxGrams: number; cents: number }[] = [
+  { maxGrams: 1000, cents: 772 },
+  { maxGrams: 3000, cents: 772 },
+  { maxGrams: 5000, cents: 848 },
+  { maxGrams: 10000, cents: 1001 },
+  { maxGrams: 15000, cents: 1114 },
+  { maxGrams: 20000, cents: 1209 },
+  { maxGrams: 25000, cents: 1396 },
+  { maxGrams: 30000, cents: 1533 },
+];
+const INTL_SHIPPING_ADIC_CENTS_PER_KG = 57;
+
 function isPortugal(country: string | undefined): boolean {
   const c = (country ?? "").trim().toLowerCase();
-  return c === "portugal" || c === "pt";
+  return c === "" || c === "portugal" || c === "pt";
 }
 
-// Shipping only applies to Portugal for now — international rates are not yet
-// implemented (see replit.md), matching current Terms & Conditions language.
-function calculateShippingCents(totalWeightGrams: number, subtotalCents: number, country: string | undefined): number {
-  if (!isPortugal(country)) return 0;
-  if (subtotalCents >= PT_FREE_SHIPPING_THRESHOLD_CENTS) return 0;
-
-  const tier = PT_SHIPPING_TIERS.find((t) => totalWeightGrams <= t.maxGrams);
+function tierLookup(totalWeightGrams: number, tiers: { maxGrams: number; cents: number }[], adicCentsPerKg: number): number {
+  const tier = tiers.find((t) => totalWeightGrams <= t.maxGrams);
   if (tier) return tier.cents;
 
-  const lastTier = PT_SHIPPING_TIERS[PT_SHIPPING_TIERS.length - 1];
+  const lastTier = tiers[tiers.length - 1];
   const extraKg = Math.ceil((totalWeightGrams - lastTier.maxGrams) / 1000);
-  return lastTier.cents + extraKg * PT_SHIPPING_ADIC_CENTS_PER_KG;
+  return lastTier.cents + extraKg * adicCentsPerKg;
+}
+
+function calculateShippingCents(totalWeightGrams: number, subtotalCents: number, country: string | undefined): number {
+  if (isPortugal(country)) {
+    if (subtotalCents >= PT_FREE_SHIPPING_THRESHOLD_CENTS) return 0;
+    return tierLookup(totalWeightGrams, PT_SHIPPING_TIERS, PT_SHIPPING_ADIC_CENTS_PER_KG);
+  }
+  return tierLookup(totalWeightGrams, INTL_SHIPPING_TIERS, INTL_SHIPPING_ADIC_CENTS_PER_KG);
 }
 
 checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
@@ -106,13 +123,6 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
     );
     if (hasInvalidQuantity) {
       res.status(400).json({ error: "Invalid quantity: must be a whole number between 1 and 100" });
-      return;
-    }
-
-    // We only ship to Portugal — reject rather than silently accepting an
-    // address we can't fulfil.
-    if (!isPortugal(shipping?.country)) {
-      res.status(400).json({ error: "We currently only ship to Portugal" });
       return;
     }
 

@@ -156,8 +156,7 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
   const [address, setAddress] = useState("");
   const [postcode, setPostcode] = useState("");
   const [city, setCity] = useState("");
-  // Shipping is Portugal-only, so this is fixed rather than user-editable.
-  const country = "Portugal";
+  const [country, setCountry] = useState("Portugal");
 
   const shippingCents = calculateShippingCents(
     items.map((i) => ({ id: i.id, quantity: i.quantity })),
@@ -418,9 +417,8 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
                   <input
                     type="text"
                     value={country}
-                    disabled
-                    readOnly
-                    className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm text-white/60 cursor-not-allowed"
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
                   />
                 </div>
               </div>

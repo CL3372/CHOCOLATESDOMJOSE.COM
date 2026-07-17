@@ -627,12 +627,12 @@ export default function Home() {
       {/* Free shipping announcement bar */}
       <div className="bg-gradient-to-r from-[#5a2a0a] via-[#7a3a14] to-[#5a2a0a] px-4 py-2 text-center text-xs font-medium text-amber-100 sm:text-sm">
         🚚 {lang === "PT"
-          ? "Envios para Portugal · Portes grátis em encomendas acima de €100"
+          ? "Enviamos para Portugal e internacionalmente · Portes grátis em Portugal acima de €100"
           : lang === "DE"
-          ? "Versand nach Portugal · Kostenloser Versand ab €100"
+          ? "Versand nach Portugal und international · Kostenloser Versand in Portugal ab €100"
           : lang === "NL"
-          ? "Verzending naar Portugal · Gratis verzending vanaf €100"
-          : "Shipping to Portugal · Free shipping on orders over €100"}
+          ? "Verzending naar Portugal en internationaal · Gratis verzending in Portugal vanaf €100"
+          : "Shipping to Portugal and internationally · Free shipping in Portugal on orders over €100"}
       </div>
 
       {/* Hero */}
