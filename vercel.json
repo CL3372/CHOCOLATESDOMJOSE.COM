@@ -2,6 +2,7 @@
   "buildCommand": "pnpm --filter @workspace/chocolates-dom-jose run build && pnpm --filter @workspace/api-server exec node build-vercel.mjs",
   "installCommand": "pnpm install",
   "outputDirectory": "artifacts/chocolates-dom-jose/dist/public",
+  "regions": ["cdg1"],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" }
   ]
