@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useCart, type Lang } from "../context/CartContext";
+import { calculateShippingCents, PT_FREE_SHIPPING_THRESHOLD_CENTS } from "../lib/shipping";
 
 const labels: Record<
   Lang,
@@ -26,6 +27,9 @@ const labels: Record<
     city: string;
     country: string;
     shippingTitle: string;
+    shippingCost: string;
+    shippingFree: string;
+    total: string;
   }
 > = {
   PT: {
@@ -51,6 +55,9 @@ const labels: Record<
     city: "Cidade",
     country: "País",
     shippingTitle: "Morada de envio",
+    shippingCost: "Portes de envio",
+    shippingFree: "Grátis",
+    total: "Total",
   },
   EN: {
     title: "Your cart",
@@ -75,6 +82,9 @@ const labels: Record<
     city: "City",
     country: "Country",
     shippingTitle: "Shipping address",
+    shippingCost: "Shipping",
+    shippingFree: "Free",
+    total: "Total",
   },
   DE: {
     title: "Ihr Warenkorb",
@@ -99,6 +109,9 @@ const labels: Record<
     city: "Stadt",
     country: "Land",
     shippingTitle: "Lieferadresse",
+    shippingCost: "Versand",
+    shippingFree: "Kostenlos",
+    total: "Gesamt",
   },
   NL: {
     title: "Uw winkelwagen",
@@ -123,6 +136,9 @@ const labels: Record<
     city: "Stad",
     country: "Land",
     shippingTitle: "Verzendadres",
+    shippingCost: "Verzendkosten",
+    shippingFree: "Gratis",
+    total: "Totaal",
   },
 };
 
@@ -141,6 +157,13 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
   const [postcode, setPostcode] = useState("");
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("Portugal");
+
+  const shippingCents = calculateShippingCents(
+    items.map((i) => ({ id: i.id, quantity: i.quantity })),
+    total,
+    country,
+  );
+  const grandTotal = total + shippingCents;
 
   const handleCheckout = async () => {
     setLoading(true);
@@ -273,11 +296,21 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
             </div>
 
             {items.length > 0 && (
-              <div className="border-t border-white/10 px-6 py-5 space-y-4">
-                <div className="flex items-center justify-between text-white">
+              <div className="border-t border-white/10 px-6 py-5 space-y-2">
+                <div className="flex items-center justify-between text-sm">
                   <span className="text-white/70">{l.subtotal}</span>
+                  <span className="text-white/90">€{(total / 100).toFixed(2)}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-white/70">{l.shippingCost}</span>
+                  <span className="text-white/90">
+                    {shippingCents === 0 ? l.shippingFree : `€${(shippingCents / 100).toFixed(2)}`}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-white pt-2">
+                  <span className="text-white/70">{l.total}</span>
                   <span className="text-lg font-semibold text-yellow-300">
-                    €{(total / 100).toFixed(2)}
+                    €{(grandTotal / 100).toFixed(2)}
                   </span>
                 </div>
                 <button
@@ -391,11 +424,23 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
               </div>
             </div>
 
-            <div className="rounded-xl bg-white/5 border border-white/10 px-4 py-3 flex justify-between text-sm">
-              <span className="text-white/60">{l.subtotal}</span>
-              <span className="font-semibold text-yellow-300">
-                €{(total / 100).toFixed(2)}
-              </span>
+            <div className="rounded-xl bg-white/5 border border-white/10 px-4 py-3 space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-white/60">{l.subtotal}</span>
+                <span className="text-white/90">€{(total / 100).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">{l.shippingCost}</span>
+                <span className="text-white/90">
+                  {shippingCents === 0 ? l.shippingFree : `€${(shippingCents / 100).toFixed(2)}`}
+                </span>
+              </div>
+              <div className="flex justify-between pt-1 border-t border-white/10">
+                <span className="text-white/60">{l.total}</span>
+                <span className="font-semibold text-yellow-300">
+                  €{(grandTotal / 100).toFixed(2)}
+                </span>
+              </div>
             </div>
 
             <div className="rounded-xl bg-white/5 border border-white/10 px-4 py-3 flex items-center gap-3">

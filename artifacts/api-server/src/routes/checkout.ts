@@ -18,14 +18,51 @@ const checkoutLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
 });
 
-const PRODUCTS: Record<string, { name: string; price: number }> = {
-  trufas_artesanais: { name: "Trufas Artesanais", price: 1500 },
-  trufas_laranja: { name: "Trufas de Laranja", price: 1500 },
-  trufas_chocolate_77: { name: "Trufas de Chocolate 77%", price: 1500 },
-  peras_bebedas: { name: "Pêras Bebedas", price: 700 },
-  dom_piri_piri: { name: "Dom Piri Piri", price: 700 },
-  cabazes: { name: "Cabazes", price: 3000 },
+const PRODUCTS: Record<string, { name: string; price: number; weightGrams: number }> = {
+  trufas_artesanais: { name: "Trufas Artesanais", price: 1500, weightGrams: 300 },
+  trufas_laranja: { name: "Trufas de Laranja", price: 1500, weightGrams: 300 },
+  trufas_chocolate_77: { name: "Trufas de Chocolate 77%", price: 1500, weightGrams: 300 },
+  peras_bebedas: { name: "Pêras Bebedas", price: 700, weightGrams: 600 },
+  dom_piri_piri: { name: "Dom Piri Piri", price: 700, weightGrams: 200 },
+  // Cabazes vary by contents; billed at the 2kg cap (heaviest offered) so
+  // shipping is never undercharged.
+  cabazes: { name: "Cabazes", price: 3000, weightGrams: 2000 },
 };
+
+// PostLog/GLS PT rates (24h-48h service), each with a flat +€1.50 markup already
+// applied. Tiers are "up to N grams"; PT_SHIPPING_ADIC_CENTS is the per-extra-kg
+// rate PostLog charges above the 30kg tier (no markup added to that marginal rate).
+const PT_SHIPPING_TIERS: { maxGrams: number; cents: number }[] = [
+  { maxGrams: 1000, cents: 475 },
+  { maxGrams: 3000, cents: 532 },
+  { maxGrams: 5000, cents: 558 },
+  { maxGrams: 10000, cents: 627 },
+  { maxGrams: 15000, cents: 722 },
+  { maxGrams: 20000, cents: 778 },
+  { maxGrams: 25000, cents: 874 },
+  { maxGrams: 30000, cents: 912 },
+];
+const PT_SHIPPING_ADIC_CENTS_PER_KG = 28;
+const PT_FREE_SHIPPING_THRESHOLD_CENTS = 10000; // €100
+
+function isPortugal(country: string | undefined): boolean {
+  const c = (country ?? "").trim().toLowerCase();
+  return c === "portugal" || c === "pt";
+}
+
+// Shipping only applies to Portugal for now — international rates are not yet
+// implemented (see replit.md), matching current Terms & Conditions language.
+function calculateShippingCents(totalWeightGrams: number, subtotalCents: number, country: string | undefined): number {
+  if (!isPortugal(country)) return 0;
+  if (subtotalCents >= PT_FREE_SHIPPING_THRESHOLD_CENTS) return 0;
+
+  const tier = PT_SHIPPING_TIERS.find((t) => totalWeightGrams <= t.maxGrams);
+  if (tier) return tier.cents;
+
+  const lastTier = PT_SHIPPING_TIERS[PT_SHIPPING_TIERS.length - 1];
+  const extraKg = Math.ceil((totalWeightGrams - lastTier.maxGrams) / 1000);
+  return lastTier.cents + extraKg * PT_SHIPPING_ADIC_CENTS_PER_KG;
+}
 
 checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
   try {
@@ -72,10 +109,16 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       return;
     }
 
-    const amountCents = validItems.reduce(
+    const subtotalCents = validItems.reduce(
       (sum, i) => sum + PRODUCTS[i.id].price * i.quantity,
       0
     );
+    const totalWeightGrams = validItems.reduce(
+      (sum, i) => sum + PRODUCTS[i.id].weightGrams * i.quantity,
+      0
+    );
+    const shippingCents = calculateShippingCents(totalWeightGrams, subtotalCents, shipping?.country);
+    const amountCents = subtotalCents + shippingCents;
 
     const { url, orderKey } = await createEasyPayCheckout({
       amountCents,
@@ -90,6 +133,14 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       quantity: i.quantity,
       unitPriceEur: PRODUCTS[i.id].price / 100,
     }));
+    if (shippingCents > 0) {
+      itemsForStore.push({
+        reference: "shipping",
+        name: "Portes de envio",
+        quantity: 1,
+        unitPriceEur: shippingCents / 100,
+      });
+    }
 
     // Persist BEFORE returning the EasyPay URL so the order is durably stored
     // even if the webhook arrives within milliseconds (and on a different
