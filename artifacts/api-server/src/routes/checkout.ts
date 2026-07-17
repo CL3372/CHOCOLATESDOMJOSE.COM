@@ -109,6 +109,13 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       return;
     }
 
+    // We only ship to Portugal — reject rather than silently accepting an
+    // address we can't fulfil.
+    if (!isPortugal(shipping?.country)) {
+      res.status(400).json({ error: "We currently only ship to Portugal" });
+      return;
+    }
+
     const subtotalCents = validItems.reduce(
       (sum, i) => sum + PRODUCTS[i.id].price * i.quantity,
       0
