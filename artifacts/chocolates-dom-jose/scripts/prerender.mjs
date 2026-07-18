@@ -7,6 +7,7 @@
 // changes for real visitors.
 
 import { chromium } from "playwright";
+import sparticuzChromium from "@sparticuz/chromium";
 import { createServer } from "node:http";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -78,7 +79,17 @@ async function main() {
   }
 
   const server = await startServer();
-  const browser = await chromium.launch();
+  // Vercel's build container has no apt/root access, so a normal
+  // playwright-downloaded Chromium fails there with missing shared
+  // libraries (libnspr4.so etc). @sparticuz/chromium ships a Chromium
+  // build made for exactly this kind of restricted Linux environment, so
+  // it is used only when running on Vercel; local dev keeps the regular
+  // playwright-managed Chromium.
+  const browser = await chromium.launch(
+    process.env.VERCEL
+      ? { executablePath: await sparticuzChromium.executablePath(), args: sparticuzChromium.args }
+      : {}
+  );
 
   try {
     for (const route of ROUTES) {
