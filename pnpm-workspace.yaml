@@ -71,6 +71,7 @@ onlyBuiltDependencies:
   - '@swc/core'
   - esbuild
   - msw
+  - playwright
   - unrs-resolver
 
 overrides:

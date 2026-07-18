@@ -4,7 +4,11 @@ export const LANGS: Lang[] = ["PT", "EN", "DE", "NL"];
 
 // Checks ?lang= first (so hreflang alternate URLs actually resolve to the
 // matching language instead of always rendering PT), then a saved
-// preference, then the browser's language, defaulting to PT.
+// preference, defaulting to PT. Deliberately does NOT fall back to the
+// browser's navigator.language: the prerendered build (scripts/prerender.mjs)
+// always captures the bare URLs as PT, and auto-switching off browser locale
+// would fight that prerendered content on every hydration for non-PT
+// visitors instead of only when they actually asked for another language.
 export function detectLang(): Lang {
   if (typeof window === "undefined") return "PT";
   const params = new URLSearchParams(window.location.search);
@@ -12,8 +16,6 @@ export function detectLang(): Lang {
   if (fromQuery && (LANGS as string[]).includes(fromQuery)) return fromQuery as Lang;
   const stored = localStorage.getItem("lang")?.toUpperCase();
   if (stored && (LANGS as string[]).includes(stored)) return stored as Lang;
-  const nav = (navigator.language || "").slice(0, 2).toUpperCase();
-  if ((LANGS as string[]).includes(nav)) return nav as Lang;
   return "PT";
 }
 
