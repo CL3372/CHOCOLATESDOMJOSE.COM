@@ -296,14 +296,14 @@ function LegalLayout({
   );
 }
 
-export function TermsPage() {
-  const initial = useMemo(detectLang, []);
+export function TermsPage({ defaultLang }: { defaultLang: Lang }) {
+  const initial = useMemo(() => detectLang(defaultLang), [defaultLang]);
   const [lang, setLang] = useState<Lang>(initial);
   return <LegalLayout doc={TERMS[lang]} lang={lang} setLang={setLang} />;
 }
 
-export function PrivacyPage() {
-  const initial = useMemo(detectLang, []);
+export function PrivacyPage({ defaultLang }: { defaultLang: Lang }) {
+  const initial = useMemo(() => detectLang(defaultLang), [defaultLang]);
   const [lang, setLang] = useState<Lang>(initial);
   return <LegalLayout doc={PRIVACY[lang]} lang={lang} setLang={setLang} />;
 }

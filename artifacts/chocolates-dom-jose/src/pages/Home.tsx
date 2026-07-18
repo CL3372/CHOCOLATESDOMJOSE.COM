@@ -92,7 +92,7 @@ const translations: Record<Lang, {
 }> = {
   PT: {
     badge: "Chocolates Dom José",
-    headline: "Chocolates artesanais com elegância atemporal",
+    headline: "Trufas Artesanais e Chocolates Gourmet de Portugal",
     subtitle: "Artesanato português, apresentação refinada e sabores memoráveis numa identidade sofisticada.",
     btnProducts: "Ver produtos",
     btnCatalogue: "Pedir catálogo",
@@ -137,7 +137,7 @@ const translations: Record<Lang, {
   },
   EN: {
     badge: "Chocolates Dom José",
-    headline: "Artisan chocolates with timeless elegance",
+    headline: "Artisan Truffles and Gourmet Chocolates from Portugal",
     subtitle: "Portuguese craftsmanship, refined presentation, and memorable flavours in a sophisticated identity.",
     btnProducts: "See products",
     btnCatalogue: "Request catalogue",
@@ -182,7 +182,7 @@ const translations: Record<Lang, {
   },
   DE: {
     badge: "Chocolates Dom José",
-    headline: "Handgemachte Schokoladen mit zeitloser Eleganz",
+    headline: "Handgemachte Trüffel und Gourmet-Schokolade aus Portugal",
     subtitle: "Portugiesisches Handwerk, raffinierte Präsentation und unvergessliche Aromen in einer eleganten Identität.",
     btnProducts: "Produkte ansehen",
     btnCatalogue: "Katalog anfordern",
@@ -227,7 +227,7 @@ const translations: Record<Lang, {
   },
   NL: {
     badge: "Chocolates Dom José",
-    headline: "Ambachtelijke chocolade met tijdloze elegantie",
+    headline: "Ambachtelijke Truffels en Gourmetchocolade uit Portugal",
     subtitle: "Portugees vakmanschap, verfijnde presentatie en onvergetelijke smaken in een verfijnde identiteit.",
     btnProducts: "Bekijk producten",
     btnCatalogue: "Catalogus aanvragen",

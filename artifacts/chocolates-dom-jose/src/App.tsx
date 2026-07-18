@@ -17,10 +17,10 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/checkout/cancel" component={CheckoutCancel} />
-      <Route path="/termos" component={TermsPage} />
-      <Route path="/terms" component={TermsPage} />
-      <Route path="/privacidade" component={PrivacyPage} />
-      <Route path="/privacy" component={PrivacyPage} />
+      <Route path="/termos"><TermsPage defaultLang="PT" /></Route>
+      <Route path="/terms"><TermsPage defaultLang="EN" /></Route>
+      <Route path="/privacidade"><PrivacyPage defaultLang="PT" /></Route>
+      <Route path="/privacy"><PrivacyPage defaultLang="EN" /></Route>
       <Route component={NotFound} />
     </Switch>
   );

@@ -43,6 +43,70 @@ const ROUTES = [
   { path: "/privacy", out: "privacy/index.html", waitFor: "h1" },
 ];
 
+const SITE = "https://chocolatesdomjose.com";
+
+// Every indexable URL plus its language alternates, used to (re)generate
+// sitemap.xml on every build so lastmod can never go stale by being
+// hand-edited and forgotten. /termos and /terms are two distinct canonical
+// URLs (PT and EN respectively — see App.tsx defaultLang), each listing the
+// same full set of alternates per the hreflang spec; DE/NL have no
+// dedicated path and live under ?lang= on the PT URL.
+const SITEMAP_PAGES = [
+  {
+    loc: "/",
+    changefreq: "weekly",
+    priority: "1.0",
+    alternates: { pt: "/", en: "/?lang=EN", de: "/?lang=DE", nl: "/?lang=NL" },
+  },
+  {
+    loc: "/termos",
+    changefreq: "yearly",
+    priority: "0.3",
+    alternates: { pt: "/termos", en: "/terms", de: "/termos?lang=DE", nl: "/termos?lang=NL" },
+  },
+  {
+    loc: "/terms",
+    changefreq: "yearly",
+    priority: "0.3",
+    alternates: { pt: "/termos", en: "/terms", de: "/termos?lang=DE", nl: "/termos?lang=NL" },
+  },
+  {
+    loc: "/privacidade",
+    changefreq: "yearly",
+    priority: "0.3",
+    alternates: { pt: "/privacidade", en: "/privacy", de: "/privacidade?lang=DE", nl: "/privacidade?lang=NL" },
+  },
+  {
+    loc: "/privacy",
+    changefreq: "yearly",
+    priority: "0.3",
+    alternates: { pt: "/privacidade", en: "/privacy", de: "/privacidade?lang=DE", nl: "/privacidade?lang=NL" },
+  },
+];
+
+async function writeSitemap() {
+  const lastmod = new Date().toISOString().slice(0, 10);
+  const urls = SITEMAP_PAGES.map((page) => {
+    const alternates = Object.entries(page.alternates)
+      .map(([hreflang, href]) => `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${SITE}${href}" />`)
+      .join("\n");
+    return [
+      "  <url>",
+      `    <loc>${SITE}${page.loc}</loc>`,
+      alternates,
+      `    <lastmod>${lastmod}</lastmod>`,
+      `    <changefreq>${page.changefreq}</changefreq>`,
+      `    <priority>${page.priority}</priority>`,
+      "  </url>",
+    ].join("\n");
+  }).join("\n");
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`;
+
+  await writeFile(path.join(distDir, "sitemap.xml"), xml);
+  console.log(`prerender: sitemap.xml regenerated (lastmod ${lastmod})`);
+}
+
 function startServer() {
   const server = createServer(async (req, res) => {
     const urlPath = req.url.split("?")[0];
@@ -121,6 +185,8 @@ async function main() {
 
       await browser.close();
     }
+
+    await writeSitemap();
   } finally {
     server.close();
   }
