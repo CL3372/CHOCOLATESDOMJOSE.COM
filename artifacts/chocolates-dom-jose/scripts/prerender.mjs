@@ -85,18 +85,21 @@ async function main() {
   // build made for exactly this kind of restricted Linux environment, so
   // it is used only when running on Vercel; local dev keeps the regular
   // playwright-managed Chromium.
-  const browser = await chromium.launch(
-    process.env.VERCEL
-      ? { executablePath: await sparticuzChromium.executablePath(), args: sparticuzChromium.args }
-      : {}
-  );
+  const launchOptions = process.env.VERCEL
+    ? { executablePath: await sparticuzChromium.executablePath(), args: sparticuzChromium.args }
+    : {};
 
   try {
     for (const route of ROUTES) {
-      // A fresh context per route avoids any localStorage carrying over
-      // between pages, and locale "pt-PT" matches this site's default
-      // market so detectLang()'s navigator.language fallback lands on
-      // Portuguese instead of Chromium's default en-US.
+      // A fresh browser per route (not just a fresh context) because
+      // sparticuz's Chromium runs with --single-process --no-zygote (needed
+      // to launch at all in Vercel's restricted build container), and that
+      // mode does not reliably survive closing one context and opening the
+      // next — the whole process dies after the first context.close().
+      const browser = await chromium.launch(launchOptions);
+      // locale "pt-PT" matches this site's default market so
+      // detectLang()'s navigator.language fallback lands on Portuguese
+      // instead of Chromium's default en-US.
       const context = await browser.newContext({ locale: "pt-PT" });
       const page = await context.newPage();
 
@@ -116,10 +119,9 @@ async function main() {
       await writeFile(outPath, html);
       console.log(`prerender: ${route.path} -> ${route.out} (${(html.length / 1024).toFixed(0)}KB)`);
 
-      await context.close();
+      await browser.close();
     }
   } finally {
-    await browser.close();
     server.close();
   }
 }
