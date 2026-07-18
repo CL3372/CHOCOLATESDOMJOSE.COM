@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import type { Lang } from "../context/CartContext";
-
-const LANGS: Lang[] = ["PT", "EN", "DE", "NL"];
+import { LANGS, detectLang, setLangInUrl } from "../lib/lang";
 
 const COMPANY = {
   name: "Nelson & Carla Louro Lda",
@@ -13,18 +12,6 @@ const COMPANY = {
   phone: "+351 912 630 054",
   website: "https://chocolatesdomjose.com",
 };
-
-function detectLang(): Lang {
-  if (typeof window === "undefined") return "PT";
-  const params = new URLSearchParams(window.location.search);
-  const fromQuery = params.get("lang")?.toUpperCase();
-  if (fromQuery && (LANGS as string[]).includes(fromQuery)) return fromQuery as Lang;
-  const stored = localStorage.getItem("lang")?.toUpperCase();
-  if (stored && (LANGS as string[]).includes(stored)) return stored as Lang;
-  const nav = (navigator.language || "").slice(0, 2).toUpperCase();
-  if ((LANGS as string[]).includes(nav)) return nav as Lang;
-  return "PT";
-}
 
 const LAST_UPDATED = "19 maio 2026";
 
@@ -267,7 +254,7 @@ function LegalLayout({
                 key={l}
                 onClick={() => {
                   setLang(l);
-                  try { localStorage.setItem("lang", l); } catch { /* ignore */ }
+                  setLangInUrl(l);
                 }}
                 className={`px-3 py-1 rounded-full transition ${
                   l === lang ? "bg-amber-300 text-black" : "text-white/60 hover:text-white"

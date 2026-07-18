@@ -1,27 +1,49 @@
 import { useState, useEffect, useRef, type ReactNode } from "react";
 import { useCart, type Lang } from "@/context/CartContext";
 import CartDrawer from "@/components/CartDrawer";
+import { detectLang, setLangInUrl } from "@/lib/lang";
 import logoSrc from "@assets/logo_bw.png";
 // Product photos below are phone shots pending the professional Bombarral shoot.
 // When those land, swap the imports in place — ProductCard already renders any
 // source through a fixed object-cover frame, so new photos don't need matching dimensions.
-import trufaImg1 from "@assets/4601CB5C-1354-4ED9-A3C5-D566E3957B7B_1775497051986.JPG";
-import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775497155075.jpeg";
-import peraImg1 from "@assets/D0001014-D8F0-4669-AA75-AA5FC99B9C61_1775497657429.JPG";
-import peraImg2 from "@assets/27402DCF-137B-4302-ADCE-BF183A97BB50_1775497663265.JPG";
-import laranjaImg from "@assets/C5049C7D-4C50-4DC6-9FF1-35C328026F8A_1_105_c_1775497857994.jpeg";
-import choc77Img from "@assets/C8C3450E-D74C-4028-8A60-556EA3DA337B_1_105_c_1775497898196.jpeg";
-import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1775497921548.jpeg";
-import piriImg1 from "@assets/1A7B88D2-D1EA-4199-A7D2-B37DEF6AB8B2_1_105_c_1775498174881.jpeg";
-import piriImg2 from "@assets/470F55A1-A0DE-438A-8CE6-9420CC02210B_1_105_c_1775498178960.jpeg";
-import piriImg3 from "@assets/5D196451-7C91-40D5-A833-00FFBF39133A_1_105_c_1775498185074.jpeg";
-import piriImg4 from "@assets/piri_extra.jpg";
+// -web.jpg variants are resized (max 1400px) + recompressed (q78) copies of the
+// originals for page-weight reasons — see attached_assets/ for the untouched originals.
+import trufaImg1 from "@assets/4601CB5C-1354-4ED9-A3C5-D566E3957B7B_1775497051986-web.jpg";
+import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775497155075-web.jpg";
+import peraImg1 from "@assets/D0001014-D8F0-4669-AA75-AA5FC99B9C61_1775497657429-web.jpg";
+import peraImg2 from "@assets/27402DCF-137B-4302-ADCE-BF183A97BB50_1775497663265-web.jpg";
+import laranjaImg from "@assets/C5049C7D-4C50-4DC6-9FF1-35C328026F8A_1_105_c_1775497857994-web.jpg";
+import choc77Img from "@assets/C8C3450E-D74C-4028-8A60-556EA3DA337B_1_105_c_1775497898196-web.jpg";
+import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1775497921548-web.jpg";
+import piriImg1 from "@assets/1A7B88D2-D1EA-4199-A7D2-B37DEF6AB8B2_1_105_c_1775498174881-web.jpg";
+import piriImg2 from "@assets/470F55A1-A0DE-438A-8CE6-9420CC02210B_1_105_c_1775498178960-web.jpg";
+import piriImg3 from "@assets/5D196451-7C91-40D5-A833-00FFBF39133A_1_105_c_1775498185074-web.jpg";
+import piriImg4 from "@assets/piri_extra-web.jpg";
 import crownSrc from "@assets/logo_crown_transparent.png";
-import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775498751104.jpeg";
-import cabazImg2 from "@assets/6B7C46BB-4F99-4C06-B042-49477038A177_1_105_c_1775498765125.jpeg";
-import cabazImg3 from "@assets/2F27B28B-3481-45FF-9C0A-4F9CA152FA00_1_105_c_1775498790966.jpeg";
-import cabazImg4 from "@assets/B32139AA-0033-43EA-9DD9-C46E629306AC_1_105_c_1775498796966.jpeg";
+import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775498751104-web.jpg";
+import cabazImg2 from "@assets/6B7C46BB-4F99-4C06-B042-49477038A177_1_105_c_1775498765125-web.jpg";
+import cabazImg3 from "@assets/2F27B28B-3481-45FF-9C0A-4F9CA152FA00_1_105_c_1775498790966-web.jpg";
+import cabazImg4 from "@assets/B32139AA-0033-43EA-9DD9-C46E629306AC_1_105_c_1775498796966-web.jpg";
 import { PaymentLogos } from "../components/PaymentLogos";
+
+const SEO_META: Record<Lang, { title: string; description: string }> = {
+  PT: {
+    title: "Chocolates Dom José | Chocolates Artesanais Gourmet de Portugal",
+    description: "Chocolates artesanais portugueses de produção cuidada em Bombarral. Sabores memoráveis e apresentação elegante para oferta, revenda e ocasiões especiais. Encomende online com entrega em Portugal e Europa.",
+  },
+  EN: {
+    title: "Chocolates Dom José | Artisan Gourmet Chocolates from Portugal",
+    description: "Handcrafted Portuguese chocolates made with care in Bombarral. Memorable flavours and elegant presentation for gifts, resale, and special occasions. Order online with delivery across Portugal and Europe.",
+  },
+  DE: {
+    title: "Chocolates Dom José | Handwerkliche Gourmet-Schokolade aus Portugal",
+    description: "Handwerklich hergestellte portugiesische Schokolade aus Bombarral. Unvergessliche Aromen und elegante Präsentation für Geschenke, Wiederverkauf und besondere Anlässe. Online bestellen mit Lieferung nach Portugal und Europa.",
+  },
+  NL: {
+    title: "Chocolates Dom José | Ambachtelijke Gourmetchocolade uit Portugal",
+    description: "Ambachtelijke Portugese chocolade, met zorg gemaakt in Bombarral. Onvergetelijke smaken en elegante presentatie voor cadeaus, wederverkoop en speciale gelegenheden. Bestel online met levering in Portugal en Europa.",
+  },
+};
 
 const translations: Record<Lang, {
   badge: string;
@@ -475,12 +497,13 @@ function ContactForm({ lang, t }: { lang: Lang; t: ContactT }) {
   );
 }
 
-function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel }: {
+function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, priority }: {
   product: typeof products[number];
   lang: Lang;
   addToCartLabel: string;
   priceFromLabel: string;
   ivaLabel: string;
+  priority?: boolean;
 }) {
   const { addItem } = useCart();
   const [imgIdx, setImgIdx] = useState(0);
@@ -506,6 +529,8 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel }
         <img
           src={imgs[imgIdx]}
           alt={product.name[lang]}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {hasMultiple && (
@@ -554,7 +579,7 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel }
 }
 
 export default function Home() {
-  const [lang, setLang] = useState<Lang>("PT");
+  const [lang, setLang] = useState<Lang>(detectLang);
   const t = translations[lang];
   const { openCart, count } = useCart();
 
@@ -563,6 +588,30 @@ export default function Home() {
   const [banner, setBanner] = useState<"success" | "cancelled" | null>(
     orderStatus === "success" ? "success" : orderStatus === "cancelled" ? "cancelled" : null
   );
+
+  // Keeps title/description/html-lang/canonical in sync with the current
+  // language so that the ?lang= URLs promised by hreflang actually carry
+  // matching on-page metadata instead of always showing the PT version.
+  useEffect(() => {
+    const meta = SEO_META[lang];
+    document.title = meta.title;
+    document.documentElement.lang = lang.toLowerCase();
+
+    const setMeta = (selector: string, attr: string, value: string) => {
+      const el = document.querySelector(selector);
+      if (el) el.setAttribute(attr, value);
+    };
+    setMeta('meta[name="description"]', "content", meta.description);
+    setMeta('meta[property="og:title"]', "content", meta.title);
+    setMeta('meta[property="og:description"]', "content", meta.description);
+    setMeta('meta[name="twitter:title"]', "content", meta.title);
+    setMeta('meta[name="twitter:description"]', "content", meta.description);
+
+    const canonicalHref = lang === "PT"
+      ? "https://chocolatesdomjose.com/"
+      : `https://chocolatesdomjose.com/?lang=${lang}`;
+    setMeta('link[rel="canonical"]', "href", canonicalHref);
+  }, [lang]);
 
   useEffect(() => {
     const origin = window.location.origin;
@@ -649,7 +698,7 @@ export default function Home() {
                 <button
                   key={l}
                   data-testid={`lang-${l}`}
-                  onClick={() => setLang(l)}
+                  onClick={() => { setLang(l); setLangInUrl(l); }}
                   className={`rounded-full border px-3 py-1 transition ${
                     lang === l
                       ? "border-yellow-400/60 text-yellow-300 font-medium"
@@ -684,6 +733,8 @@ export default function Home() {
               <img
                 src={logoSrc}
                 alt="Dom José Logo"
+                loading="eager"
+                fetchPriority="high"
                 className="max-h-[200px] w-auto object-contain"
                 style={{ filter: "invert(1)" }}
                 data-testid="img-logo"
@@ -757,6 +808,7 @@ export default function Home() {
                   addToCartLabel={t.addToCart}
                   priceFromLabel={t.priceFrom}
                   ivaLabel={t.ivaIncluded}
+                  priority={idx === 0}
                 />
               </div>
             </FadeIn>
@@ -866,6 +918,7 @@ export default function Home() {
         <img
           src={crownSrc}
           alt="Dom José crown"
+          loading="lazy"
           className="h-12 w-auto opacity-60"
           style={{ filter: "brightness(0) invert(1)" }}
         />
