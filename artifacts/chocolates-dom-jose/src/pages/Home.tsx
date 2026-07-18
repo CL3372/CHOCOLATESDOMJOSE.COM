@@ -839,6 +839,15 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-20 lg:grid-cols-2 lg:px-10">
           <FadeIn>
             <div>
+              <div className="mb-8 overflow-hidden rounded-[2rem] border border-white/10">
+                <img
+                  src={cabazImg1}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  className="h-64 w-full object-cover sm:h-80"
+                />
+              </div>
               <p className="text-sm uppercase tracking-[0.25em] text-yellow-300">{t.historyLabel}</p>
               <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">{t.historyHeading}</h2>
               <p className="mt-5 text-white/75">{t.historyP1}</p>
