@@ -351,7 +351,7 @@ const products = [
   },
 ];
 
-function FadeIn({ children, className = "", delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+function FadeIn({ children, className = "", delay = 0, scale = false }: { children: ReactNode; className?: string; delay?: number; scale?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -367,7 +367,9 @@ function FadeIn({ children, className = "", delay = 0 }: { children: ReactNode; 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} ${className}`}
+      className={`transition-all duration-700 ease-out ${
+        visible ? `opacity-100 translate-y-0 ${scale ? "scale-100" : ""}` : `opacity-0 translate-y-8 ${scale ? "scale-95" : ""}`
+      } ${className}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
       {children}
@@ -524,7 +526,7 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, 
     : `€${(product.price / 100).toFixed(2)}`;
 
   return (
-    <div className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-xl transition-shadow duration-300 hover:shadow-yellow-900/20 hover:shadow-2xl">
+    <div className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-yellow-900/20 hover:shadow-2xl">
       <div className="relative h-72 w-full flex-shrink-0 overflow-hidden">
         <img
           src={imgs[imgIdx]}
@@ -812,7 +814,11 @@ export default function Home() {
 
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {products.map((product, idx) => (
-            <FadeIn key={idx} delay={idx * 80}>
+            // Stagger resets every row (idx % 3, matching the xl:grid-cols-3
+            // layout) instead of accumulating across the whole grid — rows
+            // scroll into view together, so a purely index-based delay would
+            // make row 2 wait on row 1's delay on top of its own.
+            <FadeIn key={idx} delay={(idx % 3) * 100} scale className="h-full">
               <div data-testid={`card-product-${idx}`} className="h-full">
                 <ProductCard
                   product={product}
