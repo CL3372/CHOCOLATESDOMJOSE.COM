@@ -678,12 +678,12 @@ export default function Home() {
       {/* Free shipping announcement bar */}
       <div className="bg-gradient-to-r from-[#5a2a0a] via-[#7a3a14] to-[#5a2a0a] px-4 py-2 text-center text-xs font-medium text-amber-100 sm:text-sm">
         🚚 {lang === "PT"
-          ? "Enviamos para Portugal e internacionalmente · Portes grátis em Portugal acima de €100"
+          ? "Enviamos para todo o Portugal e também internacional ✈️ · Portes grátis em Portugal acima de €100"
           : lang === "DE"
-          ? "Versand nach Portugal und international · Kostenloser Versand in Portugal ab €100"
+          ? "Versand in ganz Portugal und auch international ✈️ · Kostenloser Versand in Portugal ab €100"
           : lang === "NL"
-          ? "Verzending naar Portugal en internationaal · Gratis verzending in Portugal vanaf €100"
-          : "Shipping to Portugal and internationally · Free shipping in Portugal on orders over €100"}
+          ? "Verzending door heel Portugal en ook internationaal ✈️ · Gratis verzending in Portugal vanaf €100"
+          : "Shipping across Portugal and internationally too ✈️ · Free shipping in Portugal on orders over €100"}
       </div>
 
       {/* Hero */}
