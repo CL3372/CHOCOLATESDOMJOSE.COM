@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, type ReactNode } from "react";
 import { useCart, type Lang } from "@/context/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import { detectLang, setLangInUrl } from "@/lib/lang";
-import logoSrc from "@assets/logo_bw.png";
+import logoSrc from "@assets/logo_bw_transparent.png";
 // Product photos below are phone shots pending the professional Bombarral shoot.
 // When those land, swap the imports in place — ProductCard already renders any
 // source through a fixed object-cover frame, so new photos don't need matching dimensions.
@@ -686,7 +686,19 @@ export default function Home() {
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/10 bg-black">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#111111] via-black to-[#111111]" />
+        <img
+          src={trufaImg1}
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {/* Uniform scrim keeps white text legible over the photo regardless
+            of local brightness, plus a bottom fade for a seamless transition
+            into the stats strip below. */}
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black" />
         {/* Warm amber glow */}
         <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse 70% 50% at 50% 30%, rgba(180,100,20,0.18) 0%, transparent 70%)" }} />
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
