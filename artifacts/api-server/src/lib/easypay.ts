@@ -50,8 +50,13 @@ export type VerifiedTransaction = {
 export async function verifyEasyPayTransaction(
   transactionId: string
 ): Promise<VerifiedTransaction | null> {
+  // NOT /transaction/{id} — that path 404s at the routing level (plain-text
+  // nginx 404, not an EasyPay JSON error) for every id, valid or not. The
+  // correct resource name for a single-payment lookup is /single/{id}; see
+  // https://docs.easypay.pt/docs/guides/webhooks. This was the actual root
+  // cause of zero payment notifications succeeding since at least April 2026.
   const res = await fetch(
-    `${EASYPAY_BASE}/transaction/${encodeURIComponent(transactionId)}`,
+    `${EASYPAY_BASE}/single/${encodeURIComponent(transactionId)}`,
     { method: "GET", headers: getHeaders() }
   );
 
