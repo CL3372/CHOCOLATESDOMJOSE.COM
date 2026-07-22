@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, type ReactNode } from "react";
 import { useCart, type Lang } from "@/context/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import { detectLang, setLangInUrl } from "@/lib/lang";
+import { getActiveSeason, SEASONAL_GREETING } from "@/lib/seasonalGreeting";
 import logoSrc from "@assets/logo_bw_transparent.png";
 // Product photos below are phone shots pending the professional Bombarral shoot.
 // When those land, swap the imports in place — ProductCard already renders any
@@ -583,6 +584,15 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, 
 export default function Home() {
   const [lang, setLang] = useState<Lang>(detectLang);
   const t = translations[lang];
+  // This page is prerendered at build time (scripts/prerender.mjs), so the
+  // banner below bakes in whatever season is active as of the last deploy.
+  // If the site goes a long stretch without redeploying across a season
+  // boundary, a visitor's hydration could briefly disagree with the
+  // prerendered markup here — React recovers automatically (this is a
+  // single small text node, not page structure), so the worst case is a
+  // harmless console warning, not a visible break. Redeploying periodically
+  // keeps this effectively always correct in practice.
+  const season = getActiveSeason();
   const { openCart, count } = useCart();
 
   const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
@@ -677,6 +687,7 @@ export default function Home() {
 
       {/* Free shipping announcement bar */}
       <div className="bg-gradient-to-r from-[#5a2a0a] via-[#7a3a14] to-[#5a2a0a] px-4 py-2 text-center text-xs font-medium text-amber-100 sm:text-sm">
+        {season && <>{SEASONAL_GREETING[season][lang]} · </>}
         🚚 {lang === "PT"
           ? "Enviamos para todo o Portugal e também internacional ✈️ · Portes grátis em Portugal acima de €100"
           : lang === "DE"
