@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { Link } from "wouter";
 import { useCart, type Lang } from "../context/CartContext";
+import { getActiveSeason, SEASONAL_GREETING } from "../lib/seasonalGreeting";
 
 const LANGS: Lang[] = ["PT", "EN", "DE", "NL"];
 
@@ -67,6 +68,9 @@ export default function CheckoutSuccess() {
   const { clearCart } = useCart();
   const lang = useMemo(detectLang, []);
   const c = COPY[lang];
+  // Recomputed on every render (not memoized) since this is a once-per-visit
+  // page — no cost to just checking the date directly.
+  const season = getActiveSeason();
 
   const cleared = useRef(false);
   useEffect(() => {
@@ -94,6 +98,11 @@ export default function CheckoutSuccess() {
         <p className="text-sm uppercase tracking-[0.3em] text-amber-300/80 mb-3">
           {c.subtitle}
         </p>
+        {season && (
+          <p className="text-lg font-serif text-amber-200 mb-1">
+            {SEASONAL_GREETING[season][lang]}
+          </p>
+        )}
         <h1 className="text-3xl md:text-4xl font-serif font-semibold mb-6">
           {c.title}
         </h1>
