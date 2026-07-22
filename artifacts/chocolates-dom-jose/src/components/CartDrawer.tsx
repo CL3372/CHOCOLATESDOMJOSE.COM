@@ -1,6 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { startCheckout, type CheckoutInstance } from "@easypaypt/checkout-sdk";
 import { useCart, type Lang } from "../context/CartContext";
 import { calculateShippingCents, PT_FREE_SHIPPING_THRESHOLD_CENTS } from "../lib/shipping";
+
+type CheckoutManifest = { id: string; session: string; config: Record<string, unknown> | null };
+
+// The SDK only natively supports pt_PT, en, and es_ES — DE/NL fall back to
+// English rather than silently defaulting to Portuguese.
+function toEasyPayLanguage(lang: Lang): string {
+  return lang === "PT" ? "pt_PT" : "en";
+}
 
 const labels: Record<
   Lang,
@@ -23,6 +32,7 @@ const labels: Record<
     pay: string;
     back: string;
     customerTitle: string;
+    paymentTitle: string;
     address: string;
     postcode: string;
     city: string;
@@ -52,6 +62,7 @@ const labels: Record<
     pay: "Pagar com EasyPay",
     back: "← Voltar",
     customerTitle: "Os seus dados",
+    paymentTitle: "Pagamento",
     address: "Morada (rua e número)",
     postcode: "Código Postal",
     city: "Cidade",
@@ -80,6 +91,7 @@ const labels: Record<
     pay: "Pay with EasyPay",
     back: "← Back",
     customerTitle: "Your details",
+    paymentTitle: "Payment",
     address: "Address (street and number)",
     postcode: "Postcode",
     city: "City",
@@ -108,6 +120,7 @@ const labels: Record<
     pay: "Mit EasyPay bezahlen",
     back: "← Zurück",
     customerTitle: "Ihre Daten",
+    paymentTitle: "Zahlung",
     address: "Adresse (Straße und Nummer)",
     postcode: "Postleitzahl",
     city: "Stadt",
@@ -136,6 +149,7 @@ const labels: Record<
     pay: "Betalen met EasyPay",
     back: "← Terug",
     customerTitle: "Uw gegevens",
+    paymentTitle: "Betaling",
     address: "Adres (straat en nummer)",
     postcode: "Postcode",
     city: "Stad",
@@ -148,12 +162,14 @@ const labels: Record<
 };
 
 export default function CartDrawer({ lang }: { lang: Lang }) {
-  const { items, isOpen, closeCart, removeItem, updateQty, total } = useCart();
+  const { items, isOpen, closeCart, removeItem, updateQty, total, clearCart } = useCart();
   const l = labels[lang];
 
-  const [step, setStep] = useState<"cart" | "details">("cart");
+  const [step, setStep] = useState<"cart" | "details" | "payment">("cart");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [manifest, setManifest] = useState<CheckoutManifest | null>(null);
+  const checkoutInstanceRef = useRef<CheckoutInstance | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -180,7 +196,6 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
     setLoading(true);
     setError(null);
     try {
-      const origin = window.location.origin;
       try {
         localStorage.setItem("lang", lang);
       } catch {
@@ -191,8 +206,6 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: items.map((i) => ({ id: i.id, quantity: i.quantity })),
-          successUrl: `${origin}/checkout/success?lang=${lang}`,
-          cancelUrl: `${origin}/checkout/cancel?lang=${lang}`,
           customer: {
             name: name.trim() || undefined,
             email: email.trim() || undefined,
@@ -209,8 +222,10 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
         }),
       });
       const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
+      if (data.manifest) {
+        setManifest(data.manifest);
+        setStep("payment");
+        setLoading(false);
       } else {
         setError(data.error ?? l.error);
         setLoading(false);
@@ -221,7 +236,48 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
     }
   };
 
+  // Mounts EasyPay's checkout SDK inline once we enter the payment step. The
+  // customer stays on our own page the whole time (an iframe inside
+  // #easypay-checkout, not a redirect to pay.easypay.pt) — that's the only
+  // documented integration EasyPay supports; there is no server-side
+  // success/return URL mechanism for the raw hosted-page redirect this
+  // replaced (confirmed 2026-07-22: that flow's "Concluir" button had nowhere
+  // to report back to, since nothing was listening for its postMessage).
+  useEffect(() => {
+    if (step !== "payment" || !manifest) return;
+
+    const instance = startCheckout(manifest, {
+      id: "easypay-checkout",
+      display: "inline",
+      language: toEasyPayLanguage(lang),
+      onSuccess: () => {
+        clearCart();
+        window.location.href = `/checkout/success?lang=${lang}`;
+      },
+      onError: () => {
+        setError(l.error);
+        setStep("details");
+      },
+      onPaymentError: () => {
+        setError(l.error);
+      },
+    });
+    checkoutInstanceRef.current = instance;
+
+    return () => {
+      checkoutInstanceRef.current?.unmount();
+      checkoutInstanceRef.current = null;
+    };
+    // Only re-run when the step/manifest actually change — l/lang/clearCart
+    // are stable enough within one checkout attempt and re-running this would
+    // remount the iframe (losing any in-progress card entry).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, manifest]);
+
   const handleClose = () => {
+    checkoutInstanceRef.current?.unmount();
+    checkoutInstanceRef.current = null;
+    setManifest(null);
     closeCart();
     setStep("cart");
     setError(null);
@@ -243,7 +299,7 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
       >
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
           <h2 className="text-lg font-semibold text-white">
-            {step === "details" ? l.customerTitle : l.title}
+            {step === "details" ? l.customerTitle : step === "payment" ? l.paymentTitle : l.title}
           </h2>
           <button
             onClick={handleClose}
@@ -333,7 +389,7 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
               </div>
             )}
           </>
-        ) : (
+        ) : step === "details" ? (
           <div className="flex flex-1 flex-col px-6 py-5 gap-4 overflow-y-auto">
             <button
               onClick={() => { setStep("cart"); setError(null); }}
@@ -475,6 +531,32 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
             >
               {loading ? l.loading : l.pay}
             </button>
+          </div>
+        ) : (
+          <div className="flex flex-1 flex-col px-6 py-5 gap-4 overflow-y-auto">
+            <button
+              onClick={() => {
+                checkoutInstanceRef.current?.unmount();
+                checkoutInstanceRef.current = null;
+                setManifest(null);
+                setStep("details");
+                setError(null);
+              }}
+              className="self-start text-sm text-white/50 hover:text-white transition"
+            >
+              {l.back}
+            </button>
+
+            {error && (
+              <p className="rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-2 text-sm text-red-400 text-center">
+                {error}
+              </p>
+            )}
+
+            {/* EasyPay's checkout SDK mounts its payment iframe as a child of
+                this element (see the useEffect above) — it must already exist
+                in the DOM before startCheckout runs. */}
+            <div id="easypay-checkout" />
           </div>
         )}
       </div>

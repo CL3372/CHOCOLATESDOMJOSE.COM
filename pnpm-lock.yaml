@@ -236,6 +236,9 @@ importers:
 
   artifacts/chocolates-dom-jose:
     devDependencies:
+      '@easypaypt/checkout-sdk':
+        specifier: ^2.9.1
+        version: 2.9.1
       '@hookform/resolvers':
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.71.2(react@19.1.0))
@@ -803,6 +806,9 @@ packages:
 
   '@drizzle-team/brocli@0.10.2':
     resolution: {integrity: sha512-z33Il7l5dKjUgGULTqBsQBQwckHh5AbIuxhdsIxDDiZAzBOrZO6q9ogcWC65kU382AfynTfgNumVcNIjuIua6w==}
+
+  '@easypaypt/checkout-sdk@2.9.1':
+    resolution: {integrity: sha512-MVaAtoFh1bUdiNtinnPI2dN/KZbTLXmX3Y8FRsDXDkmBnWJlfgM7Uy/PMO5WEFeEBuDw7DycNBqKQwAZWrf1uA==}
 
   '@esbuild/linux-x64@0.28.1':
     resolution: {integrity: sha512-u/anNYF2mmVOEDwLtnQ1wOr3EZ9sTNGLWrsYGYwHWzGA3Si84IOkHXlbWTD1NB+9/1lcnweYKO54uhxZydNzfA==}
@@ -2057,6 +2063,9 @@ packages:
 
   detect-node-es@1.1.0:
     resolution: {integrity: sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==}
+
+  dialog-polyfill@0.5.6:
+    resolution: {integrity: sha512-ZbVDJI9uvxPAKze6z146rmfUZjBqNEwcnFTVamQzXH+svluiV7swmVIGr7miwADgfgt1G2JQIytypM9fbyhX4w==}
 
   dom-helpers@5.2.1:
     resolution: {integrity: sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==}
@@ -3493,6 +3502,10 @@ snapshots:
 
   '@drizzle-team/brocli@0.10.2': {}
 
+  '@easypaypt/checkout-sdk@2.9.1':
+    dependencies:
+      dialog-polyfill: 0.5.6
+
   '@esbuild/linux-x64@0.28.1':
     optional: true
 
@@ -4855,6 +4868,8 @@ snapshots:
   detect-libc@2.1.2: {}
 
   detect-node-es@1.1.0: {}
+
+  dialog-polyfill@0.5.6: {}
 
   dom-helpers@5.2.1:
     dependencies:

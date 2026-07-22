@@ -1,11 +1,5 @@
 const EASYPAY_BASE = "https://api.prod.easypay.pt/2.0";
 
-/**
- * Canonical first-party origin for return URL generation.
- * Must be set in production. Falls back to the production domain.
- */
-export const SITE_URL = (process.env.SITE_URL ?? "https://chocolatesdomjose.com").replace(/\/$/, "");
-
 function getHeaders(): Record<string, string> {
   const accountId = process.env.EASYPAY_ACCOUNT_ID;
   const apiKey = process.env.EASYPAY_API_KEY;
@@ -89,19 +83,30 @@ export async function verifyEasyPayTransaction(
   };
 }
 
+/** The manifest shape the @easypaypt/checkout-sdk's startCheckout expects. */
+export type CheckoutManifest = {
+  id: string;
+  session: string;
+  config: Record<string, unknown> | null;
+};
+
 export async function createEasyPayCheckout(params: {
   amountCents: number;
-  returnUrl: string;
-  cancelUrl: string;
   customer?: { name?: string; email?: string; phone?: string };
   orderKey?: string;
-}): Promise<{ url: string; orderKey: string }> {
+}): Promise<{ manifest: CheckoutManifest; orderKey: string }> {
   const amountEur = parseFloat((params.amountCents / 100).toFixed(2));
 
   const orderKey =
     params.orderKey ??
     `ORDER-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
+  // No success/return/cancel URL fields here: those were guesses at
+  // undocumented field names, based on how a hosted-page redirect flow would
+  // normally work. EasyPay's actual (and only documented) integration is the
+  // client-side @easypaypt/checkout-sdk, which embeds the payment form on our
+  // own page inside an iframe and reports completion via postMessage/
+  // onSuccess — not a URL EasyPay redirects the browser to. See CartDrawer.tsx.
   const body: Record<string, unknown> = {
     type: ["single"],
     payment: {
@@ -111,31 +116,10 @@ export async function createEasyPayCheckout(params: {
         transaction_key: orderKey,
         descriptive: "Chocolates Dom Jose",
       },
-      // EasyPay Forms-checkout: redirect URLs after payment.
-      // Different EasyPay account profiles accept different field names —
-      // we send them all; unknown fields are ignored by the API.
-      config: {
-        success_url: params.returnUrl,
-        failed_url: params.cancelUrl,
-        back_url: params.cancelUrl,
-        redirect_url: params.returnUrl,
-      },
     },
     order: {
       key: orderKey,
       value: amountEur,
-    },
-    // Top-level variants for backward compatibility with older EasyPay
-    // checkout profiles.
-    success_url: params.returnUrl,
-    failed_url: params.cancelUrl,
-    back_url: params.cancelUrl,
-    return_url: params.returnUrl,
-    cancel_url: params.cancelUrl,
-    url: {
-      success: params.returnUrl,
-      failed: params.cancelUrl,
-      back: params.cancelUrl,
     },
   };
 
@@ -162,12 +146,8 @@ export async function createEasyPayCheckout(params: {
     throw new Error("EasyPay did not return id/session. Response: " + JSON.stringify(data));
   }
 
-  const manifest = Buffer.from(
-    JSON.stringify({ id: data.id, session: data.session, config: data.config ?? null })
-  ).toString("base64");
-
   return {
-    url: `https://pay.easypay.pt/?manifest=${encodeURIComponent(manifest)}`,
+    manifest: { id: data.id, session: data.session, config: data.config ?? null },
     orderKey,
   };
 }

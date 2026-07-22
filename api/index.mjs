@@ -49182,7 +49182,6 @@ var import_express2 = __toESM(require_express2(), 1);
 
 // src/lib/easypay.ts
 var EASYPAY_BASE = "https://api.prod.easypay.pt/2.0";
-var SITE_URL = (process.env.SITE_URL ?? "https://chocolatesdomjose.com").replace(/\/$/, "");
 function getHeaders() {
   const accountId = process.env.EASYPAY_ACCOUNT_ID;
   const apiKey = process.env.EASYPAY_API_KEY;
@@ -49199,7 +49198,7 @@ function getHeaders() {
 }
 async function verifyEasyPayTransaction(transactionId) {
   const res = await fetch(
-    `${EASYPAY_BASE}/transaction/${encodeURIComponent(transactionId)}`,
+    `${EASYPAY_BASE}/capture/${encodeURIComponent(transactionId)}`,
     { method: "GET", headers: getHeaders() }
   );
   if (!res.ok) {
@@ -49214,7 +49213,15 @@ async function verifyEasyPayTransaction(transactionId) {
   return {
     status: data.status,
     orderKey: data?.key ?? data?.transaction_key ?? "",
-    paidAmount: Number(data?.values?.paid ?? data?.amount ?? 0),
+    // /capture/{id} returns the paid amount as a flat "value" field (confirmed
+    // via EasyPay's example response), not values.paid or amount like the
+    // wrong endpoints we tried before.
+    paidAmount: Number(data?.value ?? data?.values?.paid ?? data?.amount ?? 0),
+    // payment_type/method are not present on the capture response — this
+    // endpoint doesn't expose the original payment method (MB/MBW/CC), so
+    // methodLabel in webhook.ts will fall back to its "Cartão" default until
+    // we find another way to recover it. Not blocking: notifications, invoice
+    // issuance, and order lookup do not depend on this field.
     method: data?.type ?? data?.method ?? ""
   };
 }
@@ -49229,32 +49236,11 @@ async function createEasyPayCheckout(params) {
       capture: {
         transaction_key: orderKey,
         descriptive: "Chocolates Dom Jose"
-      },
-      // EasyPay Forms-checkout: redirect URLs after payment.
-      // Different EasyPay account profiles accept different field names —
-      // we send them all; unknown fields are ignored by the API.
-      config: {
-        success_url: params.returnUrl,
-        failed_url: params.cancelUrl,
-        back_url: params.cancelUrl,
-        redirect_url: params.returnUrl
       }
     },
     order: {
       key: orderKey,
       value: amountEur
-    },
-    // Top-level variants for backward compatibility with older EasyPay
-    // checkout profiles.
-    success_url: params.returnUrl,
-    failed_url: params.cancelUrl,
-    back_url: params.cancelUrl,
-    return_url: params.returnUrl,
-    cancel_url: params.cancelUrl,
-    url: {
-      success: params.returnUrl,
-      failed: params.cancelUrl,
-      back: params.cancelUrl
     }
   };
   if (params.customer && Object.values(params.customer).some(Boolean)) {
@@ -49274,11 +49260,8 @@ async function createEasyPayCheckout(params) {
   if (!data?.id || !data?.session) {
     throw new Error("EasyPay did not return id/session. Response: " + JSON.stringify(data));
   }
-  const manifest = Buffer.from(
-    JSON.stringify({ id: data.id, session: data.session, config: data.config ?? null })
-  ).toString("base64");
   return {
-    url: `https://pay.easypay.pt/?manifest=${encodeURIComponent(manifest)}`,
+    manifest: { id: data.id, session: data.session, config: data.config ?? null },
     orderKey
   };
 }
@@ -56627,18 +56610,59 @@ var checkoutLimiter = rateLimit({
   windowMs: 10 * 60 * 1e3
 });
 var PRODUCTS = {
-  trufas_artesanais: { name: "Trufas Artesanais", price: 1500 },
-  trufas_laranja: { name: "Trufas de Laranja", price: 1500 },
-  trufas_chocolate_77: { name: "Trufas de Chocolate 77%", price: 1500 },
-  peras_bebedas: { name: "P\xEAras Bebedas", price: 700 },
-  dom_piri_piri: { name: "Dom Piri Piri", price: 700 },
-  cabazes: { name: "Cabazes", price: 3e3 }
+  trufas_artesanais: { name: "Trufas Artesanais", price: 1500, weightGrams: 300 },
+  trufas_laranja: { name: "Trufas de Laranja", price: 1500, weightGrams: 300 },
+  trufas_chocolate_77: { name: "Trufas de Chocolate 77%", price: 1500, weightGrams: 300 },
+  peras_bebedas: { name: "P\xEAras Bebedas", price: 700, weightGrams: 600 },
+  dom_piri_piri: { name: "Dom Piri Piri", price: 700, weightGrams: 200 },
+  // Cabazes vary by contents; billed at the 2kg cap (heaviest offered) so
+  // shipping is never undercharged.
+  cabazes: { name: "Cabazes", price: 3e3, weightGrams: 2e3 }
 };
+var PT_SHIPPING_TIERS = [
+  { maxGrams: 1e3, cents: 475 },
+  { maxGrams: 3e3, cents: 532 },
+  { maxGrams: 5e3, cents: 558 },
+  { maxGrams: 1e4, cents: 627 },
+  { maxGrams: 15e3, cents: 722 },
+  { maxGrams: 2e4, cents: 778 },
+  { maxGrams: 25e3, cents: 874 },
+  { maxGrams: 3e4, cents: 912 }
+];
+var PT_SHIPPING_ADIC_CENTS_PER_KG = 28;
+var PT_FREE_SHIPPING_THRESHOLD_CENTS = 1e4;
+var INTL_SHIPPING_TIERS = [
+  { maxGrams: 1e3, cents: 772 },
+  { maxGrams: 3e3, cents: 772 },
+  { maxGrams: 5e3, cents: 848 },
+  { maxGrams: 1e4, cents: 1001 },
+  { maxGrams: 15e3, cents: 1114 },
+  { maxGrams: 2e4, cents: 1209 },
+  { maxGrams: 25e3, cents: 1396 },
+  { maxGrams: 3e4, cents: 1533 }
+];
+var INTL_SHIPPING_ADIC_CENTS_PER_KG = 57;
+function isPortugal(country) {
+  const c = (country ?? "").trim().toLowerCase();
+  return c === "" || c === "portugal" || c === "pt";
+}
+function tierLookup(totalWeightGrams, tiers, adicCentsPerKg) {
+  const tier = tiers.find((t) => totalWeightGrams <= t.maxGrams);
+  if (tier) return tier.cents;
+  const lastTier = tiers[tiers.length - 1];
+  const extraKg = Math.ceil((totalWeightGrams - lastTier.maxGrams) / 1e3);
+  return lastTier.cents + extraKg * adicCentsPerKg;
+}
+function calculateShippingCents(totalWeightGrams, subtotalCents, country) {
+  if (isPortugal(country)) {
+    if (subtotalCents >= PT_FREE_SHIPPING_THRESHOLD_CENTS) return 0;
+    return tierLookup(totalWeightGrams, PT_SHIPPING_TIERS, PT_SHIPPING_ADIC_CENTS_PER_KG);
+  }
+  return tierLookup(totalWeightGrams, INTL_SHIPPING_TIERS, INTL_SHIPPING_ADIC_CENTS_PER_KG);
+}
 checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
   try {
     const { items, customer, shipping, lang: rawLang } = req.body;
-    const successUrl = `${SITE_URL}/?payment=success`;
-    const cancelUrl = `${SITE_URL}/?payment=cancel`;
     const lang = VALID_LANGS.includes((rawLang ?? "").toUpperCase()) ? rawLang.toUpperCase() : "PT";
     if (!items?.length) {
       res.status(400).json({ error: "No items in cart" });
@@ -56656,14 +56680,18 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       res.status(400).json({ error: "Invalid quantity: must be a whole number between 1 and 100" });
       return;
     }
-    const amountCents = validItems.reduce(
+    const subtotalCents = validItems.reduce(
       (sum, i) => sum + PRODUCTS[i.id].price * i.quantity,
       0
     );
-    const { url, orderKey } = await createEasyPayCheckout({
+    const totalWeightGrams = validItems.reduce(
+      (sum, i) => sum + PRODUCTS[i.id].weightGrams * i.quantity,
+      0
+    );
+    const shippingCents = calculateShippingCents(totalWeightGrams, subtotalCents, shipping?.country);
+    const amountCents = subtotalCents + shippingCents;
+    const { manifest, orderKey } = await createEasyPayCheckout({
       amountCents,
-      returnUrl: successUrl,
-      cancelUrl,
       customer
     });
     const itemsForStore = validItems.map((i) => ({
@@ -56672,6 +56700,14 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       quantity: i.quantity,
       unitPriceEur: PRODUCTS[i.id].price / 100
     }));
+    if (shippingCents > 0) {
+      itemsForStore.push({
+        reference: "shipping",
+        name: "Portes de envio",
+        quantity: 1,
+        unitPriceEur: shippingCents / 100
+      });
+    }
     await setPendingOrder(orderKey, {
       customer: {
         name: customer?.name ?? "",
@@ -56707,7 +56743,7 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       status: "pending",
       lang
     }).catch((err) => req.log.error({ err: err?.message }, "Notify error (non-blocking)"));
-    res.json({ url });
+    res.json({ manifest, orderKey });
   } catch (err) {
     req.log.error({ err: err?.message }, "EasyPay checkout error");
     res.status(500).json({ error: err.message ?? "Checkout failed" });
