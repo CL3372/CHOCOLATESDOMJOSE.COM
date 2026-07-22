@@ -12,6 +12,7 @@ const labels: Record<
     loading: string;
     remove: string;
     error: string;
+    emailRequired: string;
     name: string;
     email: string;
     phone: string;
@@ -40,6 +41,7 @@ const labels: Record<
     loading: "A processar…",
     remove: "Remover",
     error: "Erro ao processar. Tente novamente.",
+    emailRequired: "Indique um email válido — é necessário para receber a fatura.",
     name: "Nome",
     email: "E-mail",
     phone: "Telemóvel (para MB WAY)",
@@ -67,6 +69,7 @@ const labels: Record<
     loading: "Processing…",
     remove: "Remove",
     error: "Payment failed. Please try again.",
+    emailRequired: "Please enter a valid email — it is needed to receive your invoice.",
     name: "Name",
     email: "Email",
     phone: "Mobile (for MB WAY)",
@@ -94,6 +97,7 @@ const labels: Record<
     loading: "Wird verarbeitet…",
     remove: "Entfernen",
     error: "Zahlung fehlgeschlagen. Bitte erneut versuchen.",
+    emailRequired: "Bitte geben Sie eine gültige E-Mail-Adresse ein — sie wird für die Rechnung benötigt.",
     name: "Name",
     email: "E-Mail",
     phone: "Mobilnummer (für MB WAY)",
@@ -121,6 +125,7 @@ const labels: Record<
     loading: "Verwerken…",
     remove: "Verwijderen",
     error: "Betaling mislukt. Probeer opnieuw.",
+    emailRequired: "Vul een geldig e-mailadres in — dit is nodig om uw factuur te ontvangen.",
     name: "Naam",
     email: "E-mail",
     phone: "Mobiel (voor MB WAY)",
@@ -165,7 +170,13 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
   );
   const grandTotal = total + shippingCents;
 
+  const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
   const handleCheckout = async () => {
+    if (!isValidEmail(email.trim())) {
+      setError(l.emailRequired);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -343,9 +354,10 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
                 />
               </div>
               <div>
-                <label className="block text-xs text-white/50 mb-1">{l.email}</label>
+                <label className="block text-xs text-white/50 mb-1">{l.email} *</label>
                 <input
                   type="email"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-xl bg-white/10 border border-white/10 px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-yellow-400"
