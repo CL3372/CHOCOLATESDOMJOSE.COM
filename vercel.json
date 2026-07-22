@@ -4,6 +4,7 @@
   "outputDirectory": "artifacts/chocolates-dom-jose/dist/public",
   "regions": ["cdg1"],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" }
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/checkout/(.*)", "destination": "/app-shell.html" }
   ]
 }

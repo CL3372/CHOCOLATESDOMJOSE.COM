@@ -9,7 +9,7 @@
 import { chromium } from "playwright";
 import sparticuzChromium from "@sparticuz/chromium";
 import { createServer } from "node:http";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, copyFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -141,6 +141,17 @@ async function main() {
     console.error(`prerender: ${distDir} does not exist — run vite build first`);
     process.exit(1);
   }
+
+  // Snapshot the plain, un-prerendered index.html (empty <div id="root">, as
+  // vite build just produced it) as app-shell.html before the loop below
+  // overwrites index.html with prerendered content. Routes that stay
+  // client-only (currently /checkout/success, /checkout/cancel — see
+  // vercel.json rewrites) point their fallback at this file instead of the
+  // prerendered index.html, so main.tsx calls createRoot() and renders that
+  // route fresh, instead of hydrateRoot() trying to reconcile the homepage's
+  // prerendered markup against a completely different component tree (a
+  // guaranteed hydration mismatch with a visible flash of homepage content).
+  await copyFile(path.join(distDir, "index.html"), path.join(distDir, "app-shell.html"));
 
   const server = await startServer();
   // Vercel's build container has no apt/root access, so a normal
