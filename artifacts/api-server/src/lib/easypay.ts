@@ -50,13 +50,14 @@ export type VerifiedTransaction = {
 export async function verifyEasyPayTransaction(
   transactionId: string
 ): Promise<VerifiedTransaction | null> {
-  // NOT /transaction/{id} — that path 404s at the routing level (plain-text
-  // nginx 404, not an EasyPay JSON error) for every id, valid or not. The
-  // correct resource name for a single-payment lookup is /single/{id}; see
-  // https://docs.easypay.pt/docs/guides/webhooks. This was the actual root
-  // cause of zero payment notifications succeeding since at least April 2026.
+  // Confirmed directly with EasyPay support (2026-07-20): /single/{id} is not
+  // meant for payment-status lookups at all (it 404s with "Payment not found"
+  // even for genuinely paid transactions) — the correct resource for
+  // confirming a capture is /capture/{id}. This, plus the earlier /transaction
+  // -> /single path typo, is why zero payment notifications succeeded from at
+  // least April 2026 until this fix.
   const res = await fetch(
-    `${EASYPAY_BASE}/single/${encodeURIComponent(transactionId)}`,
+    `${EASYPAY_BASE}/capture/${encodeURIComponent(transactionId)}`,
     { method: "GET", headers: getHeaders() }
   );
 
@@ -75,7 +76,15 @@ export async function verifyEasyPayTransaction(
   return {
     status: data.status as string,
     orderKey: (data?.key ?? data?.transaction_key ?? "") as string,
-    paidAmount: Number(data?.values?.paid ?? data?.amount ?? 0),
+    // /capture/{id} returns the paid amount as a flat "value" field (confirmed
+    // via EasyPay's example response), not values.paid or amount like the
+    // wrong endpoints we tried before.
+    paidAmount: Number(data?.value ?? data?.values?.paid ?? data?.amount ?? 0),
+    // payment_type/method are not present on the capture response — this
+    // endpoint doesn't expose the original payment method (MB/MBW/CC), so
+    // methodLabel in webhook.ts will fall back to its "Cartão" default until
+    // we find another way to recover it. Not blocking: notifications, invoice
+    // issuance, and order lookup do not depend on this field.
     method: (data?.type ?? data?.method ?? "") as string,
   };
 }
