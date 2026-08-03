@@ -25,6 +25,7 @@ import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775
 import cabazImg2 from "@assets/6B7C46BB-4F99-4C06-B042-49477038A177_1_105_c_1775498765125-web.jpg";
 import cabazImg3 from "@assets/2F27B28B-3481-45FF-9C0A-4F9CA152FA00_1_105_c_1775498790966-web.jpg";
 import cabazImg4 from "@assets/B32139AA-0033-43EA-9DD9-C46E629306AC_1_105_c_1775498796966-web.jpg";
+import greatTasteBadge from "@assets/great-taste-2026-badge.png";
 import { PaymentLogos } from "../components/PaymentLogos";
 
 const SEO_META: Record<Lang, { title: string; description: string }> = {
@@ -59,6 +60,8 @@ const translations: Record<Lang, {
   productsHeading: string;
   productsDesc: string;
   learnMore: string;
+  awardLabel: string;
+  judgesLabel: string;
   historyLabel: string;
   historyHeading: string;
   historyP1: string;
@@ -104,6 +107,8 @@ const translations: Record<Lang, {
     productsHeading: "Uma coleção pensada para surpreender",
     productsDesc: "Da indulgência das trufas ao carácter dos produtos gourmet em frasco, cada detalhe é pensado para elevar a experiência.",
     learnMore: "Saber mais",
+    awardLabel: "Prémio Great Taste 2026 · 1 Estrela",
+    judgesLabel: "Nas palavras dos jurados",
     historyLabel: "A nossa história",
     historyHeading: "Uma marca feita com paixão, resiliência e sabor",
     historyP1: "A Chocolates Dom José nasce da paixão por criar produtos com identidade, qualidade e apresentação de excelência. O objetivo é simples: transformar momentos normais em experiências especiais.",
@@ -149,6 +154,8 @@ const translations: Record<Lang, {
     productsHeading: "A collection designed to surprise",
     productsDesc: "From the indulgence of truffles to the character of gourmet jarred products, every detail is designed to elevate the experience.",
     learnMore: "Learn more",
+    awardLabel: "Great Taste 2026 Award · 1 Star",
+    judgesLabel: "In the words of the judges",
     historyLabel: "Our story",
     historyHeading: "A brand built with passion, resilience and flavour",
     historyP1: "Chocolates Dom José was born from a passion for creating products with identity, quality and excellence in presentation. The goal is simple: to turn ordinary moments into special experiences.",
@@ -194,6 +201,8 @@ const translations: Record<Lang, {
     productsHeading: "Eine Kollektion, die überrascht",
     productsDesc: "Von der Genussvollen Trüffel bis zum Charakter unserer Gourmet-Produkte im Glas — jedes Detail wurde bedacht, um das Erlebnis zu steigern.",
     learnMore: "Mehr erfahren",
+    awardLabel: "Great Taste 2026 Auszeichnung · 1 Stern",
+    judgesLabel: "In den Worten der Jury",
     historyLabel: "Unsere Geschichte",
     historyHeading: "Eine Marke mit Leidenschaft, Resilienz und Geschmack",
     historyP1: "Chocolates Dom José entstand aus der Leidenschaft, Produkte mit Identität, Qualität und erstklassiger Präsentation zu schaffen. Das Ziel ist einfach: gewöhnliche Momente in besondere Erlebnisse zu verwandeln.",
@@ -239,6 +248,8 @@ const translations: Record<Lang, {
     productsHeading: "Een collectie om te verrassen",
     productsDesc: "Van de wellust van truffels tot het karakter van gourmetproducten in pot, elk detail is doordacht om de beleving te verhogen.",
     learnMore: "Meer weten",
+    awardLabel: "Great Taste 2026-onderscheiding · 1 Ster",
+    judgesLabel: "In de woorden van de jury",
     historyLabel: "Ons verhaal",
     historyHeading: "Een merk gemaakt met passie, veerkracht en smaak",
     historyP1: "Chocolates Dom José is ontstaan uit de passie om producten te creëren met identiteit, kwaliteit en uitstekende presentatie. Het doel is eenvoudig: gewone momenten omzetten in bijzondere ervaringen.",
@@ -300,6 +311,12 @@ const products = [
     // the EN/DE/NL carousel with untranslatable baked-in text. Swap all peraImg* for the
     // professional shoot once it's ready.
     images: [peraImg1, peraImg2],
+    // Great Taste is a UK award (Guild of Fine Food) — the judges' quote stays in the
+    // original English regardless of site language, same convention the award itself uses.
+    award: {
+      badge: greatTasteBadge,
+      quote: "A fun little product with a complex spiced aroma and fascinating appearance. On the tongue the spices remain and are well defined if a little more gentle than had been expected. The texture of the pear remains excellent, providing for a satisfying bite.",
+    },
   },
   {
     id: "trufas_laranja",
@@ -500,12 +517,14 @@ function ContactForm({ lang, t }: { lang: Lang; t: ContactT }) {
   );
 }
 
-function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, priority }: {
+function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, awardLabel, judgesLabel, priority }: {
   product: typeof products[number];
   lang: Lang;
   addToCartLabel: string;
   priceFromLabel: string;
   ivaLabel: string;
+  awardLabel: string;
+  judgesLabel: string;
   priority?: boolean;
 }) {
   const { addItem } = useCart();
@@ -536,6 +555,14 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, 
           fetchPriority={priority ? "high" : "auto"}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        {product.award && (
+          <img
+            src={product.award.badge}
+            alt={awardLabel}
+            loading="lazy"
+            className="absolute right-3 top-3 h-16 w-16 drop-shadow-lg sm:h-20 sm:w-20"
+          />
+        )}
         {hasMultiple && (
           <>
             <button
@@ -569,7 +596,17 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, 
         <h3 className="text-2xl font-semibold">{product.name[lang]}</h3>
         <p className="mt-1 text-lg font-medium text-yellow-300">{priceDisplay}</p>
         <p className="text-[11px] text-white/40">{ivaLabel}</p>
-        <p className="mt-3 flex-1 text-white/70">{product.description[lang]}</p>
+        <p className="mt-3 text-white/70">{product.description[lang]}</p>
+        {product.award && (
+          <div className="mt-4 flex-1 rounded-xl border border-yellow-400/20 bg-yellow-400/5 p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-yellow-300">{awardLabel}</p>
+            <p className="mt-2 text-xs italic leading-relaxed text-white/60">
+              “{product.award.quote}”
+            </p>
+            <p className="mt-1 text-[11px] text-white/40">— {judgesLabel}, Guild of Fine Food</p>
+          </div>
+        )}
+        {!product.award && <div className="flex-1" />}
         <button
           onClick={handleAdd}
           className="mt-6 rounded-xl bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-yellow-300 active:scale-95"
@@ -837,6 +874,8 @@ export default function Home() {
                   addToCartLabel={t.addToCart}
                   priceFromLabel={t.priceFrom}
                   ivaLabel={t.ivaIncluded}
+                  awardLabel={t.awardLabel}
+                  judgesLabel={t.judgesLabel}
                   priority={idx === 0}
                 />
               </div>
