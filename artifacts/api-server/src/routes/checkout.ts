@@ -3,6 +3,7 @@ import { createEasyPayCheckout } from "../lib/easypay.js";
 import { notifyOrder } from "../lib/notify.js";
 import { setPendingOrder, type Lang } from "../lib/orderStore.js";
 import { rateLimit } from "../lib/rateLimit.js";
+import { isValidEmail } from "../lib/validate.js";
 
 const VALID_LANGS: Lang[] = ["PT", "EN", "DE", "NL"];
 
@@ -121,6 +122,36 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       return;
     }
 
+    // Customer/shipping fields are attacker-controlled and, unlike /api/contact,
+    // were previously accepted with no validation — an empty or garbage
+    // customer+shipping payload would still create a real EasyPay session, a
+    // stored pending order, and a merchant notification. Reject early instead.
+    const cleanCustomer = {
+      name: (customer?.name ?? "").trim().slice(0, 200),
+      email: (customer?.email ?? "").trim().slice(0, 200),
+      phone: (customer?.phone ?? "").trim().slice(0, 40),
+      nif: customer?.nif?.trim().slice(0, 40),
+    };
+    const cleanShipping = {
+      address: (shipping?.address ?? "").trim().slice(0, 500),
+      postcode: (shipping?.postcode ?? "").trim().slice(0, 20),
+      city: (shipping?.city ?? "").trim().slice(0, 200),
+      country: (shipping?.country ?? "Portugal").trim().slice(0, 100) || "Portugal",
+    };
+
+    if (!cleanCustomer.name || !cleanCustomer.email || !cleanCustomer.phone) {
+      res.status(400).json({ error: "missing_customer_fields" });
+      return;
+    }
+    if (!isValidEmail(cleanCustomer.email)) {
+      res.status(400).json({ error: "invalid_email" });
+      return;
+    }
+    if (!cleanShipping.address || !cleanShipping.postcode || !cleanShipping.city) {
+      res.status(400).json({ error: "missing_shipping_fields" });
+      return;
+    }
+
     const subtotalCents = validItems.reduce(
       (sum, i) => sum + PRODUCTS[i.id].price * i.quantity,
       0
@@ -129,12 +160,12 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
       (sum, i) => sum + PRODUCTS[i.id].weightGrams * i.quantity,
       0
     );
-    const shippingCents = calculateShippingCents(totalWeightGrams, subtotalCents, shipping?.country);
+    const shippingCents = calculateShippingCents(totalWeightGrams, subtotalCents, cleanShipping.country);
     const amountCents = subtotalCents + shippingCents;
 
     const { manifest, orderKey } = await createEasyPayCheckout({
       amountCents,
-      customer,
+      customer: cleanCustomer,
     });
 
     const itemsForStore = validItems.map((i) => ({
@@ -156,32 +187,22 @@ checkoutRouter.post("/checkout", checkoutLimiter, async (req, res) => {
     // even if the webhook arrives within milliseconds (and on a different
     // server instance behind the load balancer).
     await setPendingOrder(orderKey, {
-      customer: {
-        name: customer?.name ?? "",
-        email: customer?.email ?? "",
-        phone: customer?.phone ?? "",
-        nif: customer?.nif,
-      },
-      shipping: {
-        address: shipping?.address ?? "",
-        postcode: shipping?.postcode ?? "",
-        city: shipping?.city ?? "",
-        country: shipping?.country ?? "Portugal",
-      },
+      customer: cleanCustomer,
+      shipping: cleanShipping,
       items: itemsForStore,
       totalEur: amountCents / 100,
       lang,
     });
 
     notifyOrder({
-      customerName: customer?.name ?? "",
-      customerEmail: customer?.email ?? "",
-      customerPhone: customer?.phone ?? "",
-      customerNif: customer?.nif ?? "",
-      shippingAddress: shipping?.address ?? "",
-      shippingPostcode: shipping?.postcode ?? "",
-      shippingCity: shipping?.city ?? "",
-      shippingCountry: shipping?.country ?? "Portugal",
+      customerName: cleanCustomer.name,
+      customerEmail: cleanCustomer.email,
+      customerPhone: cleanCustomer.phone,
+      customerNif: cleanCustomer.nif ?? "",
+      shippingAddress: cleanShipping.address,
+      shippingPostcode: cleanShipping.postcode,
+      shippingCity: cleanShipping.city,
+      shippingCountry: cleanShipping.country,
       items: itemsForStore.map((i) => ({
         name: i.name,
         quantity: i.quantity,

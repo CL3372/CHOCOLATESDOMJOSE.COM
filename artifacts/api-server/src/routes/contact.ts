@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { sendEmail, sendTelegram, escapeHtml } from "../lib/notify.js";
 import { rateLimit } from "../lib/rateLimit.js";
+import { isValidEmail } from "../lib/validate.js";
 
 type Lang = "PT" | "EN" | "DE" | "NL";
 const VALID_LANGS: Lang[] = ["PT", "EN", "DE", "NL"];
@@ -15,10 +16,6 @@ const contactLimiter = rateLimit({
   global: 60,
   windowMs: 10 * 60 * 1000,
 });
-
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
 
 contactRouter.post("/contact", contactLimiter, async (req, res) => {
   try {
