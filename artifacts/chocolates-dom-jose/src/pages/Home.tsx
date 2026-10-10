@@ -407,13 +407,71 @@ type ContactT = {
   contactRequired: string;
 };
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          callback: (token: string) => void;
+          "expired-callback"?: () => void;
+          "error-callback"?: () => void;
+        }
+      ) => string;
+      reset: (widgetId?: string) => void;
+    };
+  }
+}
+
+const TURNSTILE_SITE_KEY = "0x4AAAAAAFTAu_UA1e_2_0Lh";
+
 function ContactForm({ lang, t }: { lang: Lang; t: ContactT }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot — real visitors never fill this in
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    function renderWidget() {
+      if (cancelled || !turnstileRef.current || !window.turnstile) return;
+      if (widgetIdRef.current) return; // already rendered
+      widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        callback: (token: string) => setTurnstileToken(token),
+        "expired-callback": () => setTurnstileToken(""),
+        "error-callback": () => setTurnstileToken(""),
+      });
+    }
+
+    if (window.turnstile) {
+      renderWidget();
+    } else {
+      const interval = setInterval(() => {
+        if (window.turnstile) {
+          clearInterval(interval);
+          renderWidget();
+        }
+      }, 200);
+      return () => {
+        cancelled = true;
+        clearInterval(interval);
+      };
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -422,13 +480,18 @@ function ContactForm({ lang, t }: { lang: Lang; t: ContactT }) {
       setErrorMsg(t.contactRequired);
       return;
     }
+    if (!turnstileToken) {
+      setStatus("error");
+      setErrorMsg(t.contactError);
+      return;
+    }
     setStatus("sending");
     setErrorMsg("");
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, subject, message, lang }),
+        body: JSON.stringify({ name, email, subject, message, lang, website, turnstileToken }),
       });
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
@@ -438,9 +501,18 @@ function ContactForm({ lang, t }: { lang: Lang; t: ContactT }) {
       setEmail("");
       setSubject("");
       setMessage("");
+      setWebsite("");
+      setTurnstileToken("");
+      if (window.turnstile && widgetIdRef.current) {
+        window.turnstile.reset(widgetIdRef.current);
+      }
     } catch {
       setStatus("error");
       setErrorMsg(t.contactError);
+      if (window.turnstile && widgetIdRef.current) {
+        window.turnstile.reset(widgetIdRef.current);
+      }
+      setTurnstileToken("");
     }
   }
 
@@ -485,6 +557,28 @@ function ContactForm({ lang, t }: { lang: Lang; t: ContactT }) {
           onChange={(e) => setMessage(e.target.value)}
           disabled={sending}
         />
+
+        {/* Honeypot field — hidden from real visitors, bots fill it in. Keep name as "website". */}
+        <input
+          type="text"
+          name="website"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            left: "-9999px",
+            width: "1px",
+            height: "1px",
+            opacity: 0,
+            pointerEvents: "none",
+          }}
+        />
+
+        <div ref={turnstileRef} />
+
         <button
           type="submit"
           data-testid="btn-submit"
