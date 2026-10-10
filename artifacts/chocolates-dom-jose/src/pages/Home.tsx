@@ -424,7 +424,7 @@ declare global {
   }
 }
 
-const TURNSTILE_SITE_KEY = "0x4AAAAAAFTAu_UA1e_2_0Lh";
+const TURNSTILE_SITE_KEY = "0x4AAAAAAFTAu_UA1e_2_OLh";
 
 function ContactForm({ lang, t }: { lang: Lang; t: ContactT }) {
   const [name, setName] = useState("");
