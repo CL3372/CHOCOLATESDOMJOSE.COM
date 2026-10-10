@@ -17,15 +17,49 @@ const contactLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
 });
 
+async function verifyTurnstile(token: string, remoteIp: string | undefined): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) {
+    // Fail closed: if the secret isn't configured, don't silently let traffic through.
+    return false;
+  }
+  try {
+    const body = new URLSearchParams();
+    body.set("secret", secret);
+    body.set("response", token);
+    if (remoteIp) body.set("remoteip", remoteIp);
+
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body,
+    });
+    if (!res.ok) return false;
+    const data = (await res.json()) as { success?: boolean };
+    return data.success === true;
+  } catch {
+    return false;
+  }
+}
+
 contactRouter.post("/contact", contactLimiter, async (req, res) => {
   try {
-    const { name, email, subject, message, lang: rawLang } = req.body as {
+    const { name, email, subject, message, lang: rawLang, website, turnstileToken } = req.body as {
       name?: string;
       email?: string;
       subject?: string;
       message?: string;
       lang?: string;
+      website?: string;
+      turnstileToken?: string;
     };
+
+    // Honeypot: real visitors never see or fill this field. Bots usually do.
+    // Return a fake success so the bot doesn't know it was caught, but skip the notification.
+    if (typeof website === "string" && website.trim().length > 0) {
+      res.json({ ok: true });
+      return;
+    }
 
     const cleanName = (name ?? "").trim();
     const cleanEmail = (email ?? "").trim();
@@ -42,6 +76,13 @@ contactRouter.post("/contact", contactLimiter, async (req, res) => {
     }
     if (cleanMessage.length > 5000) {
       res.status(400).json({ error: "message_too_long" });
+      return;
+    }
+
+    const remoteIp = req.ip;
+    const captchaOk = await verifyTurnstile(typeof turnstileToken === "string" ? turnstileToken : "", remoteIp);
+    if (!captchaOk) {
+      res.status(400).json({ error: "captcha_failed" });
       return;
     }
 
