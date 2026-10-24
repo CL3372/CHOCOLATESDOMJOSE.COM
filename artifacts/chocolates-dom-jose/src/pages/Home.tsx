@@ -284,7 +284,41 @@ const translations: Record<Lang, {
   },
 };
 
-const products = [
+// Mandatory food information for online sale (Reg. (UE) 1169/2011, art. 14): must be
+// visible before purchase. Best-before date is exempt online (it's on the jar at delivery).
+type L10n = Record<Lang, string>;
+type ProductInfo = {
+  legalName: L10n;
+  quantity: string;
+  ingredients: L10n;
+  allergens: L10n;
+  nutritionBasis: L10n;
+  nutrition: { label: L10n; value: string }[];
+  storage: L10n;
+};
+
+const productInfoLabels: Record<Lang, {
+  title: string; legalName: string; quantity: string; ingredients: string; allergens: string;
+  nutrition: string; storage: string; producer: string;
+}> = {
+  PT: { title: "Informação do produto", legalName: "Denominação", quantity: "Quantidade", ingredients: "Ingredientes", allergens: "Alergénios", nutrition: "Declaração nutricional", storage: "Conservação", producer: "Produtor" },
+  EN: { title: "Product information", legalName: "Product name", quantity: "Net quantity", ingredients: "Ingredients", allergens: "Allergens", nutrition: "Nutrition declaration", storage: "Storage", producer: "Producer" },
+  DE: { title: "Produktinformationen", legalName: "Bezeichnung", quantity: "Nettofüllmenge", ingredients: "Zutaten", allergens: "Allergene", nutrition: "Nährwertdeklaration", storage: "Aufbewahrung", producer: "Hersteller" },
+  NL: { title: "Productinformatie", legalName: "Benaming", quantity: "Netto-inhoud", ingredients: "Ingrediënten", allergens: "Allergenen", nutrition: "Voedingswaardevermelding", storage: "Bewaren", producer: "Producent" },
+};
+
+const PRODUCER = "Nelson & Carla Louro Lda., Rua Dr. Alberto Martins dos Santos nº4, 2540-087 Bombarral, Portugal";
+
+const products: {
+  id: string;
+  price: number;
+  priceIsFrom?: boolean;
+  name: L10n;
+  description: L10n;
+  images: string[];
+  award?: { badge: string; quote: string };
+  info?: ProductInfo;
+}[] = [
   {
     id: "trufas_artesanais",
     price: 1500,
@@ -353,6 +387,44 @@ const products = [
       NL: "De pittigheid van de koning — een product met een sterke persoonlijkheid en premium presentatie.",
     },
     images: [piriImg1, piriImg2, piriImg3, piriImg4],
+    // Values match the printed back label (Oct 2026). Update both together at the next reprint.
+    info: {
+      legalName: {
+        PT: "Óleo picante de malagueta com whiskey",
+        EN: "Chilli oil with whiskey",
+        DE: "Scharfes Chiliöl mit Whiskey",
+        NL: "Pittige chili-olie met whiskey",
+      },
+      quantity: "100 ml",
+      ingredients: {
+        PT: "óleo de girassol, whiskey, malagueta, pimentão-doce, alho, louro.",
+        EN: "sunflower oil, whiskey, chilli, sweet paprika, garlic, bay leaf.",
+        DE: "Sonnenblumenöl, Whiskey, Chili, edelsüßer Paprika, Knoblauch, Lorbeer.",
+        NL: "zonnebloemolie, whiskey, chilipeper, zoete paprika, knoflook, laurier.",
+      },
+      allergens: {
+        PT: "Não contém alergénios.",
+        EN: "Contains no allergens.",
+        DE: "Enthält keine Allergene.",
+        NL: "Bevat geen allergenen.",
+      },
+      nutritionBasis: { PT: "por 100 ml", EN: "per 100 ml", DE: "pro 100 ml", NL: "per 100 ml" },
+      nutrition: [
+        { label: { PT: "Energia", EN: "Energy", DE: "Brennwert", NL: "Energie" }, value: "3180 kJ / 773 kcal" },
+        { label: { PT: "Lípidos", EN: "Fat", DE: "Fett", NL: "Vetten" }, value: "84 g" },
+        { label: { PT: "dos quais saturados", EN: "of which saturates", DE: "davon gesättigte Fettsäuren", NL: "waarvan verzadigde vetzuren" }, value: "8,6 g" },
+        { label: { PT: "Hidratos de carbono", EN: "Carbohydrate", DE: "Kohlenhydrate", NL: "Koolhydraten" }, value: "<0,5 g" },
+        { label: { PT: "dos quais açúcares", EN: "of which sugars", DE: "davon Zucker", NL: "waarvan suikers" }, value: "<0,5 g" },
+        { label: { PT: "Proteínas", EN: "Protein", DE: "Eiweiß", NL: "Eiwitten" }, value: "<0,5 g" },
+        { label: { PT: "Sal", EN: "Salt", DE: "Salz", NL: "Zout" }, value: "0 g" },
+      ],
+      storage: {
+        PT: "Conservar ao abrigo do calor e da luz. Depois de aberto, manter bem fechado e consumir no prazo de 6 meses.",
+        EN: "Store away from heat and light. Once opened, keep tightly closed and use within 6 months.",
+        DE: "Vor Wärme und Licht geschützt aufbewahren. Nach dem Öffnen gut verschlossen halten und innerhalb von 6 Monaten verbrauchen.",
+        NL: "Koel en donker bewaren. Na opening goed gesloten houden en binnen 6 maanden gebruiken.",
+      },
+    },
   },
   {
     id: "cabazes",
@@ -611,6 +683,41 @@ function ContactForm({ lang, t }: { lang: Lang; t: ContactT }) {
   );
 }
 
+function ProductInfoPanel({ info, lang }: { info: ProductInfo; lang: Lang }) {
+  const l = productInfoLabels[lang];
+  return (
+    <details className="group/info mt-4 rounded-xl border border-white/10 bg-black/20 text-sm">
+      <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 font-medium text-white/80 hover:text-white [&::-webkit-details-marker]:hidden">
+        {l.title}
+        <span aria-hidden="true" className="text-yellow-300 transition-transform group-open/info:rotate-45">+</span>
+      </summary>
+      <dl className="space-y-2.5 border-t border-white/10 px-4 py-3 text-white/70">
+        <div><dt className="inline font-semibold text-white/90">{l.legalName}: </dt><dd className="inline">{info.legalName[lang]}</dd></div>
+        <div><dt className="inline font-semibold text-white/90">{l.quantity}: </dt><dd className="inline">{info.quantity}</dd></div>
+        <div><dt className="inline font-semibold text-white/90">{l.ingredients}: </dt><dd className="inline">{info.ingredients[lang]}</dd></div>
+        <div><dt className="inline font-semibold text-white/90">{l.allergens}: </dt><dd className="inline">{info.allergens[lang]}</dd></div>
+        <div>
+          <dt className="font-semibold text-white/90">{l.nutrition} ({info.nutritionBasis[lang]})</dt>
+          <dd>
+            <table className="mt-1 w-full text-xs">
+              <tbody>
+                {info.nutrition.map((row) => (
+                  <tr key={row.label.EN} className="border-b border-white/5 last:border-0">
+                    <td className={`py-1 ${row.label.EN.startsWith("of which") ? "pl-3" : ""}`}>{row.label[lang]}</td>
+                    <td className="py-1 text-right tabular-nums">{row.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </dd>
+        </div>
+        <div><dt className="inline font-semibold text-white/90">{l.storage}: </dt><dd className="inline">{info.storage[lang]}</dd></div>
+        <div><dt className="inline font-semibold text-white/90">{l.producer}: </dt><dd className="inline">{PRODUCER}</dd></div>
+      </dl>
+    </details>
+  );
+}
+
 function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, awardLabel, judgesLabel, priority }: {
   product: typeof products[number];
   lang: Lang;
@@ -701,6 +808,7 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, 
           </div>
         )}
         {!product.award && <div className="flex-1" />}
+        {product.info && <ProductInfoPanel info={product.info} lang={lang} />}
         <button
           onClick={handleAdd}
           className="mt-6 rounded-xl bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-yellow-300 active:scale-95"
