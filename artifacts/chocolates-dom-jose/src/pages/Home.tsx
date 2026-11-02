@@ -836,7 +836,7 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, 
           loading={priority ? "eager" : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
                    className={`h-full w-full transition-transform duration-500 group-hover:scale-105 ${
-            ["dom_piri_piri", "trufas_benfica", "trufa_lima", "trufas_caramelo_salgado"].includes(product.id) ? "object-contain" : "object-cover"
+                        ["dom_piri_piri", "trufas_benfica", "trufa_lima", "trufas_caramelo_salgado", "trufas_chocolate_77"].includes(product.id) ? "object-contain" : "object-cover"
           }`}
         />
         {product.award && (
