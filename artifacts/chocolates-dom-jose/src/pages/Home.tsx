@@ -9,7 +9,7 @@ import logoSrc from "@assets/logo_bw_transparent.png";
 // source through a fixed object-cover frame, so new photos don't need matching dimensions.
 // -web.jpg variants are resized (max 1400px) + recompressed (q78) copies of the
 // originals for page-weight reasons — see attached_assets/ for the untouched originals.
-import trufaImg1 from import limaImg from "@assets/trufa-lima-web.jpg";
+import limaImg from "@assets/trufa-lima-web.jpg";
 import carameloImg from "@assets/trufas-caramelo-salgado-web.jpg";
 import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775497155075-web.jpg";
 import peraImg1 from "@assets/peras-bebedas-pro-1-web.jpg";
@@ -835,8 +835,7 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, 
           loading={priority ? "eager" : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
           className={`h-full w-full transition-transform duration-500 group-hover:scale-105 ${
-                        ["dom_piri_piri", "trufas_benfica"].includes(product.id) ? "object-contain" : "object-cover"
-          }`}
+                                    ["dom_piri_piri", "trufas_benfica", "trufa_lima", "trufas_caramelo_salgado"].includes(product.id) ? "object-contain" : "object-cover"
         />
         {product.award && (
           <img
