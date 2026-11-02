@@ -17,6 +17,7 @@ import laranjaImg from "@assets/C5049C7D-4C50-4DC6-9FF1-35C328026F8A_1_105_c_177
 import choc77Img from "@assets/C8C3450E-D74C-4028-8A60-556EA3DA337B_1_105_c_1775497898196-web.jpg";
 import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1775497921548-web.jpg";
 import piriImg1 from "@assets/dom-piri-piri-whole-jar-web.jpg";
+import benficaBoxImg from "@assets/benfica-truffle-box-web.jpg";
 import crownSrc from "@assets/logo_crown_transparent.png";
 import cabazImgPro1 from "@assets/cabaz-natal-pro-1-web.jpg";
 import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775498751104-web.jpg";
@@ -414,7 +415,24 @@ const products: {
       DE: "Für reine Schokoladenliebhaber — intensive Trüffeln mit 77% Kakao, elegant und raffiniert.",
       NL: "Voor liefhebbers van pure chocolade — intense truffels met 77% cacao, elegant en verfijnd.",
     },
-    images: [choc77Img],
+        images: [choc77Img],
+  },
+  {
+    id: "trufas_benfica",
+    price: 1500,
+    name: {
+      PT: "Trufas Dom José — Edição Benfica",
+      EN: "Dom José Truffles — Benfica Edition",
+      DE: "Dom José Trüffeln — Benfica Edition",
+      NL: "Dom José Truffels — Benfica Editie",
+    },
+    description: {
+      PT: "Edição especial Benfica — uma seleção das nossas trufas artesanais, numa caixa coleccionável para oferecer a um benfiquista.",
+      EN: "Special Benfica-themed edition — a selection of our handmade truffles, in a collectible box, perfect as a gift for a Benfica fan.",
+      DE: "Spezielle Benfica-Edition — eine Auswahl unserer handgefertigten Trüffeln in einer Sammlerbox, ideal als Geschenk für Benfica-Fans.",
+      NL: "Speciale Benfica-editie — een selectie van onze ambachtelijke truffels in een verzameldoos, perfect als cadeau voor een Benfica-fan.",
+    },
+    images: [benficaBoxImg],
   },
   {
     id: "dom_piri_piri",
@@ -804,7 +822,7 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, 
           loading={priority ? "eager" : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
           className={`h-full w-full transition-transform duration-500 group-hover:scale-105 ${
-            product.id === "dom_piri_piri" ? "object-contain" : "object-cover"
+                        ["dom_piri_piri", "trufas_benfica"].includes(product.id) ? "object-contain" : "object-cover"
           }`}
         />
         {product.award && (
