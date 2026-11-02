@@ -363,7 +363,7 @@ const products: {
     // Professional Bombarral shoot (Oct 2026) — replaced the phone shots. Still just 2
     // images (no region-seal/promo-graphic variants) to keep the EN/DE/NL carousel
     // free of untranslatable baked-in text.
-    images:     images: [peraImg3, peraImg1, peraImg2],
+    images:         images: [peraImg3, peraImg1, peraImg2],
     // Great Taste is a UK award (Guild of Fine Food) — the judges' quote stays in the
     // original English regardless of site language, same convention the award itself uses.
     award: {
@@ -421,7 +421,7 @@ const products: {
       DE: "Zitrusintensität in einem cremigen Kern — handgefertigte Trüffeln mit frischer Orange und Premium-Schokolade.",
       NL: "Citrusintensiteit in een romig hart — ambachtelijke truffels met verse sinaasappel en premium chocolade.",
     },
-    images:     images: [laranjaProImg, laranjaImg],
+    images:         images: [laranjaProImg, laranjaImg],
   },
   {
     id: "trufas_chocolate_77",
@@ -433,7 +433,7 @@ const products: {
       DE: "Für reine Schokoladenliebhaber — intensive Trüffeln mit 77% Kakao, elegant und raffiniert.",
       NL: "Voor liefhebbers van pure chocolade — intense truffels met 77% cacao, elegant en verfijnd.",
     },
-           images:     images: [choc77Pro1Img, choc77Img, choc77Pro2Img],,
+           images:       images: [choc77Pro1Img, choc77Img, choc77Pro2Img],
   },
   {
     id: "trufas_benfica",
