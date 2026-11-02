@@ -429,7 +429,7 @@ const products: {
       DE: "Für reine Schokoladenliebhaber — intensive Trüffeln mit 77% Kakao, elegant und raffiniert.",
       NL: "Voor liefhebbers van pure chocolade — intense truffels met 77% cacao, elegant en verfijnd.",
     },
-        images: [choc77Img],
+           images: [choc77Img, choc77Pro1Img, choc77Pro2Img],
   },
   {
     id: "trufas_benfica",
