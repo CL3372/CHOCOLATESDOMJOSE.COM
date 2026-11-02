@@ -11,16 +11,14 @@ import logoSrc from "@assets/logo_bw_transparent.png";
 // originals for page-weight reasons — see attached_assets/ for the untouched originals.
 import trufaImg1 from "@assets/4601CB5C-1354-4ED9-A3C5-D566E3957B7B_1775497051986-web.jpg";
 import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775497155075-web.jpg";
-import peraImg1 from "@assets/D0001014-D8F0-4669-AA75-AA5FC99B9C61_1775497657429-web.jpg";
-import peraImg2 from "@assets/27402DCF-137B-4302-ADCE-BF183A97BB50_1775497663265-web.jpg";
+import peraImg1 from "@assets/peras-bebedas-pro-1-web.jpg";
+import peraImg2 from "@assets/peras-bebedas-pro-2-web.jpg";
 import laranjaImg from "@assets/C5049C7D-4C50-4DC6-9FF1-35C328026F8A_1_105_c_1775497857994-web.jpg";
 import choc77Img from "@assets/C8C3450E-D74C-4028-8A60-556EA3DA337B_1_105_c_1775497898196-web.jpg";
 import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1775497921548-web.jpg";
-import piriImg1 from "@assets/1A7B88D2-D1EA-4199-A7D2-B37DEF6AB8B2_1_105_c_1775498174881-web.jpg";
-import piriImg2 from "@assets/470F55A1-A0DE-438A-8CE6-9420CC02210B_1_105_c_1775498178960-web.jpg";
-import piriImg3 from "@assets/5D196451-7C91-40D5-A833-00FFBF39133A_1_105_c_1775498185074-web.jpg";
-import piriImg4 from "@assets/piri_extra-web.jpg";
+import piriImg1 from "@assets/dom-piri-piri-pro-1-web.jpg";
 import crownSrc from "@assets/logo_crown_transparent.png";
+import cabazImgPro1 from "@assets/cabaz-natal-pro-1-web.jpg";
 import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775498751104-web.jpg";
 import cabazImg2 from "@assets/6B7C46BB-4F99-4C06-B042-49477038A177_1_105_c_1775498765125-web.jpg";
 import cabazImg3 from "@assets/2F27B28B-3481-45FF-9C0A-4F9CA152FA00_1_105_c_1775498790966-web.jpg";
@@ -290,6 +288,8 @@ type L10n = Record<Lang, string>;
 type ProductInfo = {
   legalName: L10n;
   quantity: string;
+  // Only set for solids packed in a liquid (EU Annex IX) — e.g. jarred fruit in syrup.
+  quantityDrained?: string;
   ingredients: L10n;
   allergens: L10n;
   nutritionBasis: L10n;
@@ -298,13 +298,13 @@ type ProductInfo = {
 };
 
 const productInfoLabels: Record<Lang, {
-  title: string; legalName: string; quantity: string; ingredients: string; allergens: string;
+  title: string; legalName: string; quantity: string; quantityDrained: string; ingredients: string; allergens: string;
   nutrition: string; storage: string; producer: string;
 }> = {
-  PT: { title: "Informação do produto", legalName: "Denominação", quantity: "Quantidade", ingredients: "Ingredientes", allergens: "Alergénios", nutrition: "Declaração nutricional", storage: "Conservação", producer: "Produtor" },
-  EN: { title: "Product information", legalName: "Product name", quantity: "Net quantity", ingredients: "Ingredients", allergens: "Allergens", nutrition: "Nutrition declaration", storage: "Storage", producer: "Producer" },
-  DE: { title: "Produktinformationen", legalName: "Bezeichnung", quantity: "Nettofüllmenge", ingredients: "Zutaten", allergens: "Allergene", nutrition: "Nährwertdeklaration", storage: "Aufbewahrung", producer: "Hersteller" },
-  NL: { title: "Productinformatie", legalName: "Benaming", quantity: "Netto-inhoud", ingredients: "Ingrediënten", allergens: "Allergenen", nutrition: "Voedingswaardevermelding", storage: "Bewaren", producer: "Producent" },
+  PT: { title: "Informação do produto", legalName: "Denominação", quantity: "Quantidade", quantityDrained: "Peso líquido escorrido", ingredients: "Ingredientes", allergens: "Alergénios", nutrition: "Declaração nutricional", storage: "Conservação", producer: "Produtor" },
+  EN: { title: "Product information", legalName: "Product name", quantity: "Net quantity", quantityDrained: "Drained net weight", ingredients: "Ingredients", allergens: "Allergens", nutrition: "Nutrition declaration", storage: "Storage", producer: "Producer" },
+  DE: { title: "Produktinformationen", legalName: "Bezeichnung", quantity: "Nettofüllmenge", quantityDrained: "Abtropfgewicht", ingredients: "Zutaten", allergens: "Allergene", nutrition: "Nährwertdeklaration", storage: "Aufbewahrung", producer: "Hersteller" },
+  NL: { title: "Productinformatie", legalName: "Benaming", quantity: "Netto-inhoud", quantityDrained: "Uitlekgewicht", ingredients: "Ingrediënten", allergens: "Allergenen", nutrition: "Voedingswaardevermelding", storage: "Bewaren", producer: "Producent" },
 };
 
 const PRODUCER = "Nelson & Carla Louro Lda., Rua Dr. Alberto Martins dos Santos nº4, 2540-087 Bombarral, Portugal";
@@ -341,15 +341,55 @@ const products: {
       DE: "Birnen im Glas, anspruchsvoll und einzigartig, ideal für Körbe und Gourmet-Geschenke. Mit Wein zubereitet (Alkohol verdampft); Schwangeren wird Vorsicht empfohlen.",
       NL: "Peren in pot, verfijnd en uniek, ideaal voor manden en gourmetcadeaus. Bereid met wijn (alcohol weggekookt); voorzichtigheid aangeraden voor zwangere vrouwen.",
     },
-    // peraImg3/peraImg4 (region seal + PT-only promo graphic) were dropped: they broke
-    // the EN/DE/NL carousel with untranslatable baked-in text. Swap all peraImg* for the
-    // professional shoot once it's ready.
+    // Professional Bombarral shoot (Oct 2026) — replaced the phone shots. Still just 2
+    // images (no region-seal/promo-graphic variants) to keep the EN/DE/NL carousel
+    // free of untranslatable baked-in text.
     images: [peraImg1, peraImg2],
     // Great Taste is a UK award (Guild of Fine Food) — the judges' quote stays in the
     // original English regardless of site language, same convention the award itself uses.
     award: {
       badge: greatTasteBadge,
       quote: "A fun little product with a complex spiced aroma and fascinating appearance. On the tongue the spices remain and are well defined if a little more gentle than had been expected. The texture of the pear remains excellent, providing for a satisfying bite.",
+    },
+    // Values match the printed back label (Oct 2026). Update both together at the next reprint.
+    info: {
+      legalName: {
+        PT: "Pêras em calda de vinho tinto e especiarias",
+        EN: "Pears in spiced red wine syrup",
+        DE: "Birnen in Rotwein-Gewürzsirup",
+        NL: "Peren in rode wijn-kruidensiroop",
+      },
+      quantity: "310 g",
+      quantityDrained: "190 g",
+      ingredients: {
+        PT: "Pêra Rocha (72%), vinho tinto (sulfitos), vinho do Porto (sulfitos), açúcar, canela, limão e anis.",
+        EN: "Rocha pear (72%), red wine (sulphites), port wine (sulphites), sugar, cinnamon, lemon and aniseed.",
+        DE: "Rocha-Birne (72%), Rotwein (Sulfite), Portwein (Sulfite), Zucker, Zimt, Zitrone und Anis.",
+        NL: "Rocha-peer (72%), rode wijn (sulfieten), portwijn (sulfieten), suiker, kaneel, citroen en anijs.",
+      },
+      allergens: {
+        PT: "Sulfitos. Contém pêra com picaro (pé) e caroço. Contém álcool.",
+        EN: "Sulphites. Contains pear with stem and core. Contains alcohol.",
+        DE: "Sulfite. Enthält Birne mit Stiel und Kerngehäuse. Enthält Alkohol.",
+        NL: "Sulfieten. Bevat peer met steel en klokhuis. Bevat alcohol.",
+      },
+      nutritionBasis: { PT: "por 100 g", EN: "per 100 g", DE: "pro 100 g", NL: "per 100 g" },
+      nutrition: [
+        { label: { PT: "Energia", EN: "Energy", DE: "Brennwert", NL: "Energie" }, value: "531 kJ / 127 kcal" },
+        { label: { PT: "Lípidos", EN: "Fat", DE: "Fett", NL: "Vetten" }, value: "0,3 g" },
+        { label: { PT: "dos quais saturados", EN: "of which saturates", DE: "davon gesättigte Fettsäuren", NL: "waarvan verzadigde vetzuren" }, value: "<0,05 g" },
+        { label: { PT: "Hidratos de carbono", EN: "Carbohydrate", DE: "Kohlenhydrate", NL: "Koolhydraten" }, value: "30,5 g" },
+        { label: { PT: "dos quais açúcares", EN: "of which sugars", DE: "davon Zucker", NL: "waarvan suikers" }, value: "28,9 g" },
+        { label: { PT: "Fibra", EN: "Fibre", DE: "Ballaststoffe", NL: "Vezels" }, value: "1,5 g" },
+        { label: { PT: "Proteínas", EN: "Protein", DE: "Eiweiß", NL: "Eiwitten" }, value: "0,4 g" },
+        { label: { PT: "Sal", EN: "Salt", DE: "Salz", NL: "Zout" }, value: "0,08 g" },
+      ],
+      storage: {
+        PT: "Após abertura, conservar no frigorífico e consumir em 5 dias.",
+        EN: "After opening, keep refrigerated and consume within 5 days.",
+        DE: "Nach dem Öffnen im Kühlschrank aufbewahren und innerhalb von 5 Tagen verzehren.",
+        NL: "Na openen gekoeld bewaren en binnen 5 dagen consumeren.",
+      },
     },
   },
   {
@@ -386,7 +426,10 @@ const products: {
       DE: "Die Schärfe des Königs — ein Produkt mit starker Persönlichkeit und erstklassiger Präsentation.",
       NL: "De pittigheid van de koning — een product met een sterke persoonlijkheid en premium presentatie.",
     },
-    images: [piriImg1, piriImg2, piriImg3, piriImg4],
+    // Professional Bombarral shoot (Oct 2026) replaced the phone shots — also reflects the
+    // relabelled bottle (red dropper cap, no black-cap stock shown). Just 1 image for now;
+    // add more here if/when further angles come in from the same shoot.
+    images: [piriImg1],
     // Values match the printed back label (Oct 2026). Update both together at the next reprint.
     info: {
       legalName: {
@@ -437,7 +480,10 @@ const products: {
       DE: "Exklusive Zusammenstellungen unserer handwerklichen Produkte — ideal für Geschenke, Firmen und besondere Anlässe.",
       NL: "Exclusieve samenstellingen met onze ambachtelijke producten — ideaal voor cadeaus, bedrijven en bijzondere gelegenheden.",
     },
-    images: [cabazImg1, cabazImg2, cabazImg3, cabazImg4],
+    // cabazImgPro1: professional Christmas shoot (Oct 2026) — leads the carousel. The
+    // 4 older flat-lay phone shots stay in behind it for now, showing other box
+    // compositions, until more pro photos replace them too.
+    images: [cabazImgPro1, cabazImg1, cabazImg2, cabazImg3, cabazImg4],
   },
 ];
 
@@ -694,6 +740,9 @@ function ProductInfoPanel({ info, lang }: { info: ProductInfo; lang: Lang }) {
       <dl className="space-y-2.5 border-t border-white/10 px-4 py-3 text-white/70">
         <div><dt className="inline font-semibold text-white/90">{l.legalName}: </dt><dd className="inline">{info.legalName[lang]}</dd></div>
         <div><dt className="inline font-semibold text-white/90">{l.quantity}: </dt><dd className="inline">{info.quantity}</dd></div>
+        {info.quantityDrained && (
+          <div><dt className="inline font-semibold text-white/90">{l.quantityDrained}: </dt><dd className="inline">{info.quantityDrained}</dd></div>
+        )}
         <div><dt className="inline font-semibold text-white/90">{l.ingredients}: </dt><dd className="inline">{info.ingredients[lang]}</dd></div>
         <div><dt className="inline font-semibold text-white/90">{l.allergens}: </dt><dd className="inline">{info.allergens[lang]}</dd></div>
         <div>
@@ -1093,7 +1142,7 @@ export default function Home() {
             <div>
               <div className="mb-8 overflow-hidden rounded-[2rem] border border-white/10">
                 <img
-                  src={cabazImg1}
+                  src={cabazImgPro1}
                   alt=""
                   aria-hidden="true"
                   loading="lazy"
