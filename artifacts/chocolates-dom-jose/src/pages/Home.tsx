@@ -15,7 +15,9 @@ import carameloImg from "@assets/trufas-caramelo-salgado-web.jpg";
 import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775497155075-web.jpg";
 import peraImg1 from "@assets/peras-bebedas-pro-1-web.jpg";
 import peraImg2 from "@assets/peras-bebedas-pro-2-web.jpg";
+import peraImg3 from "@assets/peras-bebedas-pro-3-web_1.jpg";
 import laranjaImg from "@assets/C5049C7D-4C50-4DC6-9FF1-35C328026F8A_1_105_c_1775497857994-web.jpg";
+import laranjaProImg from "@assets/trufas-laranja-pro-1-web_1.jpg";
 import choc77Img from "@assets/C8C3450E-D74C-4028-8A60-556EA3DA337B_1_105_c_1775497898196-web.jpg";
 import choc77Pro1Img from "@assets/trufas-chocolate-77-pro-1-web.jpg";
 import choc77Pro2Img from "@assets/trufas-chocolate-77-pro-2-web.jpg";
@@ -361,7 +363,7 @@ const products: {
     // Professional Bombarral shoot (Oct 2026) — replaced the phone shots. Still just 2
     // images (no region-seal/promo-graphic variants) to keep the EN/DE/NL carousel
     // free of untranslatable baked-in text.
-    images: [peraImg1, peraImg2],
+    images:     images: [peraImg3, peraImg1, peraImg2],
     // Great Taste is a UK award (Guild of Fine Food) — the judges' quote stays in the
     // original English regardless of site language, same convention the award itself uses.
     award: {
@@ -419,7 +421,7 @@ const products: {
       DE: "Zitrusintensität in einem cremigen Kern — handgefertigte Trüffeln mit frischer Orange und Premium-Schokolade.",
       NL: "Citrusintensiteit in een romig hart — ambachtelijke truffels met verse sinaasappel en premium chocolade.",
     },
-    images: [laranjaImg],
+    images:     images: [laranjaProImg, laranjaImg],
   },
   {
     id: "trufas_chocolate_77",
@@ -431,7 +433,7 @@ const products: {
       DE: "Für reine Schokoladenliebhaber — intensive Trüffeln mit 77% Kakao, elegant und raffiniert.",
       NL: "Voor liefhebbers van pure chocolade — intense truffels met 77% cacao, elegant en verfijnd.",
     },
-           images: [choc77Img, choc77Pro1Img, choc77Pro2Img],
+           images:     images: [choc77Pro1Img, choc77Img, choc77Pro2Img],,
   },
   {
     id: "trufas_benfica",
@@ -838,7 +840,7 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, 
           loading={priority ? "eager" : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
                    className={`h-full w-full transition-transform duration-500 group-hover:scale-105 ${
-                        ["dom_piri_piri", "trufas_benfica", "trufa_lima", "trufas_caramelo_salgado", "trufas_chocolate_77"].includes(product.id) ? "object-contain" : "object-cover"
+                        ["dom_piri_piri", "trufas_benfica", "trufa_lima", "trufas_caramelo_salgado", "trufas_chocolate_77", "trufas_laranja", "peras_bebedas"].includes(product.id) ? "object-contain" : "object-cover"
           }`}
         />
         {product.award && (
