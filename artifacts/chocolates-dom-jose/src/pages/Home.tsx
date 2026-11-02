@@ -16,7 +16,7 @@ import peraImg2 from "@assets/peras-bebedas-pro-2-web.jpg";
 import laranjaImg from "@assets/C5049C7D-4C50-4DC6-9FF1-35C328026F8A_1_105_c_1775497857994-web.jpg";
 import choc77Img from "@assets/C8C3450E-D74C-4028-8A60-556EA3DA337B_1_105_c_1775497898196-web.jpg";
 import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1775497921548-web.jpg";
-import piriImg1 from "@assets/dom-piri-piri-pro-1-web.jpg";
+import piriImg1 from "@assets/dom-piri-piri-whole-jar-web.jpg";
 import crownSrc from "@assets/logo_crown_transparent.png";
 import cabazImgPro1 from "@assets/cabaz-natal-pro-1-web.jpg";
 import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775498751104-web.jpg";
@@ -797,13 +797,15 @@ function ProductCard({ product, lang, addToCartLabel, priceFromLabel, ivaLabel, 
 
   return (
     <div className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-yellow-900/20 hover:shadow-2xl">
-      <div className="relative h-72 w-full flex-shrink-0 overflow-hidden">
+            <div className="relative h-72 w-full flex-shrink-0 overflow-hidden bg-black">
         <img
           src={imgs[imgIdx]}
           alt={product.name[lang]}
           loading={priority ? "eager" : "lazy"}
           fetchPriority={priority ? "high" : "auto"}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className={`h-full w-full transition-transform duration-500 group-hover:scale-105 ${
+            product.id === "dom_piri_piri" ? "object-contain" : "object-cover"
+          }`}
         />
         {product.award && (
           <img
