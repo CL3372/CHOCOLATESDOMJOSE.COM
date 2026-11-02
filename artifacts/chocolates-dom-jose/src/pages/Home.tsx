@@ -9,7 +9,8 @@ import logoSrc from "@assets/logo_bw_transparent.png";
 // source through a fixed object-cover frame, so new photos don't need matching dimensions.
 // -web.jpg variants are resized (max 1400px) + recompressed (q78) copies of the
 // originals for page-weight reasons — see attached_assets/ for the untouched originals.
-import trufaImg1 from "@assets/4601CB5C-1354-4ED9-A3C5-D566E3957B7B_1775497051986-web.jpg";
+import trufaImg1 from import limaImg from "@assets/trufa-lima-web.jpg";
+import carameloImg from "@assets/trufas-caramelo-salgado-web.jpg";
 import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775497155075-web.jpg";
 import peraImg1 from "@assets/peras-bebedas-pro-1-web.jpg";
 import peraImg2 from "@assets/peras-bebedas-pro-2-web.jpg";
@@ -320,17 +321,29 @@ const products: {
   award?: { badge: string; quote: string };
   info?: ProductInfo;
 }[] = [
-  {
-    id: "trufas_artesanais",
+    {
+    id: "trufa_lima",
     price: 1500,
-    name: { PT: "Trufas Artesanais", EN: "Artisan Truffles", DE: "Handwerkliche Trüffeln", NL: "Ambachtelijke Truffels" },
+    name: { PT: "Trufas de Lima", EN: "Lime Truffles", DE: "Limettentrüffeln", NL: "Limoentruffels" },
     description: {
-      PT: "Sabores elegantes e intensos, feitos artesanalmente para oferecer ou saborear.",
-      EN: "Elegant and intense flavours, handcrafted to give as a gift or savour.",
-      DE: "Elegante und intensive Aromen, handgefertigt zum Verschenken oder Genießen.",
-      NL: "Elegante en intense smaken, met de hand gemaakt om te geven of te genieten.",
+      PT: "Frescura ácida e intensa — trufas artesanais com lima e chocolate premium.",
+      EN: "Sharp, zesty freshness — handmade truffles with lime and premium chocolate.",
+      DE: "Frische Säure und Intensität — handgefertigte Trüffeln mit Limette und Premium-Schokolade.",
+      NL: "Frisse, intense zuurte — ambachtelijke truffels met limoen en premium chocolade.",
     },
-    images: [trufaImg1, trufaImg2, trufaFestImg],
+    images: [limaImg],
+  },
+  {
+    id: "trufas_caramelo_salgado",
+    price: 1500,
+    name: { PT: "Trufas de Caramelo Salgado", EN: "Salted Caramel Truffles", DE: "Gesalzene Karamelltrüffeln", NL: "Gezouten Karameltruffels" },
+    description: {
+      PT: "Doce e salgado em equilíbrio perfeito — trufas artesanais de caramelo com um toque de sal marinho.",
+      EN: "Sweet and salty in perfect balance — handmade caramel truffles with a touch of sea salt.",
+      DE: "Süß und salzig im perfekten Gleichgewicht — handgefertigte Karamelltrüffeln mit einer Prise Meersalz.",
+      NL: "Zoet en zout in perfecte balans — ambachtelijke karameltruffels met een vleugje zeezout.",
+    },
+    images: [carameloImg],
   },
   {
     id: "peras_bebedas",
