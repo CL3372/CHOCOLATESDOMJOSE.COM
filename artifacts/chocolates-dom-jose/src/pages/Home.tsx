@@ -15,7 +15,8 @@ import trufaImg2 from "@assets/F71F42C7-4094-48EA-BCED-9575AD4E41E8_1_105_c_1775
 import peraImg1 from "@assets/peras-bebedas-pro-1-web.jpg";
 import peraImg2 from "@assets/peras-bebedas-pro-2-web.jpg";
 import laranjaImg from "@assets/C5049C7D-4C50-4DC6-9FF1-35C328026F8A_1_105_c_1775497857994-web.jpg";
-import choc77Img from "@assets/C8C3450E-D74C-4028-8A60-556EA3DA337B_1_105_c_1775497898196-web.jpg";
+import choc77Pro1Img from "@assets/trufas-chocolate-77-pro-1-web.jpg";
+import choc77Pro2Img from "@assets/trufas-chocolate-77-pro-2-web.jpg";
 import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1775497921548-web.jpg";
 import piriImg1 from "@assets/dom-piri-piri-whole-jar-web.jpg";
 import benficaBoxImg from "@assets/benfica-truffle-box-web.jpg";
