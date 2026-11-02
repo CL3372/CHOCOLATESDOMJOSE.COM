@@ -3,7 +3,7 @@ import { useCart, type Lang } from "@/context/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import { detectLang, setLangInUrl } from "@/lib/lang";
 import { getActiveSeason, SEASONAL_GREETING } from "@/lib/seasonalGreeting";
-import logoSrc from "@assets/logo_bw_transparent.png";
+import trufaImg1 from "@assets/4601CB5C-1354-4ED9-A3C5-D566E3957B7B_1775497051986-web.jpg";
 // Product photos below are phone shots pending the professional Bombarral shoot.
 // When those land, swap the imports in place — ProductCard already renders any
 // source through a fixed object-cover frame, so new photos don't need matching dimensions.
