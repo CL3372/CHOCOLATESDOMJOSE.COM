@@ -454,7 +454,7 @@ const products: {
   },
   {
     id: "dom_piri_piri",
-    price: 700,
+    price: 500,
     name: { PT: "Dom Piri Piri", EN: "Dom Piri Piri", DE: "Dom Piri Piri", NL: "Dom Piri Piri" },
     description: {
       PT: "O picante do rei — um produto com personalidade forte e apresentação premium.",
