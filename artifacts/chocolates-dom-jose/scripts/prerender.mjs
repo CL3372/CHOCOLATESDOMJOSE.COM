@@ -84,94 +84,16 @@ const SITEMAP_PAGES = [
   },
 ];
 
-async function writeSitemap() {
-  const lastmod = new Date().toISOString().slice(0, 10);
-  const urls = SITEMAP_PAGES.map((page) => {
-    const alternates = Object.entries(page.alternates)
-      .map(([hreflang, href]) => `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${SITE}${href}" />`)
-      .join("\n");
-    return [
-      "  <url>",
-      `    <loc>${SITE}${page.loc}</loc>`,
-      alternates,
-      `    <lastmod>${lastmod}</lastmod>`,
-      `    <changefreq>${page.changefreq}</changefreq>`,
-      `    <priority>${page.priority}</priority>`,
-      "  </url>",
-    ].join("\n");
-  }).join("\n");
+  const MAX_ATTEMPTS = 3;
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`;
-
-  await writeFile(path.join(distDir, "sitemap.xml"), xml);
-  console.log(`prerender: sitemap.xml regenerated (lastmod ${lastmod})`);
-}
-
-function startServer() {
-  const server = createServer(async (req, res) => {
-    const urlPath = req.url.split("?")[0];
-    const filePath = path.join(distDir, urlPath);
-    const ext = path.extname(filePath);
-
+  async function renderRoute(route) {
+    // A fresh browser per route (not just a fresh context) because
+    // sparticuz's Chromium runs with --single-process --no-zygote (needed
+    // to launch at all in Vercel's restricted build container), and that
+    // mode does not reliably survive closing one context and opening the
+    // next — the whole process dies after the first context.close().
+    const browser = await chromium.launch(launchOptions);
     try {
-      if (ext && existsSync(filePath)) {
-        const data = await readFile(filePath);
-        res.writeHead(200, { "Content-Type": MIME[ext] ?? "application/octet-stream" });
-        res.end(data);
-        return;
-      }
-    } catch {
-      // fall through to SPA fallback below
-    }
-
-    // SPA fallback for build-time crawling only — production is served
-    // straight from the per-route files this script writes.
-    const indexHtml = await readFile(path.join(distDir, "index.html"));
-    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(indexHtml);
-  });
-
-  return new Promise((resolve) => {
-    server.listen(PORT, () => resolve(server));
-  });
-}
-
-async function main() {
-  if (!existsSync(distDir)) {
-    console.error(`prerender: ${distDir} does not exist — run vite build first`);
-    process.exit(1);
-  }
-
-  // Snapshot the plain, un-prerendered index.html (empty <div id="root">, as
-  // vite build just produced it) as app-shell.html before the loop below
-  // overwrites index.html with prerendered content. Routes that stay
-  // client-only (currently /checkout/success, /checkout/cancel — see
-  // vercel.json rewrites) point their fallback at this file instead of the
-  // prerendered index.html, so main.tsx calls createRoot() and renders that
-  // route fresh, instead of hydrateRoot() trying to reconcile the homepage's
-  // prerendered markup against a completely different component tree (a
-  // guaranteed hydration mismatch with a visible flash of homepage content).
-  await copyFile(path.join(distDir, "index.html"), path.join(distDir, "app-shell.html"));
-
-  const server = await startServer();
-  // Vercel's build container has no apt/root access, so a normal
-  // playwright-downloaded Chromium fails there with missing shared
-  // libraries (libnspr4.so etc). @sparticuz/chromium ships a Chromium
-  // build made for exactly this kind of restricted Linux environment, so
-  // it is used only when running on Vercel; local dev keeps the regular
-  // playwright-managed Chromium.
-  const launchOptions = process.env.VERCEL
-    ? { executablePath: await sparticuzChromium.executablePath(), args: sparticuzChromium.args }
-    : {};
-
-  try {
-    for (const route of ROUTES) {
-      // A fresh browser per route (not just a fresh context) because
-      // sparticuz's Chromium runs with --single-process --no-zygote (needed
-      // to launch at all in Vercel's restricted build container), and that
-      // mode does not reliably survive closing one context and opening the
-      // next — the whole process dies after the first context.close().
-      const browser = await chromium.launch(launchOptions);
       // locale "pt-PT" matches this site's default market so
       // detectLang()'s navigator.language fallback lands on Portuguese
       // instead of Chromium's default en-US.
@@ -188,13 +110,33 @@ async function main() {
       // Let the title/meta-sync useEffect settle after the selector appears.
       await page.waitForTimeout(150);
 
-      const html = await page.content();
+      return await page.content();
+    } finally {
+      await browser.close().catch(() => {});
+    }
+  }
+
+  try {
+    for (const route of ROUTES) {
+      let html = null;
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        try {
+          html = await renderRoute(route);
+          break;
+        } catch (err) {
+          console.warn(`prerender: attempt ${attempt}/${MAX_ATTEMPTS} failed for ${route.path}: ${err.message}`);
+          if (attempt === MAX_ATTEMPTS) {
+            console.error(`prerender: giving up on ${route.path} after ${MAX_ATTEMPTS} attempts — shipping this deploy without a prerendered snapshot of this route. Visitors are unaffected (the site still renders fully client-side); only the SEO/crawler snapshot for this route is stale until the next successful build.`);
+          }
+        }
+      }
+
+      if (html === null) continue;
+
       const outPath = path.join(distDir, route.out);
       await mkdir(path.dirname(outPath), { recursive: true });
       await writeFile(outPath, html);
       console.log(`prerender: ${route.path} -> ${route.out} (${(html.length / 1024).toFixed(0)}KB)`);
-
-      await browser.close();
     }
 
     await writeSitemap();
