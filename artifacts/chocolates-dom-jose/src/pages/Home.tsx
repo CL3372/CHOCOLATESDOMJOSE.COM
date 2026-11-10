@@ -328,7 +328,7 @@ const products: {
 }[] = [
     {
     id: "trufa_lima",
-    price: 1500,
+    price: 1200,
     name: { PT: "Trufas de Lima", EN: "Lime Truffles", DE: "Limettentrüffeln", NL: "Limoentruffels" },
     description: {
       PT: "Frescura ácida e intensa — trufas artesanais com lima e chocolate premium.",
@@ -340,7 +340,7 @@ const products: {
   },
   {
     id: "trufas_caramelo_salgado",
-    price: 1500,
+    price: 1200,
     name: { PT: "Trufas de Caramelo Salgado", EN: "Salted Caramel Truffles", DE: "Gesalzene Karamelltrüffeln", NL: "Gezouten Karameltruffels" },
     description: {
       PT: "Doce e salgado em equilíbrio perfeito — trufas artesanais de caramelo com um toque de sal marinho.",
@@ -413,7 +413,7 @@ const products: {
   },
   {
     id: "trufas_laranja",
-    price: 1500,
+    price: 1200,
     name: { PT: "Trufas de Laranja", EN: "Orange Truffles", DE: "Orangentrüffeln", NL: "Sinaasappeltruffels" },
     description: {
       PT: "Intensidade cítrica num interior cremoso — trufas artesanais com laranja fresca e chocolate premium.",
@@ -425,7 +425,7 @@ const products: {
   },
   {
     id: "trufas_chocolate_77",
-    price: 1500,
+    price: 1200,
     name: { PT: "Trufas de Chocolate 77%", EN: "77% Chocolate Truffles", DE: "Schokoladentrüffeln 77%", NL: "Chocoladetruffels 77%" },
     description: {
       PT: "Para os amantes do chocolate puro — trufas intensas com cacau 77%, elegantes e sofisticadas.",
@@ -437,7 +437,7 @@ const products: {
   },
   {
     id: "trufas_benfica",
-    price: 1500,
+    price: 1200,
     name: {
       PT: "Trufas Dom José — Edição Benfica",
       EN: "Dom José Truffles — Benfica Edition",
