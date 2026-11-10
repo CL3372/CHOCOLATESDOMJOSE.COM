@@ -84,6 +84,86 @@ const SITEMAP_PAGES = [
   },
 ];
 
+async function writeSitemap() {
+  const lastmod = new Date().toISOString().slice(0, 10);
+  const urls = SITEMAP_PAGES.map((page) => {
+    const alternates = Object.entries(page.alternates)
+      .map(([hreflang, href]) => `    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${SITE}${href}" />`)
+      .join("\n");
+    return [
+      "  <url>",
+      `    <loc>${SITE}${page.loc}</loc>`,
+      alternates,
+      `    <lastmod>${lastmod}</lastmod>`,
+      `    <changefreq>${page.changefreq}</changefreq>`,
+      `    <priority>${page.priority}</priority>`,
+      "  </url>",
+    ].join("\n");
+  }).join("\n");
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n        xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`;
+
+  await writeFile(path.join(distDir, "sitemap.xml"), xml);
+  console.log(`prerender: sitemap.xml regenerated (lastmod ${lastmod})`);
+}
+
+function startServer() {
+  const server = createServer(async (req, res) => {
+    const urlPath = req.url.split("?")[0];
+    const filePath = path.join(distDir, urlPath);
+    const ext = path.extname(filePath);
+
+    try {
+      if (ext && existsSync(filePath)) {
+        const data = await readFile(filePath);
+        res.writeHead(200, { "Content-Type": MIME[ext] ?? "application/octet-stream" });
+        res.end(data);
+        return;
+      }
+    } catch {
+      // fall through to SPA fallback below
+    }
+
+    // SPA fallback for build-time crawling only — production is served
+    // straight from the per-route files this script writes.
+    const indexHtml = await readFile(path.join(distDir, "index.html"));
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(indexHtml);
+  });
+
+  return new Promise((resolve) => {
+    server.listen(PORT, () => resolve(server));
+  });
+}
+
+async function main() {
+  if (!existsSync(distDir)) {
+    console.error(`prerender: ${distDir} does not exist — run vite build first`);
+    process.exit(1);
+  }
+
+  // Snapshot the plain, un-prerendered index.html (empty <div id="root">, as
+  // vite build just produced it) as app-shell.html before the loop below
+  // overwrites index.html with prerendered content. Routes that stay
+  // client-only (currently /checkout/success, /checkout/cancel — see
+  // vercel.json rewrites) point their fallback at this file instead of the
+  // prerendered index.html, so main.tsx calls createRoot() and renders that
+  // route fresh, instead of hydrateRoot() trying to reconcile the homepage's
+  // prerendered markup against a completely different component tree (a
+  // guaranteed hydration mismatch with a visible flash of homepage content).
+  await copyFile(path.join(distDir, "index.html"), path.join(distDir, "app-shell.html"));
+
+  const server = await startServer();
+  // Vercel's build container has no apt/root access, so a normal
+  // playwright-downloaded Chromium fails there with missing shared
+  // libraries (libnspr4.so etc). @sparticuz/chromium ships a Chromium
+  // build made for exactly this kind of restricted Linux environment, so
+  // it is used only when running on Vercel; local dev keeps the regular
+  // playwright-managed Chromium.
+  const launchOptions = process.env.VERCEL
+    ? { executablePath: await sparticuzChromium.executablePath(), args: sparticuzChromium.args }
+    : {};
+
   const MAX_ATTEMPTS = 3;
 
   async function renderRoute(route) {
