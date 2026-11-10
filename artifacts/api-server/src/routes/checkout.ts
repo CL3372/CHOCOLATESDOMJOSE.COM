@@ -20,13 +20,13 @@ const checkoutLimiter = rateLimit({
 });
 
 const PRODUCTS: Record<string, { name: string; price: number; weightGrams: number }> = {
-  trufa_lima: { name: "Trufas de Lima", price: 1500, weightGrams: 300 },
-  trufas_caramelo_salgado: { name: "Trufas de Caramelo Salgado", price: 1500, weightGrams: 300 },
-  trufas_laranja: { name: "Trufas de Laranja", price: 1500, weightGrams: 300 },
-  trufas_chocolate_77: { name: "Trufas de Chocolate 77%", price: 1500, weightGrams: 300 },
-  trufas_benfica: { name: "Trufas Dom José — Edição Benfica", price: 1500, weightGrams: 300 },
+  trufa_lima: { name: "Trufas de Lima", price: 1200, weightGrams: 300 },
+  trufas_caramelo_salgado: { name: "Trufas de Caramelo Salgado", price: 1200, weightGrams: 300 },
+  trufas_laranja: { name: "Trufas de Laranja", price: 1200, weightGrams: 300 },
+  trufas_chocolate_77: { name: "Trufas de Chocolate 77%", price: 1200, weightGrams: 300 },
+  trufas_benfica: { name: "Trufas Dom José — Edição Benfica", price: 1200, weightGrams: 300 },
   peras_bebedas: { name: "Pêras Bebedas", price: 700, weightGrams: 600 },
-  dom_piri_piri: { name: "Dom Piri Piri", price: 700, weightGrams: 200 },
+  dom_piri_piri: { name: "Dom Piri Piri", price: 500, weightGrams: 200 },
   // Cabazes vary by contents; billed at the 2kg cap (heaviest offered) so
   // shipping is never undercharged.
   cabazes: { name: "Cabazes", price: 3000, weightGrams: 2000 },
