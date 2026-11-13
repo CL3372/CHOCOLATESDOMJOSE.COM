@@ -328,7 +328,7 @@ const products: {
 }[] = [
     {
     id: "trufa_lima",
-    price: 1200,
+    price: 1450,
     name: { PT: "Trufas de Lima", EN: "Lime Truffles", DE: "Limettentrüffeln", NL: "Limoentruffels" },
       description: {
       PT: "Frescura ácida e intensa — trufas artesanais com lima e chocolate premium. Cada lata contém 10 trufas.",
@@ -340,7 +340,7 @@ const products: {
   },
   {
     id: "trufas_caramelo_salgado",
-    price: 1200,
+    price: 1450,
     name: { PT: "Trufas de Caramelo Salgado", EN: "Salted Caramel Truffles", DE: "Gesalzene Karamelltrüffeln", NL: "Gezouten Karameltruffels" },
        description: {
       PT: "Doce e salgado em equilíbrio perfeito — trufas artesanais de caramelo com um toque de sal marinho. Cada lata contém 10 trufas.",
@@ -352,7 +352,7 @@ const products: {
   },
   {
     id: "peras_bebedas",
-    price: 700,
+    price: 890,
     name: { PT: "Pêras Bebedas", EN: "Drunken Pears", DE: "Betrunkene Birnen", NL: "Dronken Peren" },
        description: {
       PT: "Pêras em frasco, sofisticadas e diferentes, ideais para cabazes e presentes gourmet. Confecionadas com vinho (álcool fervido); recomenda-se precaução a grávidas. Cada frasco contém 7 pêras.",
@@ -413,7 +413,7 @@ const products: {
   },
   {
     id: "trufas_laranja",
-    price: 1200,
+    price: 1450,
     name: { PT: "Trufas de Laranja", EN: "Orange Truffles", DE: "Orangentrüffeln", NL: "Sinaasappeltruffels" },
         description: {
       PT: "Intensidade cítrica num interior cremoso — trufas artesanais com laranja fresca e chocolate premium. Cada lata contém 10 trufas.",
@@ -425,7 +425,7 @@ const products: {
   },
   {
     id: "trufas_chocolate_77",
-    price: 1200,
+    price: 1450,
     name: { PT: "Trufas de Chocolate 77%", EN: "77% Chocolate Truffles", DE: "Schokoladentrüffeln 77%", NL: "Chocoladetruffels 77%" },
         description: {
       PT: "Para os amantes do chocolate puro — trufas intensas com cacau 77%, elegantes e sofisticadas. Cada lata contém 10 trufas.",
@@ -437,7 +437,7 @@ const products: {
   },
   {
     id: "trufas_benfica",
-    price: 1200,
+    price: 1450,
     name: {
       PT: "Trufas Dom José — Edição Benfica",
       EN: "Dom José Truffles — Benfica Edition",
@@ -454,7 +454,7 @@ const products: {
   },
   {
     id: "dom_piri_piri",
-    price: 500,
+    price: 580,
     name: { PT: "Dom Piri Piri", EN: "Dom Piri Piri", DE: "Dom Piri Piri", NL: "Dom Piri Piri" },
     description: {
       PT: "O picante do rei — um produto com personalidade forte e apresentação premium.",
