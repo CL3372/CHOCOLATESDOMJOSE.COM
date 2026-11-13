@@ -330,11 +330,11 @@ const products: {
     id: "trufa_lima",
     price: 1200,
     name: { PT: "Trufas de Lima", EN: "Lime Truffles", DE: "Limettentrüffeln", NL: "Limoentruffels" },
-    description: {
-      PT: "Frescura ácida e intensa — trufas artesanais com lima e chocolate premium.",
-      EN: "Sharp, zesty freshness — handmade truffles with lime and premium chocolate.",
-      DE: "Frische Säure und Intensität — handgefertigte Trüffeln mit Limette und Premium-Schokolade.",
-      NL: "Frisse, intense zuurte — ambachtelijke truffels met limoen en premium chocolade.",
+      description: {
+      PT: "Frescura ácida e intensa — trufas artesanais com lima e chocolate premium. Cada lata contém 10 trufas.",
+      EN: "Sharp, zesty freshness — handmade truffles with lime and premium chocolate. Each tin contains 10 truffles.",
+      DE: "Frische Säure und Intensität — handgefertigte Trüffeln mit Limette und Premium-Schokolade. Jede Dose enthält 10 Trüffel.",
+      NL: "Frisse, intense zuurte — ambachtelijke truffels met limoen en premium chocolade. Elk blikje bevat 10 truffels.",
     },
     images: [limaImg],
   },
@@ -342,11 +342,11 @@ const products: {
     id: "trufas_caramelo_salgado",
     price: 1200,
     name: { PT: "Trufas de Caramelo Salgado", EN: "Salted Caramel Truffles", DE: "Gesalzene Karamelltrüffeln", NL: "Gezouten Karameltruffels" },
-    description: {
-      PT: "Doce e salgado em equilíbrio perfeito — trufas artesanais de caramelo com um toque de sal marinho.",
-      EN: "Sweet and salty in perfect balance — handmade caramel truffles with a touch of sea salt.",
-      DE: "Süß und salzig im perfekten Gleichgewicht — handgefertigte Karamelltrüffeln mit einer Prise Meersalz.",
-      NL: "Zoet en zout in perfecte balans — ambachtelijke karameltruffels met een vleugje zeezout.",
+       description: {
+      PT: "Doce e salgado em equilíbrio perfeito — trufas artesanais de caramelo com um toque de sal marinho. Cada lata contém 10 trufas.",
+      EN: "Sweet and salty in perfect balance — handmade caramel truffles with a touch of sea salt. Each tin contains 10 truffles.",
+      DE: "Süß und salzig im perfekten Gleichgewicht — handgefertigte Karamelltrüffeln mit einer Prise Meersalz. Jede Dose enthält 10 Trüffel.",
+      NL: "Zoet en zout in perfecte balans — ambachtelijke karameltruffels met een vleugje zeezout. Elk blikje bevat 10 truffels.",
     },
     images: [carameloImg],
   },
@@ -354,11 +354,11 @@ const products: {
     id: "peras_bebedas",
     price: 700,
     name: { PT: "Pêras Bebedas", EN: "Drunken Pears", DE: "Betrunkene Birnen", NL: "Dronken Peren" },
-    description: {
-      PT: "Pêras em frasco, sofisticadas e diferentes, ideais para cabazes e presentes gourmet. Confecionadas com vinho (álcool fervido); recomenda-se precaução a grávidas.",
-      EN: "Jarred pears, sophisticated and unique, ideal for hampers and gourmet gifts. Cooked with wine (alcohol boiled off); caution advised for pregnant women.",
-      DE: "Birnen im Glas, anspruchsvoll und einzigartig, ideal für Körbe und Gourmet-Geschenke. Mit Wein zubereitet (Alkohol verdampft); Schwangeren wird Vorsicht empfohlen.",
-      NL: "Peren in pot, verfijnd en uniek, ideaal voor manden en gourmetcadeaus. Bereid met wijn (alcohol weggekookt); voorzichtigheid aangeraden voor zwangere vrouwen.",
+       description: {
+      PT: "Pêras em frasco, sofisticadas e diferentes, ideais para cabazes e presentes gourmet. Confecionadas com vinho (álcool fervido); recomenda-se precaução a grávidas. Cada frasco contém 7 pêras.",
+      EN: "Jarred pears, sophisticated and unique, ideal for hampers and gourmet gifts. Cooked with wine (alcohol boiled off); caution advised for pregnant women. Each jar contains 7 pears.",
+      DE: "Birnen im Glas, anspruchsvoll und einzigartig, ideal für Körbe und Gourmet-Geschenke. Mit Wein zubereitet (Alkohol verdampft); Schwangeren wird Vorsicht empfohlen. Jedes Glas enthält 7 Birnen.",
+      NL: "Peren in pot, verfijnd en uniek, ideaal voor manden en gourmetcadeaus. Bereid met wijn (alcohol weggekookt); voorzichtigheid aangeraden voor zwangere vrouwen. Elke pot bevat 7 peren.",
     },
     // Professional Bombarral shoot (Oct 2026) — replaced the phone shots. Still just 2
     // images (no region-seal/promo-graphic variants) to keep the EN/DE/NL carousel
@@ -415,11 +415,11 @@ const products: {
     id: "trufas_laranja",
     price: 1200,
     name: { PT: "Trufas de Laranja", EN: "Orange Truffles", DE: "Orangentrüffeln", NL: "Sinaasappeltruffels" },
-    description: {
-      PT: "Intensidade cítrica num interior cremoso — trufas artesanais com laranja fresca e chocolate premium.",
-      EN: "Citrus intensity in a creamy centre — handmade truffles with fresh orange and premium chocolate.",
-      DE: "Zitrusintensität in einem cremigen Kern — handgefertigte Trüffeln mit frischer Orange und Premium-Schokolade.",
-      NL: "Citrusintensiteit in een romig hart — ambachtelijke truffels met verse sinaasappel en premium chocolade.",
+        description: {
+      PT: "Intensidade cítrica num interior cremoso — trufas artesanais com laranja fresca e chocolate premium. Cada lata contém 10 trufas.",
+      EN: "Citrus intensity in a creamy centre — handmade truffles with fresh orange and premium chocolate. Each tin contains 10 truffles.",
+      DE: "Zitrusintensität in einem cremigen Kern — handgefertigte Trüffeln mit frischer Orange und Premium-Schokolade. Jede Dose enthält 10 Trüffel.",
+      NL: "Citrusintensiteit in een romig hart — ambachtelijke truffels met verse sinaasappel en premium chocolade. Elk blikje bevat 10 truffels.",
     },
        images: [laranjaProImg, laranjaImg],
   },
@@ -427,11 +427,11 @@ const products: {
     id: "trufas_chocolate_77",
     price: 1200,
     name: { PT: "Trufas de Chocolate 77%", EN: "77% Chocolate Truffles", DE: "Schokoladentrüffeln 77%", NL: "Chocoladetruffels 77%" },
-    description: {
-      PT: "Para os amantes do chocolate puro — trufas intensas com cacau 77%, elegantes e sofisticadas.",
-      EN: "For pure chocolate lovers — intense truffles with 77% cacao, elegant and sophisticated.",
-      DE: "Für reine Schokoladenliebhaber — intensive Trüffeln mit 77% Kakao, elegant und raffiniert.",
-      NL: "Voor liefhebbers van pure chocolade — intense truffels met 77% cacao, elegant en verfijnd.",
+        description: {
+      PT: "Para os amantes do chocolate puro — trufas intensas com cacau 77%, elegantes e sofisticadas. Cada lata contém 10 trufas.",
+      EN: "For pure chocolate lovers — intense truffles with 77% cacao, elegant and sophisticated. Each tin contains 10 truffles.",
+      DE: "Für reine Schokoladenliebhaber — intensive Trüffeln mit 77% Kakao, elegant und raffiniert. Jede Dose enthält 10 Trüffel.",
+      NL: "Voor liefhebbers van pure chocolade — intense truffels met 77% cacao, elegant en verfijnd. Elk blikje bevat 10 truffels.",
     },
              images: [choc77Pro1Img, choc77Img, choc77Pro2Img],
   },
@@ -444,11 +444,11 @@ const products: {
       DE: "Dom José Trüffeln — Benfica Edition",
       NL: "Dom José Truffels — Benfica Editie",
     },
-    description: {
-      PT: "Edição especial Benfica — uma seleção das nossas trufas artesanais, numa caixa coleccionável para oferecer a um benfiquista.",
-      EN: "Special Benfica-themed edition — a selection of our handmade truffles, in a collectible box, perfect as a gift for a Benfica fan.",
-      DE: "Spezielle Benfica-Edition — eine Auswahl unserer handgefertigten Trüffeln in einer Sammlerbox, ideal als Geschenk für Benfica-Fans.",
-      NL: "Speciale Benfica-editie — een selectie van onze ambachtelijke truffels in een verzameldoos, perfect als cadeau voor een Benfica-fan.",
+        description: {
+      PT: "Edição especial Benfica — uma seleção das nossas trufas artesanais, numa caixa coleccionável para oferecer a um benfiquista. Cada caixa contém 10 trufas.",
+      EN: "Special Benfica-themed edition — a selection of our handmade truffles, in a collectible box, perfect as a gift for a Benfica fan. Each box contains 10 truffles.",
+      DE: "Spezielle Benfica-Edition — eine Auswahl unserer handgefertigten Trüffeln in einer Sammlerbox, ideal als Geschenk für Benfica-Fans. Jede Box enthält 10 Trüffel.",
+      NL: "Speciale Benfica-editie — een selectie van onze ambachtelijke truffels in een verzameldoos, perfect als cadeau voor een Benfica-fan. Elke doos bevat 10 truffels.",
     },
     images: [benficaBoxImg],
   },
