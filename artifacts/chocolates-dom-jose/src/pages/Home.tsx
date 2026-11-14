@@ -326,16 +326,59 @@ const products: {
   award?: { badge: string; quote: string };
   info?: ProductInfo;
 }[] = [
-    {
-    id: "trufa_lima",
+      {
+    id: "trufas_laranja",
     price: 1450,
-    name: { PT: "Trufas de Lima", EN: "Lime Truffles", DE: "Limettentrüffeln", NL: "Limoentruffels" },
-      description: {
-      PT: "Frescura ácida e intensa — trufas artesanais com lima e chocolate premium. Cada lata contém 10 trufas.",
-      EN: "Sharp, zesty freshness — handmade truffles with lime and premium chocolate. Each tin contains 10 truffles.",
-      DE: "Frische Säure und Intensität — handgefertigte Trüffeln mit Limette und Premium-Schokolade. Jede Dose enthält 10 Trüffel.",
-      NL: "Frisse, intense zuurte — ambachtelijke truffels met limoen en premium chocolade. Elk blikje bevat 10 truffels.",
+    name: { PT: "Trufas de Laranja", EN: "Orange Truffles", DE: "Orangentrüffeln", NL: "Sinaasappeltruffels" },
+    description: {
+      PT: "Intensidade cítrica num interior cremoso — trufas artesanais com laranja fresca e chocolate premium. Cada lata contém 10 trufas.",
+      EN: "Citrus intensity in a creamy centre — handmade truffles with fresh orange and premium chocolate. Each tin contains 10 truffles.",
+      DE: "Zitrusintensität in einem cremigen Kern — handgefertigte Trüffeln mit frischer Orange und Premium-Schokolade. Jede Dose enthält 10 Trüffel.",
+      NL: "Citrusintensiteit in een romig hart — ambachtelijke truffels met verse sinaasappel en premium chocolade. Elk blikje bevat 10 truffels.",
     },
+    images: [laranjaProImg, laranjaImg],
+    // Values match the SGS Multilab test report PT26-81329.001 (issued 2026-11-13) for the
+    // finished product, plus the two component ingredient specs Carla supplied. Update both
+    // together at the next reprint or re-test.
+    info: {
+      legalName: {
+        PT: "Trufas de chocolate negro com recheio de ganache de laranja",
+        EN: "Chocolate orange truffle with orange ganache filling",
+        DE: "Zartbitter-Schokoladentrüffel mit Orangen-Ganache-Füllung",
+        NL: "Pure chocoladetruffel met sinaasappelganache-vulling",
+      },
+      quantity: "200 g",
+      ingredients: {
+        PT: "Açúcar, massa de cacau, manteiga de cacau, leite em pó integral, raspa de laranja (97%), óleo essencial de laranja, aroma natural de laranja, aroma natural de baunilha, emulsionante (lecitina de soja), corante (E160e).",
+        EN: "Sugar, cocoa mass, cocoa butter, whole milk powder, orange peel (97%), orange oil, natural orange flavouring, natural vanilla flavouring, emulsifier (soy lecithin), colouring (E160e).",
+        DE: "Zucker, Kakaomasse, Kakaobutter, Vollmilchpulver, Orangenschale (97%), Orangenöl, natürliches Orangenaroma, natürliches Vanillearoma, Emulgator (Sojalecithin), Farbstoff (E160e).",
+        NL: "Suiker, cacaomassa, cacaoboter, volle melkpoeder, sinaasappelschil (97%), sinaasappelolie, natuurlijk sinaasappelaroma, natuurlijk vanillearoma, emulgator (sojalecithine), kleurstof (E160e).",
+      },
+      allergens: {
+        PT: "Contém leite e soja.",
+        EN: "Contains milk and soya.",
+        DE: "Enthält Milch und Soja.",
+        NL: "Bevat melk en soja.",
+      },
+      nutritionBasis: { PT: "por 100 g", EN: "per 100 g", DE: "pro 100 g", NL: "per 100 g" },
+      nutrition: [
+        { label: { PT: "Energia", EN: "Energy", DE: "Brennwert", NL: "Energie" }, value: "1900 kJ / 450 kcal" },
+        { label: { PT: "Lípidos", EN: "Fat", DE: "Fett", NL: "Vetten" }, value: "27,1 g" },
+        { label: { PT: "dos quais saturados", EN: "of which saturates", DE: "davon gesättigte Fettsäuren", NL: "waarvan verzadigde vetzuren" }, value: "19,2 g" },
+        { label: { PT: "Hidratos de carbono", EN: "Carbohydrate", DE: "Kohlenhydrate", NL: "Koolhydraten" }, value: "45 g" },
+        { label: { PT: "dos quais açúcares", EN: "of which sugars", DE: "davon Zucker", NL: "waarvan suikers" }, value: "42,6 g" },
+        { label: { PT: "Fibra", EN: "Fibre", DE: "Ballaststoffe", NL: "Vezels" }, value: "3,1 g" },
+        { label: { PT: "Proteínas", EN: "Protein", DE: "Eiweiß", NL: "Eiwitten" }, value: "4,6 g" },
+        { label: { PT: "Sal", EN: "Salt", DE: "Salz", NL: "Zout" }, value: "0,07 g" },
+      ],
+      storage: {
+        PT: "Conservar em local fresco e seco, ao abrigo da luz solar direta. Consumir de preferência dentro de 3 meses.",
+        EN: "Store in a cool, dry place, away from direct sunlight. Best consumed within 3 months.",
+        DE: "Kühl und trocken, vor direkter Sonneneinstrahlung geschützt lagern. Innerhalb von 3 Monaten verzehren.",
+        NL: "Koel en droog bewaren, uit direct zonlicht. Bij voorkeur binnen 3 maanden consumeren.",
+      },
+    },
+  },
     images: [limaImg],
   },
   {
