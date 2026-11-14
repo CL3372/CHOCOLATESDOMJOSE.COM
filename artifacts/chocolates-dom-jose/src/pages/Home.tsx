@@ -326,7 +326,7 @@ const products: {
   award?: { badge: string; quote: string };
   info?: ProductInfo;
 }[] = [
-      {
+          {
     id: "trufa_lima",
     price: 1450,
     name: { PT: "Trufas de Lima", EN: "Lime Truffles", DE: "Limettentrüffeln", NL: "Limoentruffels" },
@@ -337,6 +337,46 @@ const products: {
       NL: "Frisse, intense zuurte — ambachtelijke truffels met limoen en premium chocolade. Elk blikje bevat 10 truffels.",
     },
     images: [limaImg],
+    // Values match Carla's "Ficha Técnica – Trufas de Lima Limão" (2026-10-18) and the SGS
+    // Multilab test report PT26-81328.001 (issued 2026-11-13, lot TL19102026).
+    info: {
+      legalName: {
+        PT: "Bombom de chocolate negro com recheio de ganache de chocolate de limão e lima, polvilhado com cacau",
+        EN: "Dark chocolate bonbon filled with lemon-lime chocolate ganache, dusted with cocoa",
+        DE: "Zartbitter-Schokoladenpraline mit Zitronen-Limetten-Ganache-Füllung, mit Kakao bestäubt",
+        NL: "Pure chocoladebonbon gevuld met citroen-limoenchocoladeganache, bestoven met cacao",
+      },
+      quantity: "100 g",
+      ingredients: {
+        PT: "Chocolate de limão 40% (açúcar, manteiga de cacau, leite em pó gordo, emulsionante: lecitina de soja, aroma natural de limão, corantes: E132, E100, aroma natural de baunilha), preparação vegetal 33% (água, proteína de lentilha, gordura de palma, óleo de colza, açúcar, amido de milho modificado, emulsionantes: E322, E473, E471, estabilizadores: E412, E410, aromas naturais, sal, corante: E160a), chocolate negro 18% (açúcar, massa de cacau, manteiga de cacau, aroma natural de baunilha, emulsionante: lecitina de soja), sumo de lima 8%, cacau magro em pó, aroma.",
+        EN: "Lemon chocolate 40% (sugar, cocoa butter, full-fat milk powder, emulsifier: soy lecithin, natural lemon flavouring, colours: E132, E100, natural vanilla flavouring), vegetable whipping preparation 33% (water, lentil protein, palm fat, rapeseed oil, sugar, modified corn starch, emulsifiers: E322, E473, E471, stabilisers: E412, E410, natural flavourings, salt, colour: E160a), dark chocolate 18% (sugar, cocoa mass, cocoa butter, natural vanilla flavouring, emulsifier: soy lecithin), fresh lime juice 8%, low-fat cocoa powder, flavouring.",
+        DE: "Zitronenschokolade 40% (Zucker, Kakaobutter, Vollmilchpulver, Emulgator: Sojalecithin, natürliches Zitronenaroma, Farbstoffe: E132, E100, natürliches Vanillearoma), pflanzliche Schlagzubereitung 33% (Wasser, Linsenprotein, Palmfett, Rapsöl, Zucker, modifizierte Maisstärke, Emulgatoren: E322, E473, E471, Stabilisatoren: E412, E410, natürliche Aromen, Salz, Farbstoff: E160a), Zartbitterschokolade 18% (Zucker, Kakaomasse, Kakaobutter, natürliches Vanillearoma, Emulgator: Sojalecithin), frischer Limettensaft 8%, fettarmes Kakaopulver, Aroma.",
+        NL: "Citroenchocolade 40% (suiker, cacaoboter, volle melkpoeder, emulgator: sojalecithine, natuurlijk citroenaroma, kleurstoffen: E132, E100, natuurlijk vanillearoma), plantaardige kloppreparaat 33% (water, linze-eiwit, palmvet, koolzaadolie, suiker, gemodificeerd maiszetmeel, emulgatoren: E322, E473, E471, stabilisatoren: E412, E410, natuurlijke aroma's, zout, kleurstof: E160a), pure chocolade 18% (suiker, cacaomassa, cacaoboter, natuurlijk vanillearoma, emulgator: sojalecithine), vers limoensap 8%, magere cacaopoeder, aroma.",
+      },
+      allergens: {
+        PT: "Contém leite e soja. Pode conter vestígios de frutos de casca rija, amendoins, ovo e glúten. Adequado a vegetarianos; não adequado a veganos (contém leite em pó).",
+        EN: "Contains milk and soya. May contain traces of tree nuts, peanuts, egg and gluten. Suitable for vegetarians; not suitable for vegans (contains milk powder).",
+        DE: "Enthält Milch und Soja. Kann Spuren von Schalenfrüchten, Erdnüssen, Ei und Gluten enthalten. Für Vegetarier geeignet; für Veganer nicht geeignet (enthält Milchpulver).",
+        NL: "Bevat melk en soja. Kan sporen bevatten van noten, pinda's, ei en gluten. Geschikt voor vegetariërs; niet geschikt voor veganisten (bevat melkpoeder).",
+      },
+      nutritionBasis: { PT: "por 100 g", EN: "per 100 g", DE: "pro 100 g", NL: "per 100 g" },
+      nutrition: [
+        { label: { PT: "Energia", EN: "Energy", DE: "Brennwert", NL: "Energie" }, value: "1942 kJ / 467 kcal" },
+        { label: { PT: "Lípidos", EN: "Fat", DE: "Fett", NL: "Vetten" }, value: "31 g" },
+        { label: { PT: "dos quais saturados", EN: "of which saturates", DE: "davon gesättigte Fettsäuren", NL: "waarvan verzadigde vetzuren" }, value: "22 g" },
+        { label: { PT: "Hidratos de carbono", EN: "Carbohydrate", DE: "Kohlenhydrate", NL: "Koolhydraten" }, value: "40 g" },
+        { label: { PT: "dos quais açúcares", EN: "of which sugars", DE: "davon Zucker", NL: "waarvan suikers" }, value: "36 g" },
+        { label: { PT: "Fibra", EN: "Fibre", DE: "Ballaststoffe", NL: "Vezels" }, value: "3,5 g" },
+        { label: { PT: "Proteínas", EN: "Protein", DE: "Eiweiß", NL: "Eiwitten" }, value: "4,7 g" },
+        { label: { PT: "Sal", EN: "Salt", DE: "Salz", NL: "Zout" }, value: "0,08 g" },
+      ],
+      storage: {
+        PT: "Conservar em local fresco e seco, ao abrigo da luz, entre 12°C e 18°C. Após aberta, manter fechada em local fresco e consumir em 7 dias. Consumir de preferência dentro de 5 meses a partir da produção.",
+        EN: "Store in a cool, dry place, away from light, between 12°C and 18°C. Once opened, keep closed in a cool place and consume within 7 days. Best consumed within 5 months of production.",
+        DE: "Kühl und trocken, vor Licht geschützt, zwischen 12°C und 18°C lagern. Nach dem Öffnen geschlossen an einem kühlen Ort aufbewahren und innerhalb von 7 Tagen verzehren. Am besten innerhalb von 5 Monaten nach der Herstellung verzehren.",
+        NL: "Koel en droog bewaren, beschermd tegen licht, tussen 12°C en 18°C. Na opening gesloten op een koele plaats bewaren en binnen 7 dagen consumeren. Bij voorkeur binnen 5 maanden na productie consumeren.",
+      },
+    },
   },
   {
     id: "trufas_caramelo_salgado",
