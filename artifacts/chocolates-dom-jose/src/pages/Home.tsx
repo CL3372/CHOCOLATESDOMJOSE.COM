@@ -346,7 +346,7 @@ const products: {
         DE: "Zartbitter-Schokoladenpraline mit Zitronen-Limetten-Ganache-Füllung, mit Kakao bestäubt",
         NL: "Pure chocoladebonbon gevuld met citroen-limoenchocoladeganache, bestoven met cacao",
       },
-      quantity: "100 g",
+      quantity: "150 g",
       ingredients: {
         PT: "Chocolate de limão 40% (açúcar, manteiga de cacau, leite em pó gordo, emulsionante: lecitina de soja, aroma natural de limão, corantes: E132, E100, aroma natural de baunilha), preparação vegetal 33% (água, proteína de lentilha, gordura de palma, óleo de colza, açúcar, amido de milho modificado, emulsionantes: E322, E473, E471, estabilizadores: E412, E410, aromas naturais, sal, corante: E160a), chocolate negro 18% (açúcar, massa de cacau, manteiga de cacau, aroma natural de baunilha, emulsionante: lecitina de soja), sumo de lima 8%, cacau magro em pó, aroma.",
         EN: "Lemon chocolate 40% (sugar, cocoa butter, full-fat milk powder, emulsifier: soy lecithin, natural lemon flavouring, colours: E132, E100, natural vanilla flavouring), vegetable whipping preparation 33% (water, lentil protein, palm fat, rapeseed oil, sugar, modified corn starch, emulsifiers: E322, E473, E471, stabilisers: E412, E410, natural flavourings, salt, colour: E160a), dark chocolate 18% (sugar, cocoa mass, cocoa butter, natural vanilla flavouring, emulsifier: soy lecithin), fresh lime juice 8%, low-fat cocoa powder, flavouring.",
@@ -371,10 +371,10 @@ const products: {
         { label: { PT: "Sal", EN: "Salt", DE: "Salz", NL: "Zout" }, value: "0,08 g" },
       ],
       storage: {
-        PT: "Conservar em local fresco e seco, ao abrigo da luz, entre 12°C e 18°C. Após aberta, manter fechada em local fresco e consumir em 7 dias. Consumir de preferência dentro de 5 meses a partir da produção.",
-        EN: "Store in a cool, dry place, away from light, between 12°C and 18°C. Once opened, keep closed in a cool place and consume within 7 days. Best consumed within 5 months of production.",
-        DE: "Kühl und trocken, vor Licht geschützt, zwischen 12°C und 18°C lagern. Nach dem Öffnen geschlossen an einem kühlen Ort aufbewahren und innerhalb von 7 Tagen verzehren. Am besten innerhalb von 5 Monaten nach der Herstellung verzehren.",
-        NL: "Koel en droog bewaren, beschermd tegen licht, tussen 12°C en 18°C. Na opening gesloten op een koele plaats bewaren en binnen 7 dagen consumeren. Bij voorkeur binnen 5 maanden na productie consumeren.",
+        PT: "Conservar em local fresco e seco, ao abrigo da luz, entre 12°C e 18°C. Após aberta, manter fechada em local fresco e consumir em 7 dias. Consumir de preferência dentro de 3 meses a partir da produção.",
+        EN: "Store in a cool, dry place, away from light, between 12°C and 18°C. Once opened, keep closed in a cool place and consume within 7 days. Best consumed within 3 months of production.",
+        DE: "Kühl und trocken, vor Licht geschützt, zwischen 12°C und 18°C lagern. Nach dem Öffnen geschlossen an einem kühlen Ort aufbewahren und innerhalb von 7 Tagen verzehren. Am besten innerhalb von 3 Monaten nach der Herstellung verzehren.",
+        NL: "Koel en droog bewaren, beschermd tegen licht, tussen 12°C en 18°C. Na opening gesloten op een koele plaats bewaren en binnen 7 dagen consumeren. Bij voorkeur binnen 3 maanden na productie consumeren.",
       },
     },
   },
@@ -463,7 +463,7 @@ const products: {
         DE: "Zartbitter-Schokoladentrüffel mit Orangen-Ganache-Füllung",
         NL: "Pure chocoladetruffel met sinaasappelganache-vulling",
       },
-      quantity: "200 g",
+      quantity: "150 g",
       ingredients: {
         PT: "Açúcar, massa de cacau, manteiga de cacau, leite em pó integral, raspa de laranja (97%), óleo essencial de laranja, aroma natural de laranja, aroma natural de baunilha, emulsionante (lecitina de soja), corante (E160e).",
         EN: "Sugar, cocoa mass, cocoa butter, whole milk powder, orange peel (97%), orange oil, natural orange flavouring, natural vanilla flavouring, emulsifier (soy lecithin), colouring (E160e).",
