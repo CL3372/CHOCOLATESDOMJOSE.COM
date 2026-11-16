@@ -597,10 +597,11 @@ const products: {
       EN: "Salted caramel almonds, our award-winning Perinhas Bêbedas (drunken pears) and a tin of handmade truffles, in an elegant ribboned Christmas bag. Contains tree nuts, milk, soya and alcohol (boiled wine); caution advised for pregnant women.",
       DE: "Karamellmandeln mit Fleur de Sel, unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen) und eine Dose handgefertigter Trüffel, in einer eleganten Weihnachtstüte mit Schleife. Enthält Schalenfrüchte, Milch, Soja und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
       NL: "Gekarameliseerde amandelen met fleur de sel, onze bekroonde Perinhas Bêbedas (dronken peren) en een blikje ambachtelijke truffels, in een elegante kerstzak met strik. Bevat noten, melk, soja en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
-    images: [cabazClassicoImg],
-  },
-  {
-    id: "cabaz_natal_premium",
+   },
+   images: [cabazClassicoImg],
+},
+{
+  id: "cabaz_natal_premium",
     price: 3500,
     name: { PT: "Cabaz Natal Premium", EN: "Premium Christmas Hamper", DE: "Premium-Weihnachtskorb", NL: "Premium Kerstmand" },
     description: {
@@ -608,7 +609,10 @@ const products: {
       EN: "Our most complete hamper — Dom Piri Piri, salted caramel almonds, our award-winning Perinhas Bêbedas (drunken pears) and a tin of handmade truffles, in a ribboned red gift box, ready to give. Contains tree nuts, milk, soya and alcohol (boiled wine); caution advised for pregnant women.",
       DE: "Unser umfangreichster Geschenkkorb — Dom Piri Piri, Karamellmandeln mit Fleur de Sel, unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen) und eine Dose handgefertigter Trüffel, in einer roten Geschenkbox mit Schleife, verschenkfertig. Enthält Schalenfrüchte, Milch, Soja und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
       NL: "Onze meest complete cadeaumand — Dom Piri Piri, gekarameliseerde amandelen met fleur de sel, onze bekroonde Perinhas Bêbedas (dronken peren) en een blikje ambachtelijke truffels, in een rode cadeaudoos met strik, klaar om te geven. Bevat noten, melk, soja en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
- ];
+    },
+    images: [cabazPremiumImg],
+  },
+];
 
 function FadeIn({ children, className = "", delay = 0, scale = false }: { children: ReactNode; className?: string; delay?: number; scale?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
