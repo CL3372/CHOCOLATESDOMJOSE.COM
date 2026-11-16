@@ -32,6 +32,7 @@ const PRODUCTS: Record<string, { name: string; price: number; weightGrams: numbe
   cabaz_natal_mini: { name: "Cabaz Natal Mini", price: 1250, weightGrams: 800 },
   cabaz_natal_classico: { name: "Cabaz Natal Clássico", price: 1700, weightGrams: 1000 },
   cabaz_natal_premium: { name: "Cabaz Natal Premium", price: 3500, weightGrams: 1300 },
+};
 
 // PostLog/GLS rates (24h-48h service). Tiers are "up to N grams". PT carries a
 // flat +€1.50 markup and is free above €100 subtotal; international (the
