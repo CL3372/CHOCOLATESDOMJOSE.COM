@@ -581,10 +581,10 @@ const products: {
     price: 1250,
     name: { PT: "Cabaz Natal Mini", EN: "Mini Christmas Hamper", DE: "Mini-Weihnachtskorb", NL: "Mini Kerstmand" },
     description: {
-      PT: "Frutos secos caramelizados e as nossas premiadas Perinhas Bêbedas, numa caixa de Natal compacta — o presente perfeito para um gesto simples e genuíno. Contém frutos de casca rija e álcool (vinho fervido); recomenda-se precaução a grávidas.",
-      EN: "Candied nuts and our award-winning Perinhas Bêbedas (drunken pears), in a compact Christmas box — the perfect gift for a simple, genuine gesture. Contains tree nuts and alcohol (boiled wine); caution advised for pregnant women.",
-      DE: "Karamellisierte Nüsse und unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen), in einer kompakten Weihnachtsbox — das perfekte Geschenk für eine einfache, aufrichtige Geste. Enthält Schalenfrüchte und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
-      NL: "Gekarameliseerde noten en onze bekroonde Perinhas Bêbedas (dronken peren), in een compacte kerstdoos — het perfecte cadeau voor een eenvoudig, oprecht gebaar. Bevat noten en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
+      PT: "Amêndoas de Caramelo com Flor de Sal e as nossas premiadas Perinhas Bêbedas, numa caixa de Natal compacta — o presente perfeito para um gesto simples e genuíno. Contém frutos de casca rija e álcool (vinho fervido); recomenda-se precaução a grávidas.",
+      EN: "Salted caramel almonds and our award-winning Perinhas Bêbedas (drunken pears), in a compact Christmas box — the perfect gift for a simple, genuine gesture. Contains tree nuts and alcohol (boiled wine); caution advised for pregnant women.",
+      DE: "Karamellmandeln mit Fleur de Sel und unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen), in einer kompakten Weihnachtsbox — das perfekte Geschenk für eine einfache, aufrichtige Geste. Enthält Schalenfrüchte und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
+      NL: "Gekarameliseerde amandelen met fleur de sel en onze bekroonde Perinhas Bêbedas (dronken peren), in een compacte kerstdoos — het perfecte cadeau voor een eenvoudig, oprecht gebaar. Bevat noten en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
     },
     images: [cabazMiniImg],
   },
@@ -593,11 +593,10 @@ const products: {
     price: 1700,
     name: { PT: "Cabaz Natal Clássico", EN: "Classic Christmas Hamper", DE: "Klassischer Weihnachtskorb", NL: "Klassieke Kerstmand" },
     description: {
-      PT: "Frutos secos caramelizados, as nossas premiadas Perinhas Bêbedas e uma lata de trufas artesanais, numa elegante embalagem de Natal com laço. Contém frutos de casca rija, leite, soja e álcool (vinho fervido); recomenda-se precaução a grávidas.",
-      EN: "Candied nuts, our award-winning Perinhas Bêbedas (drunken pears) and a tin of handmade truffles, in an elegant ribboned Christmas bag. Contains tree nuts, milk, soya and alcohol (boiled wine); caution advised for pregnant women.",
-      DE: "Karamellisierte Nüsse, unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen) und eine Dose handgefertigter Trüffel, in einer eleganten Weihnachtstüte mit Schleife. Enthält Schalenfrüchte, Milch, Soja und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
-      NL: "Gekarameliseerde noten, onze bekroonde Perinhas Bêbedas (dronken peren) en een blikje ambachtelijke truffels, in een elegante kerstzak met strik. Bevat noten, melk, soja en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
-    },
+      PT: "Amêndoas de Caramelo com Flor de Sal e as nossas premiadas Perinhas Bêbedas, numa caixa de Natal compacta — o presente perfeito para um gesto simples e genuíno. Contém frutos de casca rija e álcool (vinho fervido); recomenda-se precaução a grávidas.",
+      EN: "Salted caramel almonds and our award-winning Perinhas Bêbedas (drunken pears), in a compact Christmas box — the perfect gift for a simple, genuine gesture. Contains tree nuts and alcohol (boiled wine); caution advised for pregnant women.",
+      DE: "Karamellmandeln mit Fleur de Sel und unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen), in einer kompakten Weihnachtsbox — das perfekte Geschenk für eine einfache, aufrichtige Geste. Enthält Schalenfrüchte und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
+      NL: "Gekarameliseerde amandelen met fleur de sel en onze bekroonde Perinhas Bêbedas (dronken peren), in een compacte kerstdoos — het perfecte cadeau voor een eenvoudig, oprecht gebaar. Bevat noten en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
     images: [cabazClassicoImg],
   },
   {
@@ -605,13 +604,10 @@ const products: {
     price: 3500,
     name: { PT: "Cabaz Natal Premium", EN: "Premium Christmas Hamper", DE: "Premium-Weihnachtskorb", NL: "Premium Kerstmand" },
     description: {
-      PT: "O nosso cabaz mais completo — Dom Piri Piri, frutos secos caramelizados, as nossas premiadas Perinhas Bêbedas e uma lata de trufas artesanais, numa caixa vermelha com laço, pronta a oferecer. Contém frutos de casca rija, leite, soja e álcool (vinho fervido); recomenda-se precaução a grávidas.",
-      EN: "Our most complete hamper — Dom Piri Piri, candied nuts, our award-winning Perinhas Bêbedas (drunken pears) and a tin of handmade truffles, in a ribboned red gift box, ready to give. Contains tree nuts, milk, soya and alcohol (boiled wine); caution advised for pregnant women.",
-      DE: "Unser umfangreichster Geschenkkorb — Dom Piri Piri, karamellisierte Nüsse, unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen) und eine Dose handgefertigter Trüffel, in einer roten Geschenkbox mit Schleife, verschenkfertig. Enthält Schalenfrüchte, Milch, Soja und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
-      NL: "Onze meest complete cadeaumand — Dom Piri Piri, gekarameliseerde noten, onze bekroonde Perinhas Bêbedas (dronken peren) en een blikje ambachtelijke truffels, in een rode cadeaudoos met strik, klaar om te geven. Bevat noten, melk, soja en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
-    },
-      images: [cabazPremiumImg],
-  },
+      PT: "Amêndoas de Caramelo com Flor de Sal e as nossas premiadas Perinhas Bêbedas, numa caixa de Natal compacta — o presente perfeito para um gesto simples e genuíno. Contém frutos de casca rija e álcool (vinho fervido); recomenda-se precaução a grávidas.",
+      EN: "Salted caramel almonds and our award-winning Perinhas Bêbedas (drunken pears), in a compact Christmas box — the perfect gift for a simple, genuine gesture. Contains tree nuts and alcohol (boiled wine); caution advised for pregnant women.",
+      DE: "Karamellmandeln mit Fleur de Sel und unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen), in einer kompakten Weihnachtsbox — das perfekte Geschenk für eine einfache, aufrichtige Geste. Enthält Schalenfrüchte und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
+      NL: "Gekarameliseerde amandelen met fleur de sel en onze bekroonde Perinhas Bêbedas (dronken peren), in een compacte kerstdoos — het perfecte cadeau voor een eenvoudig, oprecht gebaar. Bevat noten en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
  ];
 
 function FadeIn({ children, className = "", delay = 0, scale = false }: { children: ReactNode; className?: string; delay?: number; scale?: boolean }) {
