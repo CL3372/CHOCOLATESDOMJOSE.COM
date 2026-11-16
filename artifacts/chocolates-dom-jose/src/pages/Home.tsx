@@ -576,8 +576,7 @@ const products: {
     },
   },
   {
-    id: "cabazes",
-      {
+   
     id: "cabaz_natal_mini",
     price: 1250,
     name: { PT: "Cabaz Natal Mini", EN: "Mini Christmas Hamper", DE: "Mini-Weihnachtskorb", NL: "Mini Kerstmand" },
@@ -611,8 +610,11 @@ const products: {
       DE: "Unser umfangreichster Geschenkkorb — Dom Piri Piri, karamellisierte Nüsse, unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen) und eine Dose handgefertigter Trüffel, in einer roten Geschenkbox mit Schleife, verschenkfertig. Enthält Schalenfrüchte, Milch, Soja und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
       NL: "Onze meest complete cadeaumand — Dom Piri Piri, gekarameliseerde noten, onze bekroonde Perinhas Bêbedas (dronken peren) en een blikje ambachtelijke truffels, in een rode cadeaudoos met strik, klaar om te geven. Bevat noten, melk, soja en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
     },
-    images: [cabazPremiumImg],
+      images: [cabazPremiumImg],
   },
+];
+
+function FadeIn(...
 
 function FadeIn({ children, className = "", delay = 0, scale = false }: { children: ReactNode; className?: string; delay?: number; scale?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -1271,7 +1273,7 @@ export default function Home() {
             <div>
               <div className="mb-8 overflow-hidden rounded-[2rem] border border-white/10">
                 <img
-                  src={cabazImgPro1}
+                  src={cabazPremiumImg}
                   alt=""
                   aria-hidden="true"
                   loading="lazy"
