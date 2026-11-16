@@ -25,11 +25,9 @@ import trufaFestImg from "@assets/52EF516A-0E69-4111-BB45-52077856933F_1_105_c_1
 import piriImg1 from "@assets/dom-piri-piri-whole-jar-web.jpg";
 import benficaBoxImg from "@assets/benfica-truffle-box-web.jpg";
 import crownSrc from "@assets/logo_crown_transparent.png";
-import cabazImgPro1 from "@assets/cabaz-natal-pro-1-web.jpg";
-import cabazImg1 from "@assets/3394A237-FCD2-4AEF-84A0-9E929846C4BE_1_201_a_1775498751104-web.jpg";
-import cabazImg2 from "@assets/6B7C46BB-4F99-4C06-B042-49477038A177_1_105_c_1775498765125-web.jpg";
-import cabazImg3 from "@assets/2F27B28B-3481-45FF-9C0A-4F9CA152FA00_1_105_c_1775498790966-web.jpg";
-import cabazImg4 from "@assets/B32139AA-0033-43EA-9DD9-C46E629306AC_1_105_c_1775498796966-web.jpg";
+import cabazMiniImg from "@assets/cabaz-natal-mini-web.png";
+import cabazClassicoImg from "@assets/cabaz-natal-classico-web.png";
+import cabazPremiumImg from "@assets/cabaz-natal-premium-web.png";
 import greatTasteBadge from "@assets/great-taste-2026-badge.png";
 import { PaymentLogos } from "../components/PaymentLogos";
 
@@ -579,21 +577,42 @@ const products: {
   },
   {
     id: "cabazes",
-    price: 3000,
-    priceIsFrom: true,
-    name: { PT: "Cabazes", EN: "Gift Hampers", DE: "Geschenkkörbe", NL: "Cadeaumanden" },
+      {
+    id: "cabaz_natal_mini",
+    price: 1250,
+    name: { PT: "Cabaz Natal Mini", EN: "Mini Christmas Hamper", DE: "Mini-Weihnachtskorb", NL: "Mini Kerstmand" },
     description: {
-      PT: "Composições exclusivas com os nossos produtos artesanais — ideais para oferta, empresas e ocasiões especiais.",
-      EN: "Exclusive compositions with our artisan products — ideal for gifts, corporate orders and special occasions.",
-      DE: "Exklusive Zusammenstellungen unserer handwerklichen Produkte — ideal für Geschenke, Firmen und besondere Anlässe.",
-      NL: "Exclusieve samenstellingen met onze ambachtelijke producten — ideaal voor cadeaus, bedrijven en bijzondere gelegenheden.",
+      PT: "Frutos secos caramelizados e as nossas premiadas Perinhas Bêbedas, numa caixa de Natal compacta — o presente perfeito para um gesto simples e genuíno. Contém frutos de casca rija e álcool (vinho fervido); recomenda-se precaução a grávidas.",
+      EN: "Candied nuts and our award-winning Perinhas Bêbedas (drunken pears), in a compact Christmas box — the perfect gift for a simple, genuine gesture. Contains tree nuts and alcohol (boiled wine); caution advised for pregnant women.",
+      DE: "Karamellisierte Nüsse und unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen), in einer kompakten Weihnachtsbox — das perfekte Geschenk für eine einfache, aufrichtige Geste. Enthält Schalenfrüchte und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
+      NL: "Gekarameliseerde noten en onze bekroonde Perinhas Bêbedas (dronken peren), in een compacte kerstdoos — het perfecte cadeau voor een eenvoudig, oprecht gebaar. Bevat noten en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
     },
-    // cabazImgPro1: professional Christmas shoot (Oct 2026) — leads the carousel. The
-    // 4 older flat-lay phone shots stay in behind it for now, showing other box
-    // compositions, until more pro photos replace them too.
-    images: [cabazImgPro1, cabazImg1, cabazImg2, cabazImg3, cabazImg4],
+    images: [cabazMiniImg],
   },
-];
+  {
+    id: "cabaz_natal_classico",
+    price: 1700,
+    name: { PT: "Cabaz Natal Clássico", EN: "Classic Christmas Hamper", DE: "Klassischer Weihnachtskorb", NL: "Klassieke Kerstmand" },
+    description: {
+      PT: "Frutos secos caramelizados, as nossas premiadas Perinhas Bêbedas e uma lata de trufas artesanais, numa elegante embalagem de Natal com laço. Contém frutos de casca rija, leite, soja e álcool (vinho fervido); recomenda-se precaução a grávidas.",
+      EN: "Candied nuts, our award-winning Perinhas Bêbedas (drunken pears) and a tin of handmade truffles, in an elegant ribboned Christmas bag. Contains tree nuts, milk, soya and alcohol (boiled wine); caution advised for pregnant women.",
+      DE: "Karamellisierte Nüsse, unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen) und eine Dose handgefertigter Trüffel, in einer eleganten Weihnachtstüte mit Schleife. Enthält Schalenfrüchte, Milch, Soja und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
+      NL: "Gekarameliseerde noten, onze bekroonde Perinhas Bêbedas (dronken peren) en een blikje ambachtelijke truffels, in een elegante kerstzak met strik. Bevat noten, melk, soja en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
+    },
+    images: [cabazClassicoImg],
+  },
+  {
+    id: "cabaz_natal_premium",
+    price: 3500,
+    name: { PT: "Cabaz Natal Premium", EN: "Premium Christmas Hamper", DE: "Premium-Weihnachtskorb", NL: "Premium Kerstmand" },
+    description: {
+      PT: "O nosso cabaz mais completo — Dom Piri Piri, frutos secos caramelizados, as nossas premiadas Perinhas Bêbedas e uma lata de trufas artesanais, numa caixa vermelha com laço, pronta a oferecer. Contém frutos de casca rija, leite, soja e álcool (vinho fervido); recomenda-se precaução a grávidas.",
+      EN: "Our most complete hamper — Dom Piri Piri, candied nuts, our award-winning Perinhas Bêbedas (drunken pears) and a tin of handmade truffles, in a ribboned red gift box, ready to give. Contains tree nuts, milk, soya and alcohol (boiled wine); caution advised for pregnant women.",
+      DE: "Unser umfangreichster Geschenkkorb — Dom Piri Piri, karamellisierte Nüsse, unsere preisgekrönten Perinhas Bêbedas (betrunkene Birnen) und eine Dose handgefertigter Trüffel, in einer roten Geschenkbox mit Schleife, verschenkfertig. Enthält Schalenfrüchte, Milch, Soja und Alkohol (verkochter Wein); Schwangeren wird Vorsicht empfohlen.",
+      NL: "Onze meest complete cadeaumand — Dom Piri Piri, gekarameliseerde noten, onze bekroonde Perinhas Bêbedas (dronken peren) en een blikje ambachtelijke truffels, in een rode cadeaudoos met strik, klaar om te geven. Bevat noten, melk, soja en alcohol (uitgekookte wijn); voorzichtigheid aangeraden voor zwangere vrouwen.",
+    },
+    images: [cabazPremiumImg],
+  },
 
 function FadeIn({ children, className = "", delay = 0, scale = false }: { children: ReactNode; className?: string; delay?: number; scale?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
