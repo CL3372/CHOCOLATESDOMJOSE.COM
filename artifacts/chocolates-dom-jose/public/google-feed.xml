@@ -152,5 +152,7 @@
       <g:brand>Chocolates Dom José</g:brand>
       <g:google_product_category>5697</g:google_product_category>
       <g:product_type>Gourmet &gt; Cabazes de Oferta</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+   </item>
+
   </channel>
-</rss>
