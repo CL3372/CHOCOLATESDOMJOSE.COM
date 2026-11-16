@@ -612,9 +612,7 @@ const products: {
     },
       images: [cabazPremiumImg],
   },
-];
-
-function FadeIn(...
+ ];
 
 function FadeIn({ children, className = "", delay = 0, scale = false }: { children: ReactNode; className?: string; delay?: number; scale?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
