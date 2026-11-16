@@ -110,14 +110,14 @@
       <g:identifier_exists>no</g:identifier_exists>
     </item>
 
-    <item>
-      <g:id>cabazes</g:id>
-      <g:title>Cabazes</g:title>
-      <g:description>Composições exclusivas com os nossos produtos artesanais — ideais para oferta, empresas e ocasiões especiais.</g:description>
+        <item>
+      <g:id>cabaz_natal_mini</g:id>
+      <g:title>Cabaz Natal Mini</g:title>
+      <g:description>Amêndoas de Caramelo com Flor de Sal e as nossas premiadas Perinhas Bêbedas, numa caixa de Natal compacta.</g:description>
       <g:link>https://chocolatesdomjose.com/</g:link>
-      <g:image_link>https://chocolatesdomjose.com/feed/cabazes.jpg</g:image_link>
+      <g:image_link>https://chocolatesdomjose.com/feed/cabaz-natal-mini-web.png</g:image_link>
       <g:availability>in_stock</g:availability>
-      <g:price>30.00 EUR</g:price>
+      <g:price>12.50 EUR</g:price>
       <g:condition>new</g:condition>
       <g:brand>Chocolates Dom José</g:brand>
       <g:google_product_category>5697</g:google_product_category>
@@ -125,5 +125,32 @@
       <g:identifier_exists>no</g:identifier_exists>
     </item>
 
+    <item>
+      <g:id>cabaz_natal_classico</g:id>
+      <g:title>Cabaz Natal Clássico</g:title>
+      <g:description>Amêndoas de Caramelo com Flor de Sal, Perinhas Bêbedas premiadas e uma lata de trufas artesanais, numa elegante embalagem de Natal.</g:description>
+      <g:link>https://chocolatesdomjose.com/</g:link>
+      <g:image_link>https://chocolatesdomjose.com/feed/cabaz-natal-classico-web.png</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>17.00 EUR</g:price>
+      <g:condition>new</g:condition>
+      <g:brand>Chocolates Dom José</g:brand>
+      <g:google_product_category>5697</g:google_product_category>
+      <g:product_type>Gourmet &gt; Cabazes de Oferta</g:product_type>
+      <g:identifier_exists>no</g:identifier_exists>
+    </item>
+
+    <item>
+      <g:id>cabaz_natal_premium</g:id>
+      <g:title>Cabaz Natal Premium</g:title>
+      <g:description>O nosso cabaz mais completo — Dom Piri Piri, Amêndoas de Caramelo com Flor de Sal, Perinhas Bêbedas premiadas e uma lata de trufas artesanais, numa caixa vermelha com laço.</g:description>
+      <g:link>https://chocolatesdomjose.com/</g:link>
+      <g:image_link>https://chocolatesdomjose.com/feed/cabaz-natal-premium-web.png</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>35.00 EUR</g:price>
+      <g:condition>new</g:condition>
+      <g:brand>Chocolates Dom José</g:brand>
+      <g:google_product_category>5697</g:google_product_category>
+      <g:product_type>Gourmet &gt; Cabazes de Oferta</g:product_type>
   </channel>
 </rss>
