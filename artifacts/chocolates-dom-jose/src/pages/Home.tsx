@@ -1431,6 +1431,14 @@ export default function Home() {
           >
             {lang === "PT" ? "Política de Privacidade" : lang === "DE" ? "Datenschutz" : lang === "NL" ? "Privacybeleid" : "Privacy Policy"}
           </a>
+          <span className="text-white/20">·</span>
+          <a
+            href="#cookies"
+            data-cookie-settings=""
+            className="text-white/50 hover:text-yellow-300 transition"
+          >
+            Cookies
+          </a>
         </div>
         <p>&copy; {new Date().getFullYear()} Nelson &amp; Carla Louro Lda · NIPC 513070389. {t.footer}</p>
       </footer>
