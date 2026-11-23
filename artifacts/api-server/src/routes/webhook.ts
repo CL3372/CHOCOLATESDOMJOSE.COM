@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { sendEmail, sendTelegram, sendCustomerConfirmation } from "../lib/notify.js";
+import { sendEmail, sendTelegram, sendCustomerConfirmation, sendInvoiceEmail } from "../lib/notify.js";
 import {
   getPendingOrder,
   deletePendingOrder,
@@ -100,7 +100,7 @@ webhookRouter.post("/webhook/easypay", webhookLimiter, async (req, res) => {
           `⚠️ Fatura NÃO emitida — valor pago (€${amountStr}) não corresponde ao total da encomenda (€${stored.totalEur.toFixed(2)}). Verifique manualmente.\n`;
       } else {
         try {
-          const result = await issueInvoiceReceipt({
+                   const result = await issueInvoiceReceipt({
             customer: stored.customer,
             shipping: stored.shipping,
             items: stored.items,
@@ -108,10 +108,26 @@ webhookRouter.post("/webhook/easypay", webhookLimiter, async (req, res) => {
             paymentMethodLabel: methodLabel,
             paymentRef: paymentId,
           });
+
+          let invoiceEmailed = false;
+          if (result.pdfUrl && stored.customer.email) {
+            try {
+              invoiceEmailed = await sendInvoiceEmail({
+                customerEmail: stored.customer.email,
+                customerName: stored.customer.name,
+                documentNumber: result.document_number || String(result.document_id),
+                pdfUrl: result.pdfUrl,
+                lang: stored.lang,
+              });
+            } catch (mailErr: any) {
+              req.log.error({ err: mailErr?.message }, "Invoice email error");
+            }
+          }
+
           faturaLine =
             `📄 Fatura-Recibo: ${result.document_number || result.document_id}` +
-            (result.emailedTo
-              ? ` (enviada para ${result.emailedTo})`
+            (invoiceEmailed
+              ? ` (enviada para ${stored.customer.email})`
               : ` (NÃO enviada por email — verifique Moloni)`) +
             `\n`;
           await deletePendingOrder(orderKey);
