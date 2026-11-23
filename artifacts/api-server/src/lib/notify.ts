@@ -330,6 +330,108 @@ export async function sendCustomerConfirmation(order: OrderDetails): Promise<voi
   console.log(`Customer confirmation (${lang}) sent to ${order.customerEmail}`);
 }
 
+const INVOICE_EMAIL_COPY: Record<
+  Lang,
+  { subject: (docNumber: string) => string; greeting: (name: string) => string; body: string; signature: string }
+> = {
+  PT: {
+    subject: (n) => `A sua fatura-recibo ${n} — Chocolates Dom José`,
+    greeting: (name) => `Olá ${name || ""},`.trim(),
+    body: "Em anexo encontra a fatura-recibo da sua encomenda. Obrigado pela sua compra!",
+    signature: "Com os melhores cumprimentos,<br/>Chocolates Dom José",
+  },
+  EN: {
+    subject: (n) => `Your invoice-receipt ${n} — Chocolates Dom José`,
+    greeting: (name) => `Hello ${name || ""},`.trim(),
+    body: "Please find your order's invoice-receipt attached. Thank you for your purchase!",
+    signature: "Kind regards,<br/>Chocolates Dom José",
+  },
+  DE: {
+    subject: (n) => `Ihre Rechnung ${n} — Chocolates Dom José`,
+    greeting: (name) => `Hallo ${name || ""},`.trim(),
+    body: "Im Anhang finden Sie die Rechnung zu Ihrer Bestellung. Vielen Dank für Ihren Einkauf!",
+    signature: "Mit freundlichen Grüßen,<br/>Chocolates Dom José",
+  },
+  NL: {
+    subject: (n) => `Uw factuur ${n} — Chocolates Dom José`,
+    greeting: (name) => `Hallo ${name || ""},`.trim(),
+    body: "In de bijlage vindt u de factuur van uw bestelling. Bedankt voor uw aankoop!",
+    signature: "Met vriendelijke groet,<br/>Chocolates Dom José",
+  },
+};
+
+/**
+ * Downloads the invoice PDF from the Moloni-issued link and emails it to the
+ * customer as an attachment, using our own SMTP (the same one that sends the
+ * order confirmation) — because Moloni's API has no built-in "email this
+ * document to the customer" call. Returns true only if the email was
+ * actually sent, so the caller can log an accurate status.
+ */
+export async function sendInvoiceEmail(args: {
+  customerEmail: string;
+  customerName: string;
+  documentNumber: string;
+  pdfUrl: string;
+  lang?: Lang;
+}): Promise<boolean> {
+  const cfg = buildTransport();
+  if (!cfg) {
+    console.warn("No SMTP/Gmail credentials configured — skipping invoice email");
+    return false;
+  }
+  if (!args.customerEmail || !args.pdfUrl) return false;
+
+  let buf: Buffer;
+  try {
+    const res = await fetch(args.pdfUrl);
+    if (!res.ok) {
+      console.error("Invoice PDF download failed, HTTP", res.status);
+      return false;
+    }
+    const contentType = res.headers.get("content-type") || "";
+    buf = Buffer.from(await res.arrayBuffer());
+    if (!contentType.includes("pdf") && buf.length < 500) {
+      console.error(
+        "Invoice PDF download did not look like a PDF (content-type:",
+        contentType,
+        ", size:",
+        buf.length,
+        "bytes)"
+      );
+      return false;
+    }
+  } catch (e) {
+    console.error("Invoice PDF download error:", e);
+    return false;
+  }
+
+  const lang: Lang = args.lang ?? "PT";
+  const copy = INVOICE_EMAIL_COPY[lang] ?? INVOICE_EMAIL_COPY.PT;
+
+  const html = `
+  <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#333">
+    <p>${copy.greeting(escapeHtml(args.customerName || ""))}</p>
+    <p>${copy.body}</p>
+    <p style="margin-top:24px;color:#555">${copy.signature}</p>
+  </div>`;
+
+  await cfg.transporter.sendMail({
+    from: cfg.from,
+    to: args.customerEmail,
+    subject: copy.subject(args.documentNumber),
+    html,
+    attachments: [
+      {
+        filename: `${(args.documentNumber || "fatura").replace(/[^a-zA-Z0-9_-]/g, "_")}.pdf`,
+        content: buf,
+        contentType: "application/pdf",
+      },
+    ],
+  });
+  console.log(`Invoice email (${lang}) sent to ${args.customerEmail}`);
+  return true;
+}
+
 export async function notifyOrder(order: OrderDetails) {
   const text = buildOrderText(order);
   const subject =
