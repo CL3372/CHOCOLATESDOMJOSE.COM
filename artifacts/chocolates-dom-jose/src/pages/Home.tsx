@@ -3,6 +3,7 @@ import { useCart, type Lang } from "@/context/CartContext";
 import CartDrawer from "@/components/CartDrawer";
 import { detectLang, setLangInUrl } from "@/lib/lang";
 import { getActiveSeason, SEASONAL_GREETING } from "@/lib/seasonalGreeting";
+import { ChristmasBanner, ChristmasSky } from "@/components/ChristmasDecor";
 import logoSrc from "@assets/logo_bw_transparent.png";
 import trufaImg1 from "@assets/4601CB5C-1354-4ED9-A3C5-D566E3957B7B_1775497051986-web.jpg";
 // Product photos below are phone shots pending the professional Bombarral shoot.
@@ -1010,6 +1011,10 @@ export default function Home() {
   // harmless console warning, not a visible break. Redeploying periodically
   // keeps this effectively always correct in practice.
   const season = getActiveSeason();
+  // During the Christmas season the hampers move to the front of the grid.
+  const shownProducts = season === "christmas"
+    ? [...products.filter((p) => p.id.startsWith("cabaz_natal")), ...products.filter((p) => !p.id.startsWith("cabaz_natal"))]
+    : products;
   const { openCart, count } = useCart();
 
   const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
@@ -1114,6 +1119,8 @@ export default function Home() {
           : "Shipping across Portugal and internationally too ✈️ · Free shipping in Portugal on orders over €100"}
       </div>
 
+      {season === "christmas" && <ChristmasBanner lang={lang} />}
+
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/10 bg-black">
         <img
@@ -1131,7 +1138,8 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black" />
         {/* Warm amber glow */}
         <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(ellipse 70% 50% at 50% 30%, rgba(180,100,20,0.18) 0%, transparent 70%)" }} />
-        <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
+        <ChristmasSky />
+        <div className="relative z-[2] mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-24">
 
           {/* Language switcher + cart */}
           <div className="mb-8 flex items-center justify-end gap-4">
@@ -1241,7 +1249,7 @@ export default function Home() {
         </FadeIn>
 
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-          {products.map((product, idx) => (
+          {shownProducts.map((product, idx) => (
             // Stagger resets every row (idx % 3, matching the xl:grid-cols-3
             // layout) instead of accumulating across the whole grid — rows
             // scroll into view together, so a purely index-based delay would

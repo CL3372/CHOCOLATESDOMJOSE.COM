@@ -295,3 +295,53 @@
 #replit-badge {
   display: none !important;
 }
+
+/* ── Christmas decorations (ChristmasDecor.tsx) ───────────────────────── */
+@keyframes xmasFly {
+  0%   { transform: translateX(-340px) translateY(0); opacity: 0; }
+  4%   { opacity: 1; }
+  55%  { opacity: 1; }
+  60%  { transform: translateX(calc(100vw + 40px)) translateY(-40px); opacity: 0; }
+  100% { transform: translateX(calc(100vw + 40px)) translateY(-40px); opacity: 0; }
+}
+@keyframes xmasBob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-8px) rotate(1deg); }
+}
+@keyframes xmasGallop {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2.5px); }
+}
+@keyframes xmasTwinkle {
+  0%, 100% { opacity: 0.2; }
+  50%      { opacity: 1; }
+}
+@keyframes xmasSnow {
+  0%   { transform: translate(0, -10px); opacity: 0; }
+  10%  { opacity: 0.85; }
+  100% { transform: translate(var(--drift, 0), 110vh); opacity: 0; }
+}
+.xmas-sleigh {
+  position: absolute;
+  top: 5.5rem;
+  left: 0;
+  filter: drop-shadow(0 0 5px rgba(255, 236, 190, 0.6));
+  animation: xmasFly 26s linear infinite;
+  animation-delay: 1.5s;
+  opacity: 0;
+}
+.xmas-bob { animation: xmasBob 2.4s ease-in-out infinite; }
+.xmas-gallop { animation: xmasGallop 0.5s ease-in-out infinite; }
+.xmas-twinkle { animation: xmasTwinkle 0.9s ease-in-out infinite; }
+.xmas-flake {
+  position: absolute;
+  top: 0;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.85);
+  animation-name: xmasSnow;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .xmas-sky { display: none; }
+}

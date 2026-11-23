@@ -48,7 +48,7 @@ function isWithinWindow(now: Date, target: Date, daysBefore: number, daysAfter: 
  * home market — notably Dia do Pai (19 March) and Dia da Mãe (first Sunday
  * of May), both of which differ from the US/UK dates used elsewhere.
  * Each window opens 10 days before the occasion (gift-buying lead time) and
- * closes on the day itself, except Christmas (a fixed Dec 1-25 range) and
+ * closes on the day itself, except Christmas (20 Nov – 6 Jan) and
  * Easter (which stays open through Easter Monday).
  */
 export function getActiveSeason(now: Date = new Date()): Season | null {
@@ -63,9 +63,11 @@ export function getActiveSeason(now: Date = new Date()): Season | null {
   const mothersDay = firstSundayOfMay(year);
   if (isWithinWindow(now, mothersDay, 10, 0)) return "mothers-day";
 
-  const christmasStart = new Date(year, 11, 1);
-  const christmasEnd = new Date(year, 11, 25, 23, 59, 59, 999);
-  if (now >= christmasStart && now <= christmasEnd) return "christmas";
+  // Christmas runs from 20 November through Dia de Reis (6 January), so the
+  // festive look covers the whole gift-buying period and the holidays after.
+  const christmasStart = new Date(year, 10, 20);
+  const reisEnd = new Date(year, 0, 6, 23, 59, 59, 999);
+  if (now >= christmasStart || now <= reisEnd) return "christmas";
 
   return null;
 }
