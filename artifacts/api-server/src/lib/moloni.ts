@@ -387,7 +387,7 @@ export type IssueInvoiceArgs = {
 export type IssueInvoiceResult = {
   document_id: number;
   document_number: string;
-  emailedTo?: string;
+  pdfUrl?: string;
 };
 
 export async function issueInvoiceReceipt(
@@ -452,26 +452,25 @@ export async function issueInvoiceReceipt(
   const documentNumber: string =
     inv?.entity_document_number ?? inv?.document_set_name ?? String(inv?.document_id ?? "");
 
-  let emailedTo: string | undefined;
-  if (order.customer.email) {
-    try {
-      await moloniCall("documents/sendEmailDocumentToCustomer", {
-        company_id,
-        document_id: inv.document_id,
-        email: order.customer.email,
-        msg:
-          "Em anexo encontra a sua fatura-recibo.\n\n" +
-          "Obrigado pela sua encomenda!\n\nChocolates Dom José\nhttps://chocolatesdomjose.com",
-      });
-      emailedTo = order.customer.email;
-    } catch (e) {
-      console.error("Moloni sendEmailDocumentToCustomer (non-fatal):", e);
-    }
+   // Moloni's API has no endpoint to email a document to the customer directly
+  // (we confirmed "documents/sendEmailDocumentToCustomer" does not exist — it
+  // previously 404'd on every order). Instead we fetch a PDF link for the
+  // issued document here; the caller (webhook.ts) downloads it and emails it
+  // via our own working SMTP, alongside the order confirmation.
+  let pdfUrl: string | undefined;
+  try {
+    const pdfRes: any = await moloniCall("documents/getPDFLink", {
+      company_id,
+      document_id: inv.document_id,
+    });
+    pdfUrl = pdfRes?.url;
+  } catch (e) {
+    console.error("Moloni getPDFLink error (non-fatal):", e);
   }
 
   return {
     document_id: inv.document_id,
     document_number: documentNumber,
-    emailedTo,
+    pdfUrl,
   };
 }
