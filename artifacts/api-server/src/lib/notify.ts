@@ -448,3 +448,257 @@ export async function notifyOrder(order: OrderDetails) {
     sendTelegram(text),
   ]);
 }
+
+export type CartRecoveryStage = "reminder" | "proof" | "deadline";
+
+export type CartRecoveryOrder = {
+  customerName: string;
+  customerEmail: string;
+  items: { name: string; quantity: number; unitPriceEur: number }[];
+  totalEur: number;
+  lang: Lang;
+};
+
+type CartRecoveryCopy = {
+  subject: string;
+  greeting: (name: string) => string;
+  intro: string;
+  // "proof" only
+  awardLine?: string;
+  quoteLabel?: string;
+  // "deadline" only — {date} is replaced with the formatted cutoff date
+  deadlineLine?: (date: string) => string;
+  itemsTitle: string;
+  totalLabel: string;
+  cta: string;
+  signature: string;
+};
+
+// The judges' quote is the exact wording already published on the site next
+// to the Great Taste badge (Home.tsx) — never invent review/award text.
+const GREAT_TASTE_QUOTE =
+  "A fun little product with a complex spiced aroma and fascinating appearance. On the tongue the spices remain and are well defined if a little more gentle than had been expected. The texture of the pear remains excellent, providing for a satisfying bite.";
+
+const CART_RECOVERY_COPY: Record<Lang, Record<CartRecoveryStage, CartRecoveryCopy>> = {
+  PT: {
+    reminder: {
+      subject: "Ainda tem um carrinho à sua espera — Chocolates Dom José",
+      greeting: (n) => `Olá ${n || ""},`.trim(),
+      intro:
+        "Reparámos que começou uma encomenda na nossa loja mas não chegou a concluir o pagamento. Ficou tudo guardado, se quiser terminar:",
+      itemsTitle: "🛍 O que tinha no carrinho",
+      totalLabel: "Total",
+      cta: "Terminar a minha encomenda",
+      signature: "Com os melhores cumprimentos,<br/>Chocolates Dom José",
+    },
+    proof: {
+      subject: "Um prémio Great Taste pode ajudar a decidir — Chocolates Dom José",
+      greeting: (n) => `Olá ${n || ""},`.trim(),
+      intro:
+        "A sua encomenda continua guardada. Entretanto, talvez isto ajude a decidir: as nossas Perinhas Bêbedas receberam 1 Estrela nos Great Taste Awards 2026, um dos prémios mais respeitados do mundo gourmet.",
+      awardLine: "🏅 Great Taste 2026 · 1 Estrela",
+      quoteLabel: "O que disseram os jurados:",
+      itemsTitle: "🛍 O que tinha no carrinho",
+      totalLabel: "Total",
+      cta: "Terminar a minha encomenda",
+      signature: "Com os melhores cumprimentos,<br/>Chocolates Dom José",
+    },
+    deadline: {
+      subject: "Último prazo para chegar antes do Natal — Chocolates Dom José",
+      greeting: (n) => `Olá ${n || ""},`.trim(),
+      intro: "A sua encomenda ainda está guardada, mas o prazo para garantir a entrega antes do Natal está a aproximar-se.",
+      deadlineLine: (date) => `📅 Para chegar antes do Natal, a encomenda precisa de ser feita até ${date}.`,
+      itemsTitle: "🛍 O que tinha no carrinho",
+      totalLabel: "Total",
+      cta: "Terminar a minha encomenda",
+      signature: "Com os melhores cumprimentos,<br/>Chocolates Dom José",
+    },
+  },
+  EN: {
+    reminder: {
+      subject: "You still have a cart waiting — Chocolates Dom José",
+      greeting: (n) => `Hello ${n || ""},`.trim(),
+      intro:
+        "We noticed you started an order on our site but didn't finish checking out. Everything's still saved if you'd like to complete it:",
+      itemsTitle: "🛍 What was in your cart",
+      totalLabel: "Total",
+      cta: "Finish my order",
+      signature: "Kind regards,<br/>Chocolates Dom José",
+    },
+    proof: {
+      subject: "A Great Taste award might help you decide — Chocolates Dom José",
+      greeting: (n) => `Hello ${n || ""},`.trim(),
+      intro:
+        "Your order is still saved. In the meantime, this might help: our Perinhas Bêbedas (Drunken Pears) won 1 Star at the Great Taste Awards 2026, one of the most respected awards in the gourmet food world.",
+      awardLine: "🏅 Great Taste 2026 · 1 Star",
+      quoteLabel: "What the judges said:",
+      itemsTitle: "🛍 What was in your cart",
+      totalLabel: "Total",
+      cta: "Finish my order",
+      signature: "Kind regards,<br/>Chocolates Dom José",
+    },
+    deadline: {
+      subject: "Last chance to arrive before Christmas — Chocolates Dom José",
+      greeting: (n) => `Hello ${n || ""},`.trim(),
+      intro: "Your order is still saved, but the deadline to guarantee delivery before Christmas is approaching.",
+      deadlineLine: (date) => `📅 To arrive before Christmas, the order needs to be placed by ${date}.`,
+      itemsTitle: "🛍 What was in your cart",
+      totalLabel: "Total",
+      cta: "Finish my order",
+      signature: "Kind regards,<br/>Chocolates Dom José",
+    },
+  },
+  DE: {
+    reminder: {
+      subject: "Ihr Warenkorb wartet noch — Chocolates Dom José",
+      greeting: (n) => `Hallo ${n || ""},`.trim(),
+      intro:
+        "Uns ist aufgefallen, dass Sie eine Bestellung begonnen, aber den Bezahlvorgang nicht abgeschlossen haben. Alles ist noch gespeichert, falls Sie sie abschließen möchten:",
+      itemsTitle: "🛍 Ihr Warenkorb",
+      totalLabel: "Gesamt",
+      cta: "Bestellung abschließen",
+      signature: "Mit freundlichen Grüßen,<br/>Chocolates Dom José",
+    },
+    proof: {
+      subject: "Eine Great-Taste-Auszeichnung könnte Ihnen helfen — Chocolates Dom José",
+      greeting: (n) => `Hallo ${n || ""},`.trim(),
+      intro:
+        "Ihre Bestellung ist noch gespeichert. Vielleicht hilft das bei der Entscheidung: Unsere Perinhas Bêbedas (betrunkene Birnen) gewannen 1 Stern bei den Great Taste Awards 2026, einer der angesehensten Auszeichnungen der Gourmet-Welt.",
+      awardLine: "🏅 Great Taste 2026 · 1 Stern",
+      quoteLabel: "Das sagten die Juroren:",
+      itemsTitle: "🛍 Ihr Warenkorb",
+      totalLabel: "Gesamt",
+      cta: "Bestellung abschließen",
+      signature: "Mit freundlichen Grüßen,<br/>Chocolates Dom José",
+    },
+    deadline: {
+      subject: "Letzte Chance vor Weihnachten — Chocolates Dom José",
+      greeting: (n) => `Hallo ${n || ""},`.trim(),
+      intro: "Ihre Bestellung ist noch gespeichert, aber die Frist für eine Lieferung vor Weihnachten rückt näher.",
+      deadlineLine: (date) => `📅 Damit die Bestellung noch vor Weihnachten ankommt, muss sie bis zum ${date} aufgegeben werden.`,
+      itemsTitle: "🛍 Ihr Warenkorb",
+      totalLabel: "Gesamt",
+      cta: "Bestellung abschließen",
+      signature: "Mit freundlichen Grüßen,<br/>Chocolates Dom José",
+    },
+  },
+  NL: {
+    reminder: {
+      subject: "Uw winkelmandje wacht nog op u — Chocolates Dom José",
+      greeting: (n) => `Hallo ${n || ""},`.trim(),
+      intro:
+        "We merkten dat u een bestelling begon op onze site, maar het afrekenen niet hebt afgerond. Alles is nog opgeslagen als u het wilt afronden:",
+      itemsTitle: "🛍 Wat er in uw mandje zat",
+      totalLabel: "Totaal",
+      cta: "Bestelling afronden",
+      signature: "Met vriendelijke groet,<br/>Chocolates Dom José",
+    },
+    proof: {
+      subject: "Een Great Taste-onderscheiding kan u helpen beslissen — Chocolates Dom José",
+      greeting: (n) => `Hallo ${n || ""},`.trim(),
+      intro:
+        "Uw bestelling is nog opgeslagen. Misschien helpt dit bij uw beslissing: onze Perinhas Bêbedas (dronken peren) wonnen 1 Ster bij de Great Taste Awards 2026, een van de meest gerespecteerde onderscheidingen in de gastronomische wereld.",
+      awardLine: "🏅 Great Taste 2026 · 1 Ster",
+      quoteLabel: "Wat de jury zei:",
+      itemsTitle: "🛍 Wat er in uw mandje zat",
+      totalLabel: "Totaal",
+      cta: "Bestelling afronden",
+      signature: "Met vriendelijke groet,<br/>Chocolates Dom José",
+    },
+    deadline: {
+      subject: "Laatste kans om voor Kerstmis te ontvangen — Chocolates Dom José",
+      greeting: (n) => `Hallo ${n || ""},`.trim(),
+      intro: "Uw bestelling is nog opgeslagen, maar de deadline om levering voor Kerstmis te garanderen komt dichterbij.",
+      deadlineLine: (date) => `📅 Om voor Kerstmis te ontvangen, moet de bestelling uiterlijk op ${date} geplaatst worden.`,
+      itemsTitle: "🛍 Wat er in uw mandje zat",
+      totalLabel: "Totaal",
+      cta: "Bestelling afronden",
+      signature: "Met vriendelijke groet,<br/>Chocolates Dom José",
+    },
+  },
+};
+
+function buildCartRecoveryHtml(
+  order: CartRecoveryOrder,
+  copy: CartRecoveryCopy,
+  deadlineDateLabel?: string
+): string {
+  const itemsRows = order.items
+    .map(
+      (i) =>
+        `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee">${i.quantity}× ${escapeHtml(i.name)}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right">€${(i.unitPriceEur * i.quantity).toFixed(2)}</td></tr>`
+    )
+    .join("");
+
+  return `
+  <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#333">
+    <h2 style="background:#5a2a0a;color:#fff;padding:14px;margin:0;border-radius:6px 6px 0 0">🍫 Chocolates Dom José</h2>
+    <div style="border:1px solid #ddd;border-top:0;padding:18px;border-radius:0 0 6px 6px">
+      <p style="font-size:16px">${copy.greeting(escapeHtml(order.customerName || ""))}</p>
+      <p>${copy.intro}</p>
+
+      ${
+        copy.awardLine
+          ? `<div style="background:#fff8ef;border:1px solid #f0d9b5;padding:12px;border-radius:6px;margin:14px 0">
+               <p style="margin:0 0 6px 0;font-weight:bold;color:#5a2a0a">${copy.awardLine}</p>
+               ${copy.quoteLabel ? `<p style="margin:0 0 4px 0;font-size:13px;color:#666">${copy.quoteLabel}</p>` : ""}
+               <p style="margin:0;font-style:italic">"${escapeHtml(GREAT_TASTE_QUOTE)}"</p>
+             </div>`
+          : ""
+      }
+
+      ${
+        copy.deadlineLine && deadlineDateLabel
+          ? `<p style="background:#fdeeee;border:1px solid #f3c6c6;padding:12px;border-radius:6px;font-weight:bold;color:#a33">${copy.deadlineLine(deadlineDateLabel)}</p>`
+          : ""
+      }
+
+      <h4 style="margin-bottom:4px;margin-top:18px">${copy.itemsTitle}</h4>
+      <table style="width:100%;border-collapse:collapse">${itemsRows}</table>
+      <p style="margin-top:14px;font-size:18px"><strong>${copy.totalLabel}: €${order.totalEur.toFixed(2)}</strong></p>
+
+      <p style="margin-top:22px">
+        <a href="https://chocolatesdomjose.com" style="display:inline-block;background:#5a2a0a;color:#fff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold">${copy.cta}</a>
+      </p>
+
+      <p style="margin-top:24px;color:#555;font-size:13px">
+        ${copy.signature}<br/>
+        <a href="https://chocolatesdomjose.com" style="color:#5a2a0a">chocolatesdomjose.com</a>
+      </p>
+    </div>
+  </div>`;
+}
+
+/**
+ * Sends one stage of the abandoned-checkout recovery sequence. Called by the
+ * daily cart-recovery cron (routes/cron.ts), never directly from checkout —
+ * this is a reminder about an order the customer already started, not cold
+ * marketing, and it only ever fires once per stage per order (the cron
+ * tracks that via StoredOrder.remindersSent).
+ */
+export async function sendCartRecoveryEmail(
+  order: CartRecoveryOrder,
+  stage: CartRecoveryStage,
+  deadlineDateLabel?: string
+): Promise<boolean> {
+  const cfg = buildTransport();
+  if (!cfg) {
+    console.warn("No SMTP/Gmail credentials configured — skipping cart recovery email");
+    return false;
+  }
+  if (!order.customerEmail) return false;
+
+  const lang: Lang = order.lang ?? "PT";
+  const copy = (CART_RECOVERY_COPY[lang] ?? CART_RECOVERY_COPY.PT)[stage];
+
+  const html = buildCartRecoveryHtml(order, copy, deadlineDateLabel);
+
+  await cfg.transporter.sendMail({
+    from: cfg.from,
+    to: order.customerEmail,
+    subject: copy.subject,
+    html,
+  });
+  console.log(`Cart recovery email (${stage}/${lang}) sent to ${order.customerEmail}`);
+  return true;
+}
