@@ -24,8 +24,11 @@ export type StoredOrder = {
     country: string;
   };
   items: StoredOrderItem[];
-  totalEur: number;
+   totalEur: number;
   lang: Lang;
+  // Which abandoned-checkout recovery emails have already gone out for this
+  // order, so the daily cron never sends the same stage twice.
+  remindersSent?: ("reminder" | "proof" | "deadline")[];
 };
 
 const TTL_MS = 24 * 60 * 60 * 1000;
@@ -64,6 +67,31 @@ export async function getPendingOrder(orderKey: string): Promise<StoredOrder | u
   return row.data as StoredOrder;
 }
 
+/**
+ * List every still-pending (unpaid) order, regardless of age — used by the
+ * cart-recovery cron, which needs to see orders older than the 24h TTL that
+ * getPendingOrder() enforces for invoice-matching. Does not delete anything;
+ * the cron decides what's too old to bother with.
+ */
+export async function listPendingOrders(): Promise<
+  { orderKey: string; data: StoredOrder; createdAt: Date }[]
+> {
+  const rows = await db.select().from(pendingOrdersTable);
+  return rows.map((row) => ({
+    orderKey: row.orderKey,
+    data: row.data as StoredOrder,
+    createdAt: row.createdAt,
+  }));
+}
+
+/** Overwrite the stored data for a pending order (e.g. to record that a
+ * recovery email stage was just sent), without touching its createdAt. */
+export async function updatePendingOrderData(orderKey: string, data: StoredOrder): Promise<void> {
+  await db
+    .update(pendingOrdersTable)
+    .set({ data })
+    .where(eq(pendingOrdersTable.orderKey, orderKey));
+}
 export async function deletePendingOrder(orderKey: string): Promise<void> {
   await db.delete(pendingOrdersTable).where(eq(pendingOrdersTable.orderKey, orderKey));
 }
