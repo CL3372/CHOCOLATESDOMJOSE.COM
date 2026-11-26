@@ -14,5 +14,8 @@
         { "key": "Content-Disposition", "value": "attachment; filename=\"catalogo-dom-jose.pdf\"" }
       ]
     }
+  ],
+  "crons": [
+    { "path": "/api/cron/cart-recovery", "schedule": "0 9 * * *" }
   ]
 }
