@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { startCheckout, type CheckoutInstance } from "@easypaypt/checkout-sdk";
+import { startCheckout, type CheckoutInstance, type CheckoutOutput } from "@easypaypt/checkout-sdk";
 import { useCart, type Lang } from "../context/CartContext";
 import { calculateShippingCents, PT_FREE_SHIPPING_THRESHOLD_CENTS } from "../lib/shipping";
 
@@ -250,7 +250,28 @@ export default function CartDrawer({ lang }: { lang: Lang }) {
       id: "easypay-checkout",
       display: "inline",
       language: toEasyPayLanguage(lang),
-      onSuccess: () => {
+           onSuccess: (successInfo: CheckoutOutput) => {
+        // EasyPay calls onSuccess once the Checkout *form* is done, not once
+        // money has actually moved. For an instant method (card, MB WAY) the
+        // reported status is "paid"/"success". For Multibanco it's "pending"
+        // — the customer still has to go pay the Entity+Reference at an ATM
+        // or in their banking app, and nothing has been charged yet. Only
+        // show the real "payment confirmed" page for an actually-paid status;
+        // otherwise send them to a page that's honest about what's pending.
+        // The authoritative confirmation (invoice + emails) only ever comes
+        // from the EasyPay webhook once it verifies the payment server-side
+        // (see routes/webhook.ts) — never from this client-side callback.
+        const status = successInfo?.payment?.status;
+        if (status !== "paid" && status !== "success") {
+          const p = successInfo?.payment ?? {};
+          const params = new URLSearchParams({ lang });
+          if (p.entity) params.set("entity", p.entity);
+          if (p.reference) params.set("reference", p.reference);
+          if (p.value != null) params.set("value", String(p.value));
+          if (p.expirationDate) params.set("expirationDate", p.expirationDate);
+          window.location.href = `/checkout/pending?${params.toString()}`;
+          return;
+        }
         clearCart();
         window.location.href = `/checkout/success?lang=${lang}`;
       },
