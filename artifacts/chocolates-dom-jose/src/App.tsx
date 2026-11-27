@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import CheckoutSuccess from "@/pages/CheckoutSuccess";
+import CheckoutPending from "@/pages/CheckoutPending";
 import CheckoutCancel from "@/pages/CheckoutCancel";
 import { TermsPage, PrivacyPage } from "@/pages/Legal";
 import { CartProvider } from "@/context/CartContext";
@@ -15,7 +16,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/checkout/success" component={CheckoutSuccess} />
+            <Route path="/checkout/success" component={CheckoutSuccess} />
+      <Route path="/checkout/pending" component={CheckoutPending} />
       <Route path="/checkout/cancel" component={CheckoutCancel} />
       <Route path="/termos"><TermsPage defaultLang="PT" /></Route>
       <Route path="/terms"><TermsPage defaultLang="EN" /></Route>
